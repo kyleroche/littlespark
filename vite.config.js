@@ -5,6 +5,7 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       input: {
         home: "index.html",
+        howto: "how-to/index.html",
         learn: "learn/index.html",
         signin: "signin/index.html",
       },

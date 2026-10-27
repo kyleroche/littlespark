@@ -57,6 +57,7 @@ test("sign-in, magic links, home, gear assets, and API routes remain public", as
   for (const path of [
     "/",
     "/signin/",
+    "/how-to/",
     "/login/otter-robot-test",
     "/parent-login/test",
     "/images/blink-circuit.png",

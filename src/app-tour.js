@@ -3,14 +3,14 @@ export const TOUR_STEPS = [
   {
     id: "home-store",
     feature: "home-store",
-    target: "#account-button",
-    title: "Home, lessons, and gear",
+    target: "#how-to-link",
+    title: "Home, How-to, and gear",
     description:
-      "Home explains how the project works. Open the lab takes you to the workbench after sign-in. Gear store opens the Little Spark apparel store in a new tab.",
+      "Home explains the project. How-to walks through family profiles, the first circuit, and progress. Gear store opens the Little Spark apparel store.",
     tip: "Your workbench stays here.",
     detail:
-      "The store link is beside Sign in on the home page and beside Home in the lab. Switch back to this tab to continue building. Your saved lesson progress stays separate from the store.",
-    action: "Show the home and store links",
+      "How-to and Gear store open in new tabs from the lab, so switch back here to keep building. Home also links to the guide. Your lesson progress stays separate from the store.",
+    action: "Show the help links",
     demo: "home-store",
   },
   {
@@ -35,7 +35,7 @@ export const TOUR_STEPS = [
       "After signing in as a parent, create child profiles, see lesson progress, and generate a temporary login link or QR code for each child.",
     tip: "Use the link on the child’s device.",
     detail:
-      "Parents can rename profiles and sign out a child’s devices. Child profiles only access their own progress.",
+      "Each child has their own progress. Links work once and expire after five minutes; that does not limit lesson time. Use the child’s device. Parents can edit profiles or sign out a child’s devices.",
     action: "Open family accounts",
     demo: "accounts",
   },

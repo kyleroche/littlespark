@@ -11,6 +11,14 @@ Every addition, removal, or change to a user-facing feature MUST update the in-a
 - Run `npm test` and `npm run build`, then check the changed feature and its tutorial in the browser before publishing. Tutorial coverage tests must pass.
 - The app tour must preserve circuit-lesson progress. Practice actions must never automatically request USB access or upload to a physical board.
 
+## Keep the How-to and home page current
+
+- Every addition, removal, rename, or behavior change that affects user instructions MUST update `/how-to/` (`how-to/index.html`) in the same change. Keep the sequence, button labels, expected feedback, recovery steps, and parent/child roles accurate. Describe only shipped behavior.
+- For major user-facing features—new lessons or supported boards, sign-in or family profiles, progress saving, workspace/editor controls, simulation, or real-board workflows—MUST also update the relevant home-page explanation, FAQ, and call to action in `index.html` in the same change. Routine fixes that do not change the public explanation do not need extra marketing copy.
+- Keep the public How-to, home page, and in-app tour consistent. Preserve the distinction between a five-minute one-use login link and the learner’s signed-in lesson time; between parent practice and child saved progress; and between virtual program checks and physical wiring checks.
+- Keep guide links reachable from the home page, sign-in page, and lab. A guide opened from the lab must preserve the learner’s workbench tab. Verify updated instructions and links in the browser before publishing, including a narrow-screen view when layout changes.
+- In each feature change’s summary or PR description, identify the guidance updated, or briefly explain why the public guide/home page is unaffected.
+
 ## Development and release
 
 - Source: https://github.com/kyleroche/littlespark (private).

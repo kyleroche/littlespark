@@ -8,6 +8,14 @@ An illustrated Arduino workbench for a child's first electronics project. Seven 
 
 The lesson workspace is at `/learn/`. Home-page sign-in opens `/signin/`. The server checks the session before serving `/learn/`; parent and child accounts can enter. Parent and child magic links continue to open the lab, and existing browser progress keys are unchanged. The app tour covers Home, the lab, and the gear link. Vite builds the home, sign-in, and lab entry points; Vercel rewrites magic-link routes to the sign-in entry point. The lab bundle is loaded only after a session check.
 
+## How-to and family profiles
+
+The public [How-to guide](https://littlespark.tech/how-to/) walks through parent email sign-in, child profiles, one-use five-minute links/QR codes, opening the correct learner profile, the Starter Kit checklist, camera/layout controls, the guided editor, virtual testing, parent progress monitoring, and optional Uno upload. It is available from the home page, sign-in page, and lab. The lab opens it in a separate tab.
+
+A link’s five-minute expiry limits when it can be redeemed; it does not limit lesson duration. Browser tabs share sign-in, so use the child’s device or a separate browser profile to keep the parent dashboard signed in. Reopen Family to refresh progress. Continuing on another device uses a new link for the same child profile. Revoking a child’s sessions preserves their profile and progress.
+
+`AGENTS.md` requires the How-to and in-app tour to change with affected user workflows, and the home page to change with major features. The owner has confirmed parent email sign-in, child profile creation, child login, and progress appearing in Family on production.
+
 ## Run
 
 ```sh

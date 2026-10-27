@@ -1847,3 +1847,13 @@ p {
     top: -8%;
   }
 }
+
+.family-guide-link {
+  margin-top: 18px;
+  font-size: 11px;
+}
+.faq-list p a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: #506b44;
+}
