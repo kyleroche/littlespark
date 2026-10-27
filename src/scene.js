@@ -381,39 +381,6 @@ function usbCable() {
   g.userData.part = "usb";
   return g;
 }
-function kitBox() {
-  let g = new T.Group();
-  let cardboard = mat("#c5b891");
-  box(184, 1.4, 101, cardboard, g, 5, 0.3, 0);
-  for (let z of [-50, 50]) box(184, 6, 1.3, cardboard, g, 5, 3, z);
-  for (let x of [-87, 97]) box(1.3, 6, 101, cardboard, g, x, 3, 0);
-  box(182, 3, 1, cardboard, g, 5, 2, 18);
-  box(1, 3, 66, cardboard, g, 0, 2, -16);
-  let lid = new T.Group();
-  lid.position.set(5, 4, -50);
-  lid.rotation.x = Math.PI / 2.3;
-  box(184, 1, 83, cardboard, lid, 0, 0, -41);
-  textPlane(
-    lid,
-    174,
-    72,
-    (c, w, h) => {
-      c.fillStyle = "#456d5a";
-      c.textAlign = "center";
-      c.font = "bold 11px sans-serif";
-      c.fillText("ARDUINO", w / 2, 29);
-      c.font = "5px monospace";
-      c.fillText("STARTER KIT", w / 2, 40);
-      c.font = "2.8px monospace";
-      c.fillText("A BOX FULL OF POSSIBILITIES", w / 2, 52);
-    },
-    0,
-    0.6,
-    -41,
-  );
-  g.add(lid);
-  return g;
-}
 function led() {
   let g = new T.Group(),
     m = mat("#d25f4d", 0.3);
@@ -579,16 +546,13 @@ export class Workbench {
       p.userData.home = p.position.clone();
       p.visible = k === "board";
     }
-    this.kitBox = kitBox();
-    this.scene.add(this.kitBox);
-    this.kitBox.visible = false;
     this.kitHomes = {
-      board: new T.Vector3(-40, 4, -12),
-      breadboard: new T.Vector3(48, 4, -12),
-      led: new T.Vector3(20, 4, 32),
-      resistor: new T.Vector3(50, 4, 42),
-      wires: new T.Vector3(-35, 4, 35),
-      usb: new T.Vector3(-5, 4, 33),
+      board: new T.Vector3(-40, 0, -12),
+      breadboard: new T.Vector3(48, 0, -12),
+      led: new T.Vector3(20, 0, 32),
+      resistor: new T.Vector3(50, 0, 42),
+      wires: new T.Vector3(-35, 0, 35),
+      usb: new T.Vector3(-5, 0, 33),
     };
     this.raycaster = new T.Raycaster();
     this.mouse = new T.Vector2();
@@ -597,8 +561,8 @@ export class Workbench {
       ["board", "ARDUINO UNO", [-12, 12, 24]],
       ["usb", "POWER + IDEAS", [-72, 16, -8]],
       ["breadboard", "A PLACE TO CONNECT", [78, 7, 18]],
-      ["led", "YOUR LITTLE LIGHT", [43.57, 23, 0]],
-      ["resistor", "220 Ω · SLOWS THE FLOW", [53, 12, -9]],
+      ["led", "YOUR LITTLE LIGHT", [35, 38, 0]],
+      ["resistor", "220 Ω · SLOWS THE FLOW", [75, 18, -9]],
       ["d13", "D13", [-44.84, 18, -23]],
       ["gnd", "GND", [-50.38, 11, -23]],
     ]) {
@@ -628,7 +592,6 @@ export class Workbench {
     this.step = step;
     this.animations = [];
     this.popAnimation = null;
-    this.kitBox.visible = step === -1;
     if (step === -1) {
       for (let [k, p] of Object.entries(this.parts)) {
         p.visible = true;
@@ -670,6 +633,7 @@ export class Workbench {
     this.home();
   }
   resetKit() {
+    for (const part of Object.values(this.parts)) part.visible = true;
     this.selectedKit = null;
     this.popAnimation = {
       from: performance.now(),
@@ -682,7 +646,7 @@ export class Workbench {
         endScale: k === "wires" ? 0.35 : 1,
       })),
     };
-    Object.assign(this.goal, { x: 5, y: 18, z: -7, scale: 205, azimuth: 0.35 });
+    Object.assign(this.goal, { x: 5, y: 3, z: 4, scale: 170, azimuth: 0.35 });
   }
   popout(key) {
     if (this.step !== -1) {
@@ -699,6 +663,9 @@ export class Workbench {
       return true;
     }
     if (!this.parts[key]) return false;
+    if (this.selectedKit === key) this.parts[key].position.y -= 8;
+    for (const [name, part] of Object.entries(this.parts))
+      part.visible = name === key;
     this.selectedKit = key;
     let homes = this.kitHomes;
     this.popAnimation = {
@@ -721,9 +688,16 @@ export class Workbench {
     };
     let center = homes[key];
     Object.assign(this.goal, {
-      x: center.x + (key === "resistor" ? 7.6 : key === "wires" ? 2 : 0),
-      z: center.z + (key === "resistor" ? -9 : 0),
-      y: 30,
+      x: center.x + (key === "resistor" ? 15.24 : key === "wires" ? 2 : 0),
+      z: center.z + (key === "resistor" ? -18.16 : 0),
+      y: {
+        board: 24,
+        breadboard: 22,
+        led: 43,
+        resistor: 30,
+        wires: 28,
+        usb: 21,
+      }[key],
       scale: {
         board: 105,
         breadboard: 105,
@@ -766,7 +740,7 @@ export class Workbench {
             : key === "resistor"
               ? 51.19
               : 55;
-    this.goal.z = key === "resistor" ? -9 : 0;
+    this.goal.z = key === "resistor" ? -18.16 : 0;
     this.goal.scale =
       key === "board"
         ? 87

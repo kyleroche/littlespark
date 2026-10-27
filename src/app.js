@@ -6,9 +6,9 @@ const $ = (s) => document.querySelector(s);
 const unboxing = {
   short: "Unbox your kit",
   sub: "Find six little essentials",
-  title: "A box full of possibilities.",
+  title: "Find these six things.",
   description:
-    "Open your official Arduino Starter Kit. Find these six things for our first adventure. Tap each one to lift it out and look closer.",
+    "Take these parts out of your official Arduino Starter Kit. Tap a name for a close-up, then tick it off when you find it.",
   tip: "Just a few parts today.",
   detail:
     "Leave the other treasures in the box. Keep the USB cable unplugged while we build.",
@@ -340,7 +340,11 @@ function render() {
   $("#tip-text").textContent = step.detail;
   $("#scene-number").textContent =
     `FIG. ${String(state.step + 2).padStart(2, "0")}`;
-  $("#scene-title").textContent = step.caption;
+  $("#scene-title").textContent =
+    state.step === -1 && selectedKit
+      ? kitItems.find((item) => item.key === selectedKit).name.toUpperCase() +
+        " · FIND THIS IN YOUR KIT"
+      : step.caption;
   $("#previous-step").disabled = state.step === -1;
   $("#next-step").innerHTML =
     state.step === 5
@@ -388,7 +392,7 @@ function render() {
       : "";
   if (state.step === -1) {
     $("#step-extra").innerHTML =
-      `<div class="kit-checklist"><div class="kit-count"><span>YOUR FIRST-CIRCUIT CHECKLIST</span><b>${state.found.length} / 6</b></div>${kitItems.map((item) => `<div class="kit-row ${state.found.includes(item.key) ? "found" : ""} ${selectedKit === item.key ? "selected" : ""}"><button class="kit-look" data-kit="${item.key}" aria-label="Look closely at ${item.name}"><span class="kit-glyph ${item.key}-glyph">${item.glyph}</span><span><strong>${item.name}</strong><small>${item.qty}</small></span><i>⌕</i></button><button class="kit-check" data-found="${item.key}" aria-label="${state.found.includes(item.key) ? "Unmark" : "Found"} ${item.name}" aria-pressed="${state.found.includes(item.key)}">${state.found.includes(item.key) ? "✓" : "+"}</button></div>`).join("")}</div>${selectedKit ? `<div class="kit-detail"><strong>${kitItems.find((i) => i.key === selectedKit).name}</strong><p>${kitItems.find((i) => i.key === selectedKit).hint}</p><button id="back-to-kit">↶ See the whole kit</button></div>` : '<p class="kit-hint">Tap + when you find a part. No kit yet? Find them on screen!</p>'}<a class="kit-source" href="https://store-usa.arduino.cc/products/arduino-starter-kit-multi-language" target="_blank" rel="noopener noreferrer">Based on the official Uno R3 Starter Kit ↗</a>`;
+      `<div class="kit-checklist"><div class="kit-count"><span>YOUR FIRST-CIRCUIT CHECKLIST</span><b>${state.found.length} / 6</b></div>${kitItems.map((item) => `<div class="kit-row ${state.found.includes(item.key) ? "found" : ""} ${selectedKit === item.key ? "selected" : ""}"><button class="kit-look" data-kit="${item.key}" aria-label="Look closely at ${item.name}"><span class="kit-glyph ${item.key}-glyph">${item.glyph}</span><span><strong>${item.name}</strong><small>${item.qty}</small></span><i>⌕</i></button><button class="kit-check" data-found="${item.key}" aria-label="${state.found.includes(item.key) ? "Unmark" : "Found"} ${item.name}" aria-pressed="${state.found.includes(item.key)}">${state.found.includes(item.key) ? "✓" : "+"}</button></div>`).join("")}</div>${selectedKit ? `<div class="kit-detail"><strong>${kitItems.find((i) => i.key === selectedKit).name}</strong><p>${kitItems.find((i) => i.key === selectedKit).hint}</p><button id="back-to-kit">↶ See all six parts</button></div>` : '<p class="kit-hint">Tap + when you find a part. No kit yet? Find them on screen!</p>'}<a class="kit-source" href="https://store-usa.arduino.cc/products/arduino-starter-kit-multi-language" target="_blank" rel="noopener noreferrer">Based on the official Uno R3 Starter Kit ↗</a>`;
     document.querySelectorAll("[data-kit]").forEach(
       (b) =>
         (b.onclick = () => {
