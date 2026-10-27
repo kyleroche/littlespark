@@ -4,7 +4,7 @@ export const TOUR_STEPS = [
     id: "welcome",
     feature: "lessons",
     target: "#step-list",
-    title: "Welcome to your little lab.",
+    title: "Welcome to Little Spark.",
     description:
       "This is a practice adventure for using the app. Your circuit lesson and checklist will be waiting when you come back.",
     tip: "Your field guide is on the left.",

@@ -1,4 +1,4 @@
-# Little Sparks
+# Little Spark
 
 An illustrated Arduino workbench for a child's first electronics adventure. Seven animated steps lead from meeting a classic Uno R3 to wiring and blinking a real LED.
 
@@ -8,6 +8,8 @@ An illustrated Arduino workbench for a child's first electronics adventure. Seve
 npm install
 npm run dev
 ```
+
+Brand: **Little Spark**. Canonical domain: **https://littlespark.tech/**. The existing GitHub repository and Vercel project retain their `little-sparks` identifiers. Existing browser storage keys are preserved so the rename does not reset progress.
 
 Production: `npm run build`. Deploy the resulting `dist` directory to Vercel (configuration included).
 
@@ -68,3 +70,14 @@ The guided code editor edits both wait instructions with **Blink delay** (250 / 
 ## Rendering stability
 
 Camera easing is time-based and snaps to its exact destination below a subpixel threshold. Idle views do not redraw, and shadow maps are cached until a component moves or scene visibility changes. Edge lines do not write depth; shaded faces and outline shells use separate depth offsets to avoid flicker during zoom. LED simulation invalidates the frame whenever its output changes.
+
+## Custom domain DNS
+
+`littlespark.tech` is attached to the existing Vercel project. With external nameservers, configure both apex A records recommended by Vercel:
+
+| Type | Name | Value |
+| --- | --- | --- |
+| A | @ | 216.150.1.1 |
+| A | @ | 216.150.16.1 |
+
+Keep unrelated mail records. Verify after DNS changes with `vercel domains verify littlespark.tech`. Until DNS is configured, use https://little-sparks-delta.vercel.app/.

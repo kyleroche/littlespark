@@ -1,4 +1,4 @@
-Little Sparks third-party notices
+Little Spark third-party notices
 
 Three.js and AVR8js are used under the MIT license. Arduino core code in the firmware is LGPL-2.1-or-later.
 

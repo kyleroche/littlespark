@@ -1,4 +1,4 @@
-# Little Sparks project rules
+# Little Spark project rules
 
 ## Keep the app tour current
 
@@ -14,6 +14,8 @@ Every addition, removal, or change to a user-facing feature MUST update the in-a
 ## Development and release
 
 - Source: https://github.com/kyleroche/little-sparks (private).
-- Hosting: Vercel project `little-sparks`; preserve the existing production alias.
+- Brand: **Little Spark** (singular). Canonical domain: `littlespark.tech`.
+- Hosting: Vercel project `little-sparks`; preserve the existing project and fallback production alias.
+- Existing `little-sparks-*` local-storage keys intentionally preserve returning learners’ progress.
 - Keep the exact tested firmware image as the only upload source. A program change invalidates prior verification. State clearly when physical-board validation is still outstanding.
 - Keep original procedural models and the illustrated workbench style. Avoid placing a modal over a component close-up.
