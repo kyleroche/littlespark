@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="theme-color" content="#f6f3e9" />
+    <title>Sign in — Little Spark</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23264e46'/%3E%3Cpath d='M23 5L10 23h10l-3 12 14-19H21z' fill='%23efbd68'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/src/access.css" />
+  </head>
+  <body>
+    <header class="access-header">
+      <a class="access-brand" href="/" aria-label="Little Spark home"
+        ><span>ϟ</span>little spark<b>.</b></a
+      >
+      <nav aria-label="Public pages">
+        <a href="/">Home</a
+        ><a
+          href="https://littlespark.vtc.store"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Gear store ↗</a
+        >
+      </nav>
+    </header>
+    <main class="access-layout">
+      <section class="access-intro">
+        <p class="access-eyebrow">THE LITTLE SPARK LAB</p>
+        <h1>Sign in.<br />Start building<span>.</span></h1>
+        <p>One account for your family.<br />A workbench for each learner.</p>
+        <figure>
+          <img
+            src="/images/arduino-uno.png"
+            width="3600"
+            height="2800"
+            alt="Illustrated Arduino Uno"
+          />
+          <figcaption>YOUR FIRST CIRCUIT STARTS HERE.</figcaption>
+        </figure>
+      </section>
+      <section class="access-card" aria-labelledby="access-title">
+        <span class="access-symbol" aria-hidden="true">⌁</span>
+        <p class="access-eyebrow" id="access-label">PARENT SIGN-IN</p>
+        <h2 id="access-title">Open your lab.</h2>
+        <p id="access-description">
+          Parents sign in by email. Then create child profiles and temporary
+          login links for the kids.
+        </p>
+        <form id="access-form">
+          <label for="access-email">Your email address</label
+          ><input
+            id="access-email"
+            type="email"
+            autocomplete="email"
+            inputmode="email"
+            maxlength="254"
+            placeholder="you@example.com"
+            required
+          /><button type="submit" id="access-submit">
+            Email me a sign-in link <span aria-hidden="true">↗</span>
+          </button>
+        </form>
+        <button id="access-confirm" hidden>Continue to the lab ↗</button>
+        <p id="access-status" role="status" aria-live="polite"></p>
+        <a id="access-again" href="/signin/" hidden
+          >Request a new sign-in link</a
+        >
+        <div class="access-help" id="access-help">
+          <strong>Building as a kid?</strong>
+          <p>
+            Open the login link or scan the QR code your grown-up made for you.
+            You don’t need your own email.
+          </p>
+        </div>
+        <p class="access-fine" id="access-fine">
+          No password. Email links work once and expire in five minutes. Your
+          email is used for sign-in and your family account.
+        </p>
+      </section>
+    </main>
+    <footer class="access-footer">
+      <a href="/">← Back to Little Spark</a
+      ><span>FIND IT. BUILD IT. TEST IT.</span>
+    </footer>
+    <script type="module" src="/src/access.js"></script>
+  </body>
+</html>

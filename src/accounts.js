@@ -77,6 +77,10 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
     try {
       const result = await api("me");
       user = result.user;
+      if (!user) {
+        location.replace("/signin/");
+        return;
+      }
       button.textContent =
         user?.role === "parent" ? "Family" : user?.name || "Sign in";
       if (user?.role === "kid") {
@@ -109,11 +113,11 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
         controller.saveProgress(progress);
       } else {
         onProfile(user, null);
-        status("Saved on this device");
+        status("Practice saved on this device");
       }
       if (panel.open) render(result.kids || []);
     } catch {
-      status("Saved on this device");
+      status("Practice saved on this device");
       button.textContent = "Sign in";
     }
   }
@@ -282,7 +286,7 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
   }
   async function logout() {
     await api("logout", {});
-    location.assign("/learn/");
+    location.assign("/signin/");
   }
   button.onclick = async () => {
     try {
@@ -356,34 +360,12 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) flush();
   });
-  const match = location.pathname.match(/^\/(login|parent-login)\/([^/]+)\/?$/);
-  if (match) {
-    const page = document.createElement("section");
-    page.className = "login-screen";
-    page.innerHTML = `<div class="login-card"><div class="brand">⚡ little spark.</div><h1>${match[1] === "login" ? "Ready to build?" : "Parent sign-in"}</h1><p>${match[1] === "login" ? "Use this link to open your learner profile." : "Confirm to sign in to your parent account."}</p><button id="magic-start" class="button primary">${match[1] === "login" ? "Start lesson" : "Sign in"}</button><p id="magic-status" role="status"></p><a href="/">Back to Little Spark</a></div>`;
-    document.body.append(page);
-    document.querySelector("#magic-start").onclick = async (e) => {
-      e.target.disabled = true;
-      try {
-        await api(
-          match[1] === "login" ? "consume-kid-link" : "consume-parent-link",
-          { token: decodeURIComponent(match[2]) },
-        );
-        history.replaceState(null, "", "/learn/");
-        page.remove();
-        await load();
-      } catch (error) {
-        document.querySelector("#magic-status").textContent = error.message;
-        e.target.disabled = false;
-      }
-    };
-  } else
-    queueMicrotask(async () => {
-      await load();
-      if (new URLSearchParams(location.search).get("signin") === "1") {
-        history.replaceState(null, "", "/learn/");
-        button.click();
-      }
-    });
+  queueMicrotask(async () => {
+    await load();
+    if (new URLSearchParams(location.search).get("signin") === "1") {
+      history.replaceState(null, "", "/learn/");
+      button.click();
+    }
+  });
   return controller;
 }

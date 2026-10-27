@@ -53,16 +53,50 @@
           "value": "noindex"
         }
       ]
+    },
+    {
+      "source": "/learn/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        },
+        {
+          "key": "Vary",
+          "value": "Cookie"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/signin/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
     }
   ],
   "rewrites": [
     {
       "source": "/login/:token",
-      "destination": "/learn/index.html"
+      "destination": "/signin/index.html"
     },
     {
       "source": "/parent-login/:token",
-      "destination": "/learn/index.html"
+      "destination": "/signin/index.html"
     }
   ]
 }

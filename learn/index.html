@@ -19,7 +19,9 @@
     />
   </head>
   <body>
-    <div id="app">
+    <div id="lab-loading" role="status">Checking your sign-in…</div>
+    <noscript>JavaScript is required to open the lab.</noscript>
+    <div id="app" hidden>
       <header class="header">
         <a class="brand" href="/" aria-label="Little Spark home"
           ><span class="brand-icon">ϟ</span
@@ -45,7 +47,7 @@
           </button>
           <button class="button quiet" id="app-tour-button">✧ App tour</button>
           <span class="save-state" data-tour-feature="progress"
-            ><span></span> Saved on this device</span
+            ><span></span> Checking sign-in…</span
           ><button
             class="button quiet"
             id="board-button"
@@ -400,9 +402,9 @@
           hands-on check.
         </p>
         <p>
-          Guest progress stays in this browser. Signed-in child profiles sync
-          progress to their parent-managed account. There are no ads or tracking
-          scripts. The editor uses guided timing controls.
+          Parent practice stays in this browser. Child profiles sync progress to
+          their parent-managed account. There are no ads or tracking scripts.
+          The editor uses guided timing controls.
         </p>
         <button class="button primary close-notes">Back to the lesson →</button>
       </dialog>
@@ -426,6 +428,6 @@
       </div>
       <div id="toast" role="status"></div>
     </div>
-    <script type="module" src="/src/app.js"></script>
+    <script type="module" src="/src/lab-entry.js"></script>
   </body>
 </html>

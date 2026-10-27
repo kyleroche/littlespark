@@ -6,7 +6,7 @@ An illustrated Arduino workbench for a child's first electronics project. Seven 
 
 `/` introduces the project with a parallax circuit illustration, a scrolling parts/build/test walkthrough, an interactive blink-delay preview, family account explanations, and FAQs. Gear Store beside Sign in opens https://littlespark.vtc.store in a new tab. The shirt drawing is an illustration, not a product listing. Motion respects reduced-motion preferences; mobile layouts use a static illustration.
 
-The lesson workspace is at `/learn/`. Home-page sign-in opens its account panel through `/learn/?signin=1`. Parent and child magic links continue to open the lab, and existing browser progress keys are unchanged. The app tour covers Home, the lab, and the gear link. Vite builds both HTML entry points; Vercel rewrites magic-link routes to the lab entry point.
+The lesson workspace is at `/learn/`. Home-page sign-in opens `/signin/`. The server checks the session before serving `/learn/`; parent and child accounts can enter. Parent and child magic links continue to open the lab, and existing browser progress keys are unchanged. The app tour covers Home, the lab, and the gear link. Vite builds the home, sign-in, and lab entry points; Vercel rewrites magic-link routes to the sign-in entry point. The lab bundle is loaded only after a session check.
 
 ## Run
 
@@ -27,7 +27,7 @@ Production: `npm run build`. Deploy the resulting `dist` directory to Vercel (co
 - Real AVR8js execution of compiled Arduino firmware in a Web Worker. The test checks six D13 transitions and their timing.
 - SHA-256 checks for the firmware artifacts. Upload uses the exact byte image that passed emulation.
 - Desktop Web Serial connection and STK500v1 upload for classic Uno R3 / ATmega328P / Optiboot at 115200 baud. Verifies chip signature before writing and reads flash back after writing.
-- Guest progress is browser-local; signed-in child progress syncs to an account. No analytics or external compilation service.
+- Parent practice is browser-local; child progress syncs to an account. No analytics or external compilation service.
 
 ## Real board
 
@@ -92,7 +92,7 @@ Keep unrelated mail records. Verify after DNS changes with `vercel domains verif
 
 Choose **Build + Code**, **Build only**, **Code only**, or **Guided** above the workbench. Build + Code displays both panes side by side on wider screens and stacks them on narrow screens. The lesson controls stay available below the panes. Layout preference is browser-local.
 
-Parents sign in with a single-use email link. The parent dashboard can create and rename child profiles, view step completion, generate a five-minute child login link/QR code, and revoke child sessions. Kids do not provide email addresses or passwords. Links use friendly words plus a random suffix, are stored as hashes, and are consumed atomically. Signed-in child progress is stored in Neon Postgres; guest progress stays on the device. Progress resets invalidate stale writes from other devices. Account changes in another tab block stale saves and show a persistent message with Reload. Locally recovered progress is sent back to the server after sign-in.
+Parents sign in with a single-use email link. The parent dashboard can create and rename child profiles, view step completion, generate a five-minute child login link/QR code, and revoke child sessions. Kids do not provide email addresses or passwords. Links use friendly words plus a random suffix, are stored as hashes, and are consumed atomically. Signed-in child progress is stored in Neon Postgres; parent practice stays on the device. Progress resets invalidate stale writes from other devices. Account changes in another tab block stale saves and show a persistent message with Reload. Locally recovered progress is sent back to the server after sign-in.
 
 Backend setup: copy `.env.example` to `.env.local`, supply server credentials, and run `node --env-file=.env.local scripts/migrate.mjs`. Production uses Vercel Functions, Neon, and Resend. Sender-domain DNS must be verified before email sign-in works. Never put production credentials in PR preview deployments.
 

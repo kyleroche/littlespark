@@ -6,7 +6,7 @@ export const TOUR_STEPS = [
     target: "#account-button",
     title: "Home, lessons, and gear",
     description:
-      "Home explains how the project works. Open the lab starts a lesson. Gear store opens the Little Spark apparel store in a new tab.",
+      "Home explains how the project works. Open the lab takes you to the workbench after sign-in. Gear store opens the Little Spark apparel store in a new tab.",
     tip: "Your workbench stays here.",
     detail:
       "The store link is beside Sign in on the home page and beside Home in the lab. Switch back to this tab to continue building. Your saved lesson progress stays separate from the store.",
@@ -19,10 +19,10 @@ export const TOUR_STEPS = [
     target: "#account-button",
     title: "Sign in to save across devices",
     description:
-      "Parents sign in with an email link. Kids use a short login link made by a parent. You can also try the lessons without an account.",
+      "Parents sign in with an email link. Kids use a short login link made by a parent. Sign-in is required to open the lab.",
     tip: "No passwords to remember.",
     detail:
-      "Sign-in links expire after five minutes and work once. Without an account, progress stays in this browser.",
+      "Sign-in links expire after five minutes and work once. Parent practice stays in this browser; child profiles sync progress to their account.",
     action: "Open sign-in",
     demo: "accounts",
   },
@@ -149,7 +149,7 @@ export const TOUR_STEPS = [
     target: "#tour-lesson",
     title: "Save your progress",
     description:
-      "Guest progress is saved in this browser. Signed-in child profiles save progress to their account. The tour does not complete circuit steps. If a profile changes in another tab, use Reload in the message before continuing.",
+      "Parent practice is saved in this browser. Child profiles save progress to their account. The tour does not complete circuit steps. If a profile changes in another tab, use Reload in the message before continuing.",
     tip: "You can come back to this tour anytime.",
     detail:
       "Use App tour at the top or Learn your way around in the field guide. Reset lesson progress resets the circuit lesson’s checklist and progress.",

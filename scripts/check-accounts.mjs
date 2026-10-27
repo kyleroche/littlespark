@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { neon } from "@neondatabase/serverless";
 import { createStore } from "../server/store.js";
 import handler from "../api/family.js";
+import { checkLabAccess } from "../server/lab-access.js";
 async function request(
   action,
   token,
@@ -48,6 +49,14 @@ try {
     assert.equal(results.filter(Boolean).length, 1);
     return results.filter(Boolean);
   });
+  assert.equal(
+    await checkLabAccess(
+      new Request("https://littlespark.tech/learn/", {
+        headers: { cookie: `ls_session=${parentA.token}` },
+      }),
+    ),
+    null,
+  );
   const tokenB = await store.parentLink(emailB);
   parentB = await store.consumeParent(tokenB);
   const kid = await store.addChild(parentA.user.id, "QA learner", "robot");
@@ -73,6 +82,14 @@ try {
   const session = await store.session(login.token);
   assert.equal(session.role, "kid");
   assert.equal(session.id, kid.id);
+  assert.equal(
+    await checkLabAccess(
+      new Request("https://littlespark.tech/learn/index.html", {
+        headers: { cookie: `ls_session=${login.token}` },
+      }),
+    ),
+    null,
+  );
   const sibling = await store.addChild(parentA.user.id, "QA sibling", "fox");
   const siblingLink = await store.childLink(parentA.user.id, sibling.id);
   const siblingLogin = await store.consumeChild(siblingLink.code);
@@ -163,6 +180,16 @@ try {
   assert.equal(await store.consumeChild(expired.code), null);
   await store.revokeChild(parentA.user.id, kid.id);
   assert.equal(await store.session(login.token), null);
+  assert.equal(
+    (
+      await checkLabAccess(
+        new Request("https://littlespark.tech/learn/", {
+          headers: { cookie: `ls_session=${login.token}` },
+        }),
+      )
+    ).status,
+    302,
+  );
   const limits = await Promise.all(
     Array.from({ length: 5 }, () => store.limit("qa-" + suffix, 3, 60000)),
   );

@@ -4,6 +4,8 @@ This repository is private pending an explicit release decision by its owner. Do
 
 ## Trust boundaries
 
+The lab requires a server-validated parent or child session. Vercel Node routing middleware protects `/learn/` and its HTML entry point; Vite mirrors the check locally. The client verifies the session before loading the workbench module. Home, sign-in, login-link landing pages, and the external gear store remain public. Public JS/firmware assets are not a DRM boundary.
+
 - The browser is untrusted. Family ownership and learner identity are checked in the server API.
 - Parent email links and child login links expire after five minutes and are consumed with an atomic database update. Only hashes are stored.
 - Session cookies are HTTP-only, host-only, SameSite=Lax, and Secure in production. State-changing API requests require an approved Origin.

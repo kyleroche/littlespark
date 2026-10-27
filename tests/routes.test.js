@@ -8,19 +8,15 @@ test("home, lab, and magic-link routes remain distinct", () => {
     lab = read("learn/index.html"),
     config = JSON.parse(read("vercel.json"));
   assert.ok(home.includes('href="/learn/"'));
-  assert.ok(home.includes('href="/learn/?signin=1"'));
+  assert.ok(home.includes('href="/signin/"'));
   assert.ok(home.includes("https://littlespark.vtc.store"));
   assert.ok(lab.includes('id="account-button"'));
   assert.ok(!home.includes('id="account-button"'));
   for (const path of ["/login/:token", "/parent-login/:token"]) {
     assert.equal(
       config.rewrites.find((rule) => rule.source === path)?.destination,
-      "/learn/index.html",
+      "/signin/index.html",
     );
   }
-  assert.ok(
-    read("src/accounts.js").includes(
-      'history.replaceState(null, "", "/learn/")',
-    ),
-  );
+  assert.ok(read("src/lab-entry.js").includes('location.replace("/signin/")'));
 });
