@@ -19,7 +19,7 @@ jobs:
       - uses: arduino/setup-arduino-cli@v2
       - name: Install pinned Uno core
         run: arduino-cli core update-index && arduino-cli core install arduino:avr@1.8.8
-      - name: Compile all three lesson variants
+      - name: Compile Blink and Traffic Lights variants
         run: node scripts/build-firmware.mjs
       - name: Test actual firmware and upload protocol
         run: npm test

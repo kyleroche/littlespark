@@ -34,7 +34,7 @@ export function sessionCookie(
   return `${COOKIE_NAME}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${secure ? "; Secure" : ""}`;
 }
 export function normalizeLesson(value = "first-circuit") {
-  if (!["first-circuit", "fruit-piano"].includes(value)) throw Error("Invalid progress lesson.");
+  if (!["first-circuit", "fruit-piano", "traffic-lights"].includes(value)) throw Error("Invalid progress lesson.");
   return value;
 }
 export function normalizeProgress(input, lesson = "first-circuit") {

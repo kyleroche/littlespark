@@ -190,6 +190,15 @@ try {
   assert.equal(makeyReset.generation,1);
   assert.equal(await store.saveProgress(kid.id,{completed:[5]},0,false,"fruit-piano"),null);
   assert.deepEqual(await store.progress(kid.id),blinkBefore);
+  const trafficSaved = await request("save-progress",login.token,{state:{step:5,completed:[-1,0,1],found:["led","resistor"]},generation:0},process.env.APP_ORIGIN,"POST","traffic-lights");
+  assert.equal(trafficSaved.status,200);
+  const trafficRead=await request("me",login.token,undefined,process.env.APP_ORIGIN,"GET","traffic-lights");
+  assert.equal(trafficRead.progress.state.completed.length,3);
+  assert.deepEqual(await store.progress(kid.id),blinkBefore);
+  assert.equal((await store.progress(kid.id,"fruit-piano")).generation,1);
+  await store.saveProgress(kid.id,{step:-1},0,true,"traffic-lights");
+  assert.equal((await store.progress(kid.id,"fruit-piano")).generation,1);
+  assert.deepEqual(await store.progress(kid.id),blinkBefore);
   const badLesson = await request("me",login.token,undefined,process.env.APP_ORIGIN,"GET","unknown");
   assert.equal(badLesson.status,400);
   const expired = await store.childLink(parentA.user.id, kid.id);

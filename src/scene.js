@@ -1,4 +1,5 @@
 import * as T from "three";
+import { TRAFFIC_CONNECTIONS } from "./arduino-lessons.js";
 import {
   CAMERA_HELP,
   orbitView,
@@ -502,7 +503,8 @@ function wire(start, end, color, height) {
   return g;
 }
 export class Workbench {
-  constructor({ onPart, onReady, onInspectChange = () => {} }) {
+  constructor({ onPart, onReady, onInspectChange = () => {}, traffic = false }) {
+    this.traffic = traffic;
     this.canvas = document.querySelector("#workbench");
     this.host = document.querySelector("#scene");
     this.onPart = onPart;
@@ -580,6 +582,28 @@ export class Workbench {
       wire([-44.84, 10.6, -23], [58.81, 3.6, -14.16], "#d2a054", 35),
       wire([-47.38, 10.6, -23], [43.57, 3.6, 14.16], "#4e6860", 26),
     );
+    if (traffic) {
+      this.trafficLeds = [];
+      this.parts.led = new T.Group();
+      this.parts.resistor = new T.Group();
+      this.parts.led.position.x = this.parts.resistor.position.x = 43.57;
+      this.parts.wires = new T.Group();
+      for (const item of TRAFFIC_CONNECTIONS) {
+        const light = led(); light.position.x = item.x - 43.57;
+        const color = {red:"#d25f4d",yellow:"#d5b549",green:"#6b9b70"}[item.color];
+        light.userData.lens.color.set(color);light.userData.lens.emissive.set(color);
+        light.userData.trafficColor = color; light.userData.mask = item.mask;
+        this.trafficLeds.push(light);this.parts.led.add(light);
+        const resistance = resistor();resistance.position.x = item.x - 43.57;this.parts.resistor.add(resistance);
+        this.parts.wires.add(wire([item.boardX,10.6,-23],[item.x+15.24,3.6,-14.16],color,35+item.pin-11));
+      }
+      this.parts.led.userData.part="led";this.parts.resistor.userData.part="resistor";
+      this.parts.wires.add(
+        wire([-47.38,10.6,-23],[25.79,3.6,9.08],"#4e6860",28),
+        wire([25.79,3.6,14.16],[48.65,3.6,14.16],"#4e6860",12),
+        wire([48.65,3.6,11.62],[71.51,3.6,14.16],"#4e6860",15),
+      );
+    }
     this.parts.wires.userData.part = "wires";
     for (let [k, p] of Object.entries(this.parts)) {
       this.scene.add(p);
@@ -611,7 +635,7 @@ export class Workbench {
     ]) {
       let el = document.createElement("button");
       el.className = "label";
-      el.textContent = label;
+      el.textContent = traffic && key === "led" ? "RED · YELLOW · GREEN" : traffic && key === "d13" ? "D13 · D12 · D11" : label;
       el.onclick = () => {
         const detail = {
           usb: "usbPort",
@@ -849,7 +873,17 @@ export class Workbench {
     });
     this.focus(keys[this.step]);
   }
+  setTrafficLights(mask = 0) {
+    this.needsRender = true;
+    for (const light of this.trafficLeds || []) {
+      const on=Boolean(mask & light.userData.mask);
+      light.userData.lens.emissiveIntensity=on?1.9:0;
+      light.userData.glow.color.set(light.userData.trafficColor);
+      light.userData.glow.intensity=on?22:0;
+    }
+  }
   setLed(on, color = "#df8255") {
+    if (this.traffic) { this.setTrafficLights(on?32:0); return; }
     this.needsRender = true;
     let l = this.parts.led;
     l.userData.lens.color.set(color);
@@ -1101,7 +1135,7 @@ export class Workbench {
           if (child !== tube) child.visible = f === 1;
         for (let child of tube.children) child.visible = f === 1;
       });
-      if (elapsed > 2500) this.wireAnimation = null;
+      if (elapsed > (this.parts.wires.children.length-1)*1100+1400) this.wireAnimation = null;
     }
     for (let l of this.labelItems) {
       let visible =

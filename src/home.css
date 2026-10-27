@@ -1866,3 +1866,5 @@ p {
 .home-lesson-grid a { display:table; margin-top:20px; }.home-fruit { width:240px; height:120px; margin-bottom:24px; }.home-fruit text { font:16px ui-monospace,monospace; fill:#52674d; }
 .home-lesson-symbol { display:block; font-size:100px; height:120px; color:#be9547; margin-bottom:24px; }
 @media(max-width:760px){.home-lesson-grid{grid-template-columns:1fr}.home-lessons{padding:55px 20px}.home-lesson-grid article{padding:25px}}
+
+@media(min-width:1150px){.home-lesson-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.home-lesson-grid article{padding:26px}}

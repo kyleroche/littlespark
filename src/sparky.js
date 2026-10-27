@@ -6,7 +6,7 @@ export function suggestRhythm(current, goal) {
   return choices[Math.min(index + 1, choices.length - 1)];
 }
 
-export function initSparky({ getSpeed, changeSpeed }) {
+export function initSparky({ getSpeed, changeSpeed, traffic = false }) {
   const root = document.querySelector("#sparky");
   const toggle = root.querySelector("#sparky-toggle");
   const panel = root.querySelector("#sparky-panel");
@@ -52,7 +52,7 @@ export function initSparky({ getSpeed, changeSpeed }) {
   });
   root.querySelector("#sparky-hint").onclick = () => {
     clearPreview();
-    message.textContent = "Find the two glowing delay() lines. Each number is a wait in milliseconds. 1000 is one second. A smaller number makes the light blink faster.";
+    message.textContent = traffic ? "Find the three glowing delay() lines. Red and green wait twice as long as yellow. Each LOW turns a light off before the next HIGH turns another on. The order is red, green, yellow." : "Find the two glowing delay() lines. Each number is a wait in milliseconds. 1000 is one second. A smaller number makes the light blink faster.";
     highlight(true);
   };
   root.querySelectorAll("[data-sparky-goal]").forEach((button) => {
@@ -64,8 +64,8 @@ export function initSparky({ getSpeed, changeSpeed }) {
         message.textContent = "That’s already the " + (current === 250 ? "fastest" : "slowest") + " rhythm in this lesson. Try the other direction.";
         return;
       }
-      message.textContent = `Let’s change both waits from ${current} to ${suggestion} milliseconds. The light will blink ${suggestion < current ? "faster" : "slower"}. Your code hasn’t changed yet.`;
-      preview.textContent = `Both wait lines:\ndelay(${current}); → delay(${suggestion});`;
+      message.textContent = traffic ? `Red and green: ${current*2} → ${suggestion*2} ms. Yellow: ${current} → ${suggestion} ms. The sequence stays red, green, yellow. Your code hasn’t changed yet.` : `Let’s change both waits from ${current} to ${suggestion} milliseconds. The light will blink ${suggestion < current ? "faster" : "slower"}. Your code hasn’t changed yet.`;
+      preview.textContent = traffic ? `Red + green: delay(${current*2}); → delay(${suggestion*2});\nYellow: delay(${current}); → delay(${suggestion});` : `Both wait lines:\ndelay(${current}); → delay(${suggestion});`;
       preview.hidden = false;
       apply.hidden = false;
       highlight(true);
@@ -80,7 +80,7 @@ export function initSparky({ getSpeed, changeSpeed }) {
     previous = before;
     applied = next;
     undo.hidden = false;
-    message.textContent = "Both waits changed. Go to step 7 and choose Test my circuit to see the new rhythm. Undo puts your old waits back.";
+    message.textContent = traffic ? "All three waits changed. Go to step 7 and choose Test my sequence. Undo restores your old waits." : "Both waits changed. Go to step 7 and choose Test my circuit to see the new rhythm. Undo puts your old waits back.";
     root.classList.remove("sparky-cheer");
     void root.offsetWidth;
     root.classList.add("sparky-cheer");
@@ -114,7 +114,7 @@ export function initSparky({ getSpeed, changeSpeed }) {
       previous = applied = null;
       undo.hidden = true;
       observed = getSpeed();
-      message.textContent = "I’m Sparky. Want a hint, or shall we change the blink rhythm together?";
+      message.textContent = traffic ? "I’m Sparky. Want a hint about HIGH, LOW and the three waits?" : "I’m Sparky. Want a hint, or shall we change the blink rhythm together?";
       close();
     },
   };

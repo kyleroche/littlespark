@@ -154,7 +154,7 @@ export function initAccounts({ onProfile, onNotice = () => {}, lesson = "first-c
       return;
     }
     const grouped = [...new Map(kids.map((k) => [k.id, k])).values()];
-    const lessons = [["first-circuit", "Blink an LED"], ["fruit-piano", "Fruit Piano"]];
+    const lessons = [["first-circuit", "Blink an LED"], ["fruit-piano", "Fruit Piano"], ["traffic-lights", "Traffic Lights"]];
     const rowsFor = (kid) => lessons.map(([id, name]) => {
       const row = kids.find((k) => k.id === kid.id && k.lesson_id === id);
       const complete = row?.state?.completed?.length || 0;
@@ -164,7 +164,7 @@ export function initAccounts({ onProfile, onNotice = () => {}, lesson = "first-c
       .map((k) => {
         const rows = rowsFor(k);
         const complete = rows.reduce((sum, row) => sum + row.complete, 0);
-        return `<section class="kid-card"><div class="kid-heading"><span>${avatars[k.avatar] || "🤖"}</span><strong>${escape(k.name)}</strong><span class="kid-percent">${Math.round((complete / 14) * 100)}%</span></div><div class="kid-progress"><i style="width:${Math.min(100, (complete / 14) * 100)}%"></i></div>${rows.map((row) => `<p>${row.complete} of 7 steps · ${row.name}</p><p class="kid-updated">${row.updated ? "Last saved " + new Date(row.updated).toLocaleString() : "Not started"}</p>`).join("")}<button class="button secondary" data-kid-link="${k.id}">Make a 5-minute login link</button><details class="kid-edit"><summary>Edit profile</summary><form data-edit-child="${k.id}"><label>Nickname<input name="name" value="${escape(k.name)}" maxlength="32" required></label><label>Icon<select name="avatar">${Object.entries(
+        return `<section class="kid-card"><div class="kid-heading"><span>${avatars[k.avatar] || "🤖"}</span><strong>${escape(k.name)}</strong><span class="kid-percent">${Math.round((complete / 21) * 100)}%</span></div><div class="kid-progress"><i style="width:${Math.min(100, (complete / 21) * 100)}%"></i></div>${rows.map((row) => `<p>${row.complete} of 7 steps · ${row.name}</p><p class="kid-updated">${row.updated ? "Last saved " + new Date(row.updated).toLocaleString() : "Not started"}</p>`).join("")}<button class="button secondary" data-kid-link="${k.id}">Make a 5-minute login link</button><details class="kid-edit"><summary>Edit profile</summary><form data-edit-child="${k.id}"><label>Nickname<input name="name" value="${escape(k.name)}" maxlength="32" required></label><label>Icon<select name="avatar">${Object.entries(
           avatars,
         )
           .map(

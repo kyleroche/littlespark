@@ -1,4 +1,4 @@
-import { verifyBlink, createUno } from "./firmware.js";
+import { verifyBlink, verifyTraffic, createUno } from "./firmware.js";
 let active = null;
 self.onmessage = ({ data }) => {
   if (data.type === "stop") {
@@ -8,10 +8,11 @@ self.onmessage = ({ data }) => {
   if (data.type !== "run") return;
   try {
     const image = new Uint8Array(data.image);
-    const result = verifyBlink(image, data.halfPeriod);
+    const result = data.traffic ? verifyTraffic(image, data.halfPeriod) : verifyBlink(image, data.halfPeriod);
     self.postMessage({ type: "verified", ...result });
     const avr = createUno(image, (high) =>
-      self.postMessage({ type: "pin", high }),
+      !data.traffic && self.postMessage({ type: "pin", high }),
+      (mask) => data.traffic && self.postMessage({ type: "traffic-pin", mask }),
     );
     const run = { avr, start: performance.now() };
     active = run;

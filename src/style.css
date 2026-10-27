@@ -2652,3 +2652,8 @@ body.in-tour .lesson-nav {
 @media (max-width: 480px) { .sparky { margin: 10px; } .sparky-toggle { gap: 10px; } .sparky-actions button { flex: 1 1 140px; } }
 
 .lesson-picker{display:grid;gap:7px;margin-bottom:22px}.lesson-picker a{padding:10px;border:1px solid #ced3c3;border-radius:9px;text-decoration:none;color:#53654f;font-size:13px}.lesson-picker a[aria-current]{background:#dce5d2;color:#294b3f;font-weight:700}
+@media(max-width:760px){
+  .header-right{flex-wrap:wrap;max-width:100%;gap:6px}
+  .lesson-picker{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .lesson-picker a{flex:1 1 100px;font-size:11px;padding:9px}
+}

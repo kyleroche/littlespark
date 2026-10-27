@@ -49,7 +49,7 @@ export function parseHex(text) {
   if (!eof || highest === 0) throw Error("Incomplete firmware.");
   return image.slice(0, Math.ceil(highest / 128) * 128);
 }
-export function createUno(image, onPin = () => {}) {
+export function createUno(image, onPin = () => {}, onPort = () => {}) {
   const flash = new Uint8Array(32768).fill(255);
   flash.set(image);
   const cpu = new CPU(new Uint16Array(flash.buffer));
@@ -59,6 +59,7 @@ export function createUno(image, onPin = () => {}) {
   const port = new AVRIOPort(cpu, portBConfig);
   let last = false;
   port.addListener((value) => {
+    onPort(value & 56, cpu.cycles);
     let high = Boolean(value & 32);
     if (high !== last) {
       last = high;
@@ -97,4 +98,28 @@ export function verifyBlink(image, halfPeriod) {
     measuredMs: intervals.reduce((a, b) => a + b, 0) / intervals.length,
     cycles: avr.cpu.cycles,
   };
+}
+
+export function verifyTraffic(image, unit) {
+  if (![250,500,1000].includes(unit)) throw Error("Unsupported lesson speed.");
+  const phases=[];
+  let last=0;
+  const avr=createUno(image,()=>{},(mask,cycle)=>{
+    if (mask && (mask & (mask-1))) throw Error("Two traffic lights were on together.");
+    if(mask!==last && mask) phases.push({mask,cycle});
+    last=mask;
+  });
+  const limit=16e6*(14*unit/1000+1);
+  while(avr.cpu.cycles<limit && phases.length<7) avr.tick();
+  if(phases.length<7) throw Error("The traffic sequence did not repeat enough times.");
+  const order=[32,8,16];
+  for(let i=0;i<phases.length;i++) {
+    if(phases[i].mask!==order[i%3]) throw Error("The traffic light order did not match red, green, yellow.");
+    if(i>0) {
+      const expected=((i-1)%3===2?1:2)*unit;
+      const actual=(phases[i].cycle-phases[i-1].cycle)/16000;
+      if(Math.abs(actual-expected)>Math.max(5,expected*.03)) throw Error("The traffic light timing did not match this sketch.");
+    }
+  }
+  return {passed:true,phases:phases.length};
 }

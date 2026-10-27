@@ -8,6 +8,7 @@ export default defineConfig(({ mode }) => ({
         howto: "how-to/index.html",
         learn: "learn/index.html",
         makey: "learn/makey-makey/index.html",
+        traffic: "learn/traffic-lights/index.html",
         signin: "signin/index.html",
       },
     },

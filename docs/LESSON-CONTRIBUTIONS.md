@@ -1,6 +1,6 @@
 # Community lessons: proposed extension format
 
-The current app contains two reviewed, built-in lessons: Arduino Blink (fixed 3D scene/firmware variants) and Makey Makey Fruit Piano (animated SVG connection diagram and keyboard/Web Audio instrument). Adding a JSON file alone does not yet add a working lesson. The next extension step should separate lesson content, circuit scenes, animation cues, and tests from the app shell.
+The current app contains three reviewed, built-in lessons: Arduino Blink (fixed 3D scene/firmware variants) Arduino Traffic Lights (shared Arduino shell/content structure), and Makey Makey Fruit Piano (animated SVG connection diagram and keyboard/Web Audio instrument). Adding a JSON file alone does not yet add a working lesson. The next extension step should separate lesson content, circuit scenes, animation cues, and tests from the app shell.
 
 ## Recommended approach
 
@@ -50,3 +50,5 @@ New lessons should explain their parts, demonstrate each connection, and retain 
 2. Add a local preview command for contributors.
 3. Accept reviewed pull requests for new lessons.
 4. Add an in-app authoring tool only after the package format and validation rules are stable.
+
+The two Arduino lessons now share `src/arduino-lessons.js`, the workbench and the app shell. New built-in lessons still need reviewed geometry, firmware verification and a server-allowlisted progress ID; adding JSON alone does not create them.

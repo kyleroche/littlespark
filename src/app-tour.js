@@ -2,9 +2,9 @@
 export const TOUR_STEPS = [
   {
     id: "lesson-picker", feature: "lesson-picker", target: "#lesson-picker",
-    title: "Choose a lesson", description: "Choose Blink an LED for Arduino, or Fruit Piano for Makey Makey, in the field guide.",
+    title: "Choose a lesson", description: "Choose Blink an LED or Traffic Lights for Arduino, or Fruit Piano for Makey Makey, in the field guide.",
     tip: "Each lesson has its own checklist and progress.",
-    detail: "Fruit Piano starts with unboxing and animated connections, then a playable piano. It has its own tour. Child profiles save both lessons separately; parents see both in Family. Switching lessons keeps your saved steps.",
+    detail: "Fruit Piano starts with unboxing and animated connections, then a playable piano. It has its own tour. Child profiles save both lessons separately; parents see all three in Family. Switching lessons keeps your saved steps.",
     action: "Show the lesson picker", demo: "lesson-picker",
   },
   {
@@ -183,11 +183,22 @@ export function assertTourCoverage(features) {
 }
 
 export const MAKEY_TOUR_STEPS = [
-  { id: "makey-lessons", feature: "makey-lessons", target: "#makey-lessons", title: "Choose your lesson", description: "Switch between Blink an LED and Fruit Piano here. Each saves its own steps. This tour leaves your progress alone." },
+  { id: "makey-lessons", feature: "makey-lessons", target: "#makey-lessons", title: "Choose your lesson", description: "Switch between Blink an LED, Traffic Lights and Fruit Piano here. Each saves its own steps. This tour leaves your progress alone." },
   { id: "makey-parts", feature: "makey-parts", target: "#makey-kit", title: "Find the parts", description: "Check off the kit parts and things from home. Tap a part in the picture for details. Unboxing is a checklist, with no box to open on screen." },
   { id: "makey-diagram", feature: "makey-diagram", target: "#makey-diagram", title: "Watch the connections", description: "Next adds one connection at a time. Replay shows it again. Zoom + and − change the view; arrow buttons move it; Reset view brings everything back. Tap a part for a note, then Back to diagram." },
   { id: "makey-piano", feature: "makey-piano", target: "#makey-piano", title: "Try your fruit keys", description: "In the last step choose Virtual practice, connect virtual EARTH, then tap all three fruit keys. Release EARTH to see why the loop matters. Sound on enables the notes; Mute keeps the visual flashes." },
   { id: "makey-real", feature: "makey-real", target: "#makey-play-mode", title: "Play a real board", description: "Choose Real board / keyboard and click Focus piano. While holding the metal EARTH clip, touch your fruit. SPACE, LEFT and UP play notes. Your ordinary keyboard works too. No upload or special connection permission is needed; keyboard input cannot prove your real wiring is correct." },
-  { id: "makey-progress", feature: "makey-progress", target: "#makey-progress", title: "Pick up where you left off", description: "Parent practice stays on this device. Child progress syncs to their profile and appears beside Blink progress in Family. Wait for Progress synced before changing devices. Reset lesson resets only Fruit Piano." },
+  { id: "makey-progress", feature: "makey-progress", target: "#makey-progress", title: "Pick up where you left off", description: "Parent practice stays on this device. Child progress syncs to their profile and appears beside the Arduino lessons in Family. Wait for Progress synced before changing devices. Reset lesson resets only Fruit Piano." },
   { id: "makey-family", feature: "makey-family", target: "#account-button", title: "Family and help", description: "Family opens the parent dashboard or your learner profile. The How-to link opens a new tab. Close this tour to return to your current fruit-piano step." },
 ];
+
+export function arduinoTour(traffic=false) {
+  if (!traffic) return TOUR_STEPS;
+  const replacements = {
+    code: { title:"Edit the sequence pace",description:"The program turns on red, then green, then yellow. Sequence pace changes all three waits. Red and green each last twice as long as yellow.",detail:"This is a guided editor, not free typing. Changing pace clears the old test result. Copy code and Download sketch export this lesson’s matching program.",tip:"Three waits, one repeating sequence.",action:"Try a faster sequence" },
+    sparky: { description:"Ask Sparky highlights the three wait lines and explains HIGH, LOW, and red → green → yellow.",detail:"Show a faster sequence or Show a slower sequence previews the three waits. Try it applies them; Undo restores the old pace. Test my sequence in step 7 checks the new program. Close × hides his help." },
+    test: { title:"Test all three outputs",description:"In step 7, Test my sequence runs the compiled Uno program. It checks the order, timing and that two lights are never on together.",detail:"The diagram follows the program’s actual D13, D12 and D11 outputs. A changed pace needs a new test. Pause stops all three lights. This does not check physical wiring." },
+    hardware: { detail:"With USB unplugged, have a grown-up check all three LED directions, three 220 Ω resistors and six jumper wires. Pass Test my sequence, then connect and send that exact tested program to a classic Uno R3 in Chrome or Edge. Safari can download the sketch for Arduino IDE. Close × returns to the workbench." },
+  };
+  return TOUR_STEPS.map(step=>({...step,...replacements[step.id]}));
+}

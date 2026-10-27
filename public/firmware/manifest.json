@@ -15,5 +15,19 @@
       "path": "/firmware/blink-1000.hex",
       "sha256": "b0486f73bf131e0d2b2cc49db0591a8cf96aa885c3ea7405a7d58d61fe86c7d0"
     }
+  },
+  "traffic": {
+    "250": {
+      "path": "/firmware/traffic-250.hex",
+      "sha256": "9607319071ae15c8a6db091a03817e544440be87455a32a3eff7e16be4282f8c"
+    },
+    "500": {
+      "path": "/firmware/traffic-500.hex",
+      "sha256": "c8fcf3c5d970e6141b6c3eecdf73961ecb616e48ba0f5b822c8f515e884067d9"
+    },
+    "1000": {
+      "path": "/firmware/traffic-1000.hex",
+      "sha256": "d8df5f75e7c5b23a4318f3f6bc2f7da016eb4ad931949919b6d4771f1ba0a0de"
+    }
   }
 }
