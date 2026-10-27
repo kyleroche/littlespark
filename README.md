@@ -1,6 +1,6 @@
 # Little Sparks
 
-An illustrated Arduino workbench for a child's first electronics adventure. Six animated steps lead from meeting a classic Uno R3 to wiring and blinking a real LED.
+An illustrated Arduino workbench for a child's first electronics adventure. Seven animated steps lead from meeting a classic Uno R3 to wiring and blinking a real LED.
 
 ## Run
 
@@ -13,8 +13,8 @@ Production: `npm run build`. Deploy the resulting `dist` directory to Vercel (co
 
 ## What works
 
-- Original procedural Three.js Uno R3, breadboard, LED, 330 Ω resistor, and jumper wires.
-- Six guided steps, animated part placement, replay, component inspection, cursor-anchored zoom, rotation, pan, and touch pinch zoom.
+- Original procedural Three.js Uno R3, breadboard, LED, 220 Ω resistor, and jumper wires.
+- Seven guided steps, animated part placement, replay, component inspection, cursor-anchored zoom, rotation, pan, and touch pinch zoom.
 - Three guided Blink rhythms (250 / 500 / 1000 ms) and virtual LED colors.
 - Real AVR8js execution of compiled Arduino firmware in a Web Worker. The test checks six D13 transitions and their timing.
 - SHA-256 checks for the firmware artifacts. Upload uses the exact byte image that passed emulation.
@@ -23,11 +23,11 @@ Production: `npm run build`. Deploy the resulting `dist` directory to Vercel (co
 
 ## Real board
 
-Use a **classic Uno R3**, USB cable, breadboard, standard 5 mm LED, 330 Ω resistor, and two jumper wires. Uno R4, Nano, ESP32, and other bootloaders are not supported by this lesson.
+Use a **classic Uno R3**, USB cable, breadboard, standard 5 mm LED, 220 Ω resistor, and two jumper wires. Uno R4, Nano, ESP32, and other bootloaders are not supported by this lesson.
 
 With USB unplugged, place the LED across the center gap: long leg E11, short leg F11. Resistor C11–C17, D13–A17, GND–J11. Letters correspond to the five connected holes on each side of the center gap; check your breadboard's numbering and orientation.
 
-Pass the virtual test in step 6, open **Connect a board**, have an adult check the board and wiring, connect using a browser with Web Serial (desktop Chrome/Edge), and select **Send tested code**. Serial access requires HTTPS or localhost and a user gesture. The test validates program behavior; it cannot validate physical wiring. USB bootloader flashing must still be tested with a physical Uno before this is considered hardware-validated.
+Pass the virtual test in step 7, open **Connect a board**, have an adult check the board and wiring, connect using a browser with Web Serial (desktop Chrome/Edge), and select **Send tested code**. Serial access requires HTTPS or localhost and a user gesture. The test validates program behavior; it cannot validate physical wiring. USB bootloader flashing must still be tested with a physical Uno before this is considered hardware-validated.
 
 Firmware is constrained to supplied, precompiled lesson variants. The displayed sketch matches the source of each artifact. This is not an arbitrary-code compiler or a general analog circuit simulator.
 
@@ -52,3 +52,7 @@ Drag to pan; Shift-drag to rotate; scroll/pinch to zoom; Q/E to rotate; WASD to 
 Models and interface are original and authored in this repository. Three.js and AVR8js are MIT-licensed dependencies; their licenses are retained by npm. Arduino's compiled core is LGPL-2.1; the source sketches and toolchain/core version are included, and corresponding core source is available at https://github.com/arduino/ArduinoCore-avr/tree/1.8.8. Interface fonts are loaded from Google Fonts.
 
 The visual exploration was inspired by Dilum Sanjaya's Learn Arduino (https://learn-arduino-red.vercel.app/). No reference-site code or models are included.
+
+## Official Starter Kit unboxing
+
+The first step identifies one Uno R3, one USB-A to USB-B cable, one 400-point breadboard, one red two-legged LED, one 220 Ω resistor, and two solid-core jumper wires. Each item has a persistent found checklist and animated lift/zoom inspection. Other kit components are not needed for this adventure. Inventory source: https://store-usa.arduino.cc/products/arduino-starter-kit-multi-language

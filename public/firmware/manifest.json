@@ -1,0 +1,19 @@
+{
+  "board": "arduino:avr:uno",
+  "core": "arduino:avr@1.8.8",
+  "clockHz": 16000000,
+  "variants": {
+    "250": {
+      "path": "/firmware/blink-250.hex",
+      "sha256": "bc4408ee6ffa35578f2c71f11e4f463205f99cec924db3d856457ca3750aedd1"
+    },
+    "500": {
+      "path": "/firmware/blink-500.hex",
+      "sha256": "fca1d74f3e16ea45d3e7aaf7d3b89f0dabb462a645d241aa5cf74dce11fb84c3"
+    },
+    "1000": {
+      "path": "/firmware/blink-1000.hex",
+      "sha256": "b0486f73bf131e0d2b2cc49db0591a8cf96aa885c3ea7405a7d58d61fe86c7d0"
+    }
+  }
+}

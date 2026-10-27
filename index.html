@@ -1,9 +1,315 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f4f1e8"><meta name="description" content="Build your first Arduino circuit, one animated step at a time. A little electronics adventure for curious minds."><title>Little Sparks — Your first circuit</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23264e46'/%3E%3Cpath d='M23 5L10 23h10l-3 12 14-19H21z' fill='%23efbd68'/%3E%3C/svg%3E"></head><body><div id="app">
-<header class="header"><a class="brand" href="/" aria-label="Little Sparks home"><span class="brand-icon">ϟ</span><span>little sparks<span class="brand-dot">.</span></span></a><span class="header-caption">BIG IDEAS START SMALL</span><div class="header-right"><span class="save-state"><span></span> Your progress is saved</span><button class="button quiet" id="board-button"><span>⌁</span> Connect a board <span class="status-dot"></span></button></div></header>
-<aside class="sidebar"><div class="course-label">YOUR FIELD GUIDE <span>01</span></div><h2>A little light,<br>a big beginning.</h2><p class="course-description">Your first adventure in electronics.</p><div class="course-progress"><div><span id="progress-label">0 of 6 steps explored</span><span id="progress-percent">0%</span></div><div class="progress-track"><i id="progress-fill"></i></div></div><nav id="step-list" aria-label="Lesson steps"></nav><div class="side-note"><span class="note-star">✳</span><p>No kit? No problem.<br><strong>You can try everything here.</strong></p></div><button id="restart" class="restart">↺ Start this adventure again</button><div class="side-footer">MADE FOR CURIOUS MINDS <span>↗</span></div></aside>
-<main><section class="intro"><div><div class="eyebrow"><span class="tiny-spark">✦</span> ADVENTURE 01 <span class="separator">/</span> MEET YOUR FIRST CIRCUIT</div><h1>Let’s make a little light<span>.</span></h1><p>A board, a few tiny parts, and a bright idea. You’ve got this.</p></div><div class="difficulty"><span>✳</span><div>First-time friendly<small>6 small steps · about 10 minutes</small></div></div></section>
-<div class="workspace"><section class="stage-card" aria-label="Interactive electronics workbench"><div class="stage-heading"><span><i></i> YOUR WORKBENCH</span><button id="view-mode" class="view-badge">↗ &nbsp; 3D VIEW</button></div><div id="scene"><canvas id="workbench" aria-label="3D Arduino circuit. Drag to pan, scroll to zoom, Q and E to rotate." tabindex="0"></canvas><div id="labels"></div><div id="scene-loading">Setting out your workbench…</div><div class="scene-caption"><span id="scene-number">FIG. 01</span><span id="scene-title">THE LITTLE BRAIN OF YOUR CIRCUIT</span></div><div class="view-controls"><button id="rotate-left" aria-label="Rotate left" title="Rotate left (Q)">↶</button><button id="rotate-right" aria-label="Rotate right" title="Rotate right (E)">↷</button><span></span><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-in" aria-label="Zoom in">+</button><span></span><button id="reset-view" aria-label="Reset view" title="Reset view (R)">⌖</button></div><div class="drag-hint">DRAG TO EXPLORE <span>·</span> SCROLL TO ZOOM</div></div><div class="parts-tray"><span>IN YOUR KIT</span><button data-part="board"><i class="part-glyph board-glyph">▤</i><span>Arduino Uno</span><b>1×</b></button><button data-part="breadboard"><i class="part-glyph bread-glyph">⠿</i><span>Breadboard</span><b>1×</b></button><button data-part="led"><i class="part-glyph led-glyph">♟</i><span>LED</span><b>1×</b></button><button data-part="resistor"><i class="part-glyph resistor-glyph">▰</i><span>Resistor</span><b>1×</b></button><button data-part="wires"><i class="part-glyph wire-glyph">∿</i><span>Wires</span><b>2×</b></button></div></section>
-<aside class="instruction-card"><div class="step-kicker"><span id="step-count">STEP 01 / 06</span><span class="time-label" id="step-time">~1 MIN</span></div><div id="step-art" class="step-art">01<span>✦</span></div><h2 id="step-title"></h2><p id="step-description"></p><div class="why-box"><span>☀</span><div><strong id="tip-title"></strong><p id="tip-text"></p></div></div><div id="step-extra"></div><div class="instruction-actions"><button id="replay" class="replay">↻ Watch that again</button><button id="next-step" class="button primary">Got it, let’s go <span>→</span></button><button id="previous-step" class="previous">← Previous step</button></div><div class="instruction-footer"><span>✧</span> Little steps. Real discoveries.</div></aside></div>
-<section class="lower"><div class="notebook"><div class="notebook-heading"><span><span class="code-icon">&lt;/&gt;</span> A PEEK AT THE CODE</span><button id="copy-code">Copy code <span>⧉</span></button></div><div class="code-content"><pre id="code"></pre><div class="code-explanation"><span class="hand-arrow">↙</span><strong>A tiny set of instructions.</strong><p>Turn the light on.<br>Wait a little.<br>Turn it off.<br>Do it all again.</p><span class="code-tag">THAT’S A LOOP!</span></div></div><div class="simulation-status"><span id="sim-dot"></span><span id="sim-status" role="status">Ready when you are. We’ll test your circuit in step 6.</span></div></div><div class="discovery"><div class="eyebrow">THE BIG LITTLE IDEA</div><div class="discovery-icon">∞</div><h3>You’re telling electricity<br>where to go.</h3><p>And when it gets to your LED…<br>hello, light!</p><div class="discovery-bottom">EXPLORE <span>→</span> BUILD <span>→</span> MAKE IT REAL</div></div></section><footer class="main-footer"><span>A safe place to try, tinker, and wonder.</span><button id="parent-notes">A note for grown-ups ↗</button></footer>
-</main><dialog id="inspector"><button class="dialog-close" aria-label="Close component details">×</button><div class="eyebrow">A CLOSER LOOK</div><h2 id="part-title"></h2><p id="part-description"></p><div id="part-details"></div><button id="focus-part" class="button primary">Take a closer look <span>⌖</span></button></dialog>
-<dialog id="board-dialog"><button class="dialog-close" aria-label="Close board connection">×</button><div class="eyebrow">FROM YOUR SCREEN TO YOUR DESK</div><h2>A real-life little light.</h2><p>With a grown-up, connect a <strong>classic Arduino Uno R3 (ATmega328P)</strong> using its USB cable.</p><div class="hardware-checks"><div><span>1</span><p>Build the circuit with USB unplugged. Ask a grown-up to check the LED, 330 Ω resistor, and wires.</p></div><div><span>2</span><p>Run the virtual test in step 6. We test the same compiled program that goes to your board.</p></div><div><span>3</span><p>Plug in USB, connect, then send the program. This needs a desktop browser with Web Serial, such as Chrome or Edge.</p></div></div><label class="adult-check"><input type="checkbox" id="adult-check"> A grown-up checked our Uno R3 and wiring.</label><div id="hardware-status" role="status"></div><div class="hardware-actions"><button id="connect-usb" class="button secondary">1. Connect Uno</button><button id="upload-usb" class="button primary" disabled>2. Send tested code →</button></div><p class="small-print">The virtual test checks program behavior. It cannot inspect the wires on your real board. This lesson doesn’t support Uno R4, Nano, or ESP32.</p></dialog><dialog id="notes-dialog"><button class="dialog-close" aria-label="Close parent notes">×</button><div class="eyebrow">HELLO, GROWN-UP</div><h2>A small adventure, together.</h2><p>This first lesson uses a classic Uno R3, a breadboard, a standard LED, a 330 Ω resistor, and two jumper wires.</p><p>Follow each animated step with the board unplugged. Check the LED’s long leg connects through the resistor to D13, and its short leg connects to GND. Use USB power for this activity.</p><p>The browser runs the actual precompiled AVR program in an emulator. After the test passes, the identical firmware can be uploaded using Web Serial and the Uno’s bootloader. Physical uploads still need a hands-on check.</p><p>Progress stays in this browser. There are no accounts, ads, or tracking scripts. The code is intentionally guided; free-form programming is a later adventure.</p><button class="button primary close-notes">Let’s explore →</button></dialog><div id="toast" role="status"></div></div><script type="module" src="/src/app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f4f1e8" />
+    <meta
+      name="description"
+      content="Build your first Arduino circuit, one animated step at a time. A little electronics adventure for curious minds."
+    />
+    <title>Little Sparks — Your first circuit</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23264e46'/%3E%3Cpath d='M23 5L10 23h10l-3 12 14-19H21z' fill='%23efbd68'/%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <header class="header">
+        <a class="brand" href="/" aria-label="Little Sparks home"
+          ><span class="brand-icon">ϟ</span
+          ><span>little sparks<span class="brand-dot">.</span></span></a
+        ><span class="header-caption">BIG IDEAS START SMALL</span>
+        <div class="header-right">
+          <span class="save-state"><span></span> Your progress is saved</span
+          ><button class="button quiet" id="board-button">
+            <span>⌁</span> Connect a board <span class="status-dot"></span>
+          </button>
+        </div>
+      </header>
+      <aside class="sidebar">
+        <div class="course-label">YOUR FIELD GUIDE <span>01</span></div>
+        <h2>A little light,<br />a big beginning.</h2>
+        <p class="course-description">Your first adventure in electronics.</p>
+        <div class="course-progress">
+          <div>
+            <span id="progress-label">0 of 7 steps explored</span
+            ><span id="progress-percent">0%</span>
+          </div>
+          <div class="progress-track"><i id="progress-fill"></i></div>
+        </div>
+        <nav id="step-list" aria-label="Lesson steps"></nav>
+        <div class="side-note">
+          <span class="note-star">✳</span>
+          <p>
+            No kit? No problem.<br /><strong
+              >You can try everything here.</strong
+            >
+          </p>
+        </div>
+        <button id="restart" class="restart">
+          ↺ Start this adventure again
+        </button>
+        <div class="side-footer">MADE FOR CURIOUS MINDS <span>↗</span></div>
+      </aside>
+      <main>
+        <section class="intro">
+          <div>
+            <div class="eyebrow">
+              <span class="tiny-spark">✦</span> ADVENTURE 01
+              <span class="separator">/</span> MEET YOUR FIRST CIRCUIT
+            </div>
+            <h1>Let’s make a little light<span>.</span></h1>
+            <p>
+              A board, a few tiny parts, and a bright idea. You’ve got this.
+            </p>
+          </div>
+          <div class="difficulty">
+            <span>✳</span>
+            <div>
+              First-time friendly<small>7 small steps · about 10 minutes</small>
+            </div>
+          </div>
+        </section>
+        <div class="workspace">
+          <section
+            class="stage-card"
+            aria-label="Interactive electronics workbench"
+          >
+            <div class="stage-heading">
+              <span><i></i> YOUR WORKBENCH</span
+              ><button id="view-mode" class="view-badge">
+                ↗ &nbsp; 3D VIEW
+              </button>
+            </div>
+            <div id="scene">
+              <canvas
+                id="workbench"
+                aria-label="3D Arduino circuit. Drag to pan, scroll to zoom, Q and E to rotate."
+                tabindex="0"
+              ></canvas>
+              <div id="labels"></div>
+              <div id="scene-loading">Setting out your workbench…</div>
+              <div class="scene-caption">
+                <span id="scene-number">FIG. 01</span
+                ><span id="scene-title">THE LITTLE BRAIN OF YOUR CIRCUIT</span>
+              </div>
+              <div class="view-controls">
+                <button
+                  id="rotate-left"
+                  aria-label="Rotate left"
+                  title="Rotate left (Q)"
+                >
+                  ↶</button
+                ><button
+                  id="rotate-right"
+                  aria-label="Rotate right"
+                  title="Rotate right (E)"
+                >
+                  ↷</button
+                ><span></span
+                ><button id="zoom-out" aria-label="Zoom out">−</button
+                ><button id="zoom-in" aria-label="Zoom in">+</button
+                ><span></span
+                ><button
+                  id="reset-view"
+                  aria-label="Reset view"
+                  title="Reset view (R)"
+                >
+                  ⌖
+                </button>
+              </div>
+              <div class="drag-hint">
+                DRAG TO EXPLORE <span>·</span> SCROLL TO ZOOM
+              </div>
+            </div>
+            <div class="parts-tray">
+              <span>IN YOUR KIT</span
+              ><button data-part="board">
+                <i class="part-glyph board-glyph">▤</i><span>Arduino Uno</span
+                ><b>1×</b></button
+              ><button data-part="breadboard">
+                <i class="part-glyph bread-glyph">⠿</i><span>Breadboard</span
+                ><b>1×</b></button
+              ><button data-part="led">
+                <i class="part-glyph led-glyph">♟</i><span>LED</span
+                ><b>1×</b></button
+              ><button data-part="resistor">
+                <i class="part-glyph resistor-glyph">▰</i><span>Resistor</span
+                ><b>1×</b></button
+              ><button data-part="usb">
+                <i class="part-glyph usb-glyph">⌁</i><span>USB cable</span
+                ><b>1×</b></button
+              ><button data-part="wires">
+                <i class="part-glyph wire-glyph">∿</i><span>Wires</span
+                ><b>2×</b>
+              </button>
+            </div>
+          </section>
+          <aside class="instruction-card">
+            <div class="step-kicker">
+              <span id="step-count">STEP 01 / 07</span
+              ><span class="time-label" id="step-time">~1 MIN</span>
+            </div>
+            <div id="step-art" class="step-art">01<span>✦</span></div>
+            <h2 id="step-title"></h2>
+            <p id="step-description"></p>
+            <div class="why-box">
+              <span>☀</span>
+              <div>
+                <strong id="tip-title"></strong>
+                <p id="tip-text"></p>
+              </div>
+            </div>
+            <div id="step-extra"></div>
+            <div class="instruction-actions">
+              <button id="replay" class="replay">↻ Watch that again</button
+              ><button id="next-step" class="button primary">
+                Got it, let’s go <span>→</span></button
+              ><button id="previous-step" class="previous">
+                ← Previous step
+              </button>
+            </div>
+            <div class="instruction-footer">
+              <span>✧</span> Little steps. Real discoveries.
+            </div>
+          </aside>
+        </div>
+        <section class="lower">
+          <div class="notebook">
+            <div class="notebook-heading">
+              <span
+                ><span class="code-icon">&lt;/&gt;</span> A PEEK AT THE
+                CODE</span
+              ><button id="copy-code">Copy code <span>⧉</span></button>
+            </div>
+            <div class="code-content">
+              <pre id="code"></pre>
+              <div class="code-explanation">
+                <span class="hand-arrow">↙</span
+                ><strong>A tiny set of instructions.</strong>
+                <p>
+                  Turn the light on.<br />Wait a little.<br />Turn it off.<br />Do
+                  it all again.
+                </p>
+                <span class="code-tag">THAT’S A LOOP!</span>
+              </div>
+            </div>
+            <div class="simulation-status">
+              <span id="sim-dot"></span
+              ><span id="sim-status" role="status"
+                >Ready when you are. We’ll test your circuit in step 7.</span
+              >
+            </div>
+          </div>
+          <div class="discovery">
+            <div class="eyebrow">THE BIG LITTLE IDEA</div>
+            <div class="discovery-icon">∞</div>
+            <h3>You’re telling electricity<br />where to go.</h3>
+            <p>And when it gets to your LED…<br />hello, light!</p>
+            <div class="discovery-bottom">
+              EXPLORE <span>→</span> BUILD <span>→</span> MAKE IT REAL
+            </div>
+          </div>
+        </section>
+        <footer class="main-footer">
+          <span>A safe place to try, tinker, and wonder.</span
+          ><button id="parent-notes">A note for grown-ups ↗</button>
+        </footer>
+      </main>
+      <dialog id="inspector">
+        <button class="dialog-close" aria-label="Close component details">
+          ×
+        </button>
+        <div class="eyebrow">A CLOSER LOOK</div>
+        <h2 id="part-title"></h2>
+        <p id="part-description"></p>
+        <div id="part-details"></div>
+        <button id="focus-part" class="button primary">
+          Take a closer look <span>⌖</span>
+        </button>
+      </dialog>
+      <dialog id="board-dialog">
+        <button class="dialog-close" aria-label="Close board connection">
+          ×
+        </button>
+        <div class="eyebrow">FROM YOUR SCREEN TO YOUR DESK</div>
+        <h2>A real-life little light.</h2>
+        <p>
+          With a grown-up, connect a
+          <strong>classic Arduino Uno R3 (ATmega328P)</strong> using its USB
+          cable.
+        </p>
+        <div class="hardware-checks">
+          <div>
+            <span>1</span>
+            <p>
+              Build the circuit with USB unplugged. Ask a grown-up to check the
+              LED, 220 Ω resistor, and wires.
+            </p>
+          </div>
+          <div>
+            <span>2</span>
+            <p>
+              Run the virtual test in step 7. We test the same compiled program
+              that goes to your board.
+            </p>
+          </div>
+          <div>
+            <span>3</span>
+            <p>
+              Plug in USB, connect, then send the program. This needs a desktop
+              browser with Web Serial, such as Chrome or Edge.
+            </p>
+          </div>
+        </div>
+        <label class="adult-check"
+          ><input type="checkbox" id="adult-check" /> A grown-up checked our Uno
+          R3 and wiring.</label
+        >
+        <div id="hardware-status" role="status"></div>
+        <div class="hardware-actions">
+          <button id="connect-usb" class="button secondary">
+            1. Connect Uno</button
+          ><button id="upload-usb" class="button primary" disabled>
+            2. Send tested code →
+          </button>
+        </div>
+        <p class="small-print">
+          The virtual test checks program behavior. It cannot inspect the wires
+          on your real board. This lesson doesn’t support Uno R4, Nano, or
+          ESP32.
+        </p>
+      </dialog>
+      <dialog id="notes-dialog">
+        <button class="dialog-close" aria-label="Close parent notes">×</button>
+        <div class="eyebrow">HELLO, GROWN-UP</div>
+        <h2>A small adventure, together.</h2>
+        <p>
+          This first lesson uses a classic Uno R3, a breadboard, a standard LED,
+          a 220 Ω resistor, and two jumper wires.
+        </p>
+        <p>
+          Follow each animated step with the board unplugged. Check the LED’s
+          long leg connects through the resistor to D13, and its short leg
+          connects to GND. Use USB power for this activity.
+        </p>
+        <p>
+          The browser runs the actual precompiled AVR program in an emulator.
+          After the test passes, the identical firmware can be uploaded using
+          Web Serial and the Uno’s bootloader. Physical uploads still need a
+          hands-on check.
+        </p>
+        <p>
+          Progress stays in this browser. There are no accounts, ads, or
+          tracking scripts. The code is intentionally guided; free-form
+          programming is a later adventure.
+        </p>
+        <button class="button primary close-notes">Let’s explore →</button>
+      </dialog>
+      <div id="toast" role="status"></div>
+    </div>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>

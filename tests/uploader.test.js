@@ -1,8 +1,52 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import { UnoConnection } from '../src/uploader.js';
-class MockUno extends UnoConnection{constructor(signature=[0x1e,0x95,0x0f]){super({setSignals:async()=>{}});this.calls=[];this.signature=signature;this.address=0;this.flash=new Uint8Array(32768)}async command(data){this.calls.push(data);if(data[0]===0x75)return this.signature;if(data[0]===0x55)this.address=(data[1]+data[2]*256)*2;if(data[0]===0x64)this.flash.set(data.slice(4),this.address);if(data[0]===0x74)return[...this.flash.slice(this.address,this.address+128)];return[]}}
-test('uploader writes pages then reads identical bytes back before leaving programming mode',async()=>{const board=new MockUno();const image=Uint8Array.from({length:256},(_,i)=>i);let progress=[];await board.upload(image,p=>progress.push(p));assert.deepEqual(board.flash.slice(0,256),image);assert.equal(board.calls.filter(c=>c[0]===0x64).length,2);assert.equal(board.calls.filter(c=>c[0]===0x74).length,2);assert.equal(board.calls.at(-1)[0],0x51);assert.equal(progress.at(-1),100)});
-test('wrong chip signature prevents flash writes',async()=>{const board=new MockUno([0x1e,0x95,0x14]);await assert.rejects(board.upload(new Uint8Array(128)),/not an ATmega328P/);assert.ok(!board.calls.some(c=>c[0]===0x64))});
-test('readback mismatch fails the upload',async()=>{const board=new MockUno();const original=board.command.bind(board);board.command=async data=>{let r=await original(data);if(data[0]===0x74)r[0]^=255;return r};await assert.rejects(board.upload(new Uint8Array(128)),/Read-back/)});
-test('invalid image cannot start a hardware write',async()=>{const board=new MockUno();await assert.rejects(board.upload(new Uint8Array(129)),/Invalid/);assert.equal(board.calls.length,0)});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { UnoConnection } from "../src/uploader.js";
+class MockUno extends UnoConnection {
+  constructor(signature = [0x1e, 0x95, 0x0f]) {
+    super({ setSignals: async () => {} });
+    this.calls = [];
+    this.signature = signature;
+    this.address = 0;
+    this.flash = new Uint8Array(32768);
+  }
+  async command(data) {
+    this.calls.push(data);
+    if (data[0] === 0x75) return this.signature;
+    if (data[0] === 0x55) this.address = (data[1] + data[2] * 256) * 2;
+    if (data[0] === 0x64) this.flash.set(data.slice(4), this.address);
+    if (data[0] === 0x74)
+      return [...this.flash.slice(this.address, this.address + 128)];
+    return [];
+  }
+}
+test("uploader writes pages then reads identical bytes back before leaving programming mode", async () => {
+  const board = new MockUno();
+  const image = Uint8Array.from({ length: 256 }, (_, i) => i);
+  let progress = [];
+  await board.upload(image, (p) => progress.push(p));
+  assert.deepEqual(board.flash.slice(0, 256), image);
+  assert.equal(board.calls.filter((c) => c[0] === 0x64).length, 2);
+  assert.equal(board.calls.filter((c) => c[0] === 0x74).length, 2);
+  assert.equal(board.calls.at(-1)[0], 0x51);
+  assert.equal(progress.at(-1), 100);
+});
+test("wrong chip signature prevents flash writes", async () => {
+  const board = new MockUno([0x1e, 0x95, 0x14]);
+  await assert.rejects(board.upload(new Uint8Array(128)), /not an ATmega328P/);
+  assert.ok(!board.calls.some((c) => c[0] === 0x64));
+});
+test("readback mismatch fails the upload", async () => {
+  const board = new MockUno();
+  const original = board.command.bind(board);
+  board.command = async (data) => {
+    let r = await original(data);
+    if (data[0] === 0x74) r[0] ^= 255;
+    return r;
+  };
+  await assert.rejects(board.upload(new Uint8Array(128)), /Read-back/);
+});
+test("invalid image cannot start a hardware write", async () => {
+  const board = new MockUno();
+  await assert.rejects(board.upload(new Uint8Array(129)), /Invalid/);
+  assert.equal(board.calls.length, 0);
+});
