@@ -1,4 +1,5 @@
 import * as T from "three";
+import { CAMERA_HELP, orbitView, panView, zoomView } from "./view-controls.js";
 const INK = 0x263d37;
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const mat = (color, roughness = 0.76, metalness = 0) =>
@@ -214,24 +215,29 @@ function board() {
     }
     return group;
   };
-  header(10, -5.57, -23);
-  header(8, 17.29, -23);
-  header(8, -1, 23);
-  header(6, 21, 23);
+  header(10, -5.57, -23).userData.detail = "digitalPins";
+  header(8, 17.29, -23).userData.detail = "digitalPins";
+  header(8, -1, 23).userData.detail = "powerPins";
+  header(6, 21, 23).userData.detail = "analogPins";
   let usb = new T.Group();
   g.add(usb);
+  usb.userData.detail = "usbPort";
   box(13, 10, 12, metal, usb, -29, 8, -8);
   box(0.4, 7, 9, mat("#5e6d60"), usb, -35.6, 7.8, -8);
   box(0.45, 5.3, 6.8, cream, usb, -35.9, 7.7, -8);
   box(10, 0.4, 10, mat("#cbccb7"), usb, -29, 13.2, -8);
   for (let z of [-12, -4]) box(5, 0.2, 0.4, dark, usb, -29, 13.5, z);
-  box(11, 9, 9, dark, g, -29, 7.5, 13);
+  const jackBody = box(11, 9, 9, dark, g, -29, 7.5, 13);
+  jackBody.userData.detail = "powerJack";
   let jack = cyl(3.7, 3.7, 6, dark, g, -34.5, 8, 13);
   jack.rotation.z = Math.PI / 2;
+  jack.userData.detail = "powerJack";
   let jackHole = cyl(2.4, 2.4, 0.1, mat("#182c25"), g, -37.6, 8, 13);
   jackHole.rotation.z = Math.PI / 2;
+  jackHole.userData.detail = "powerJack";
   let dip = box(32, 4.5, 8, dark, g, 9, 6.5, 11);
-  textPlane(
+  dip.userData.detail = "microcontroller";
+  const chipLabel = textPlane(
     g,
     28,
     6,
@@ -246,6 +252,7 @@ function board() {
     8.8,
     11,
   );
+  chipLabel.userData.detail = "microcontroller";
   for (let i = 0; i < 14; i++)
     for (let s of [-1, 1])
       box(0.65, 2, 1.6, metal, g, -6.3 + i * 2.35, 5.2, 11 + s * 4.7);
@@ -276,7 +283,8 @@ function board() {
     for (let s of [-1, 1])
       box(0.4, 0.4, 1.2, metal, g, 5 + i, 4.5, -7 + s * 3.5, false);
   box(5, 1.2, 5, metal, g, -20, 4.7, -19);
-  cyl(1.9, 1.9, 1.5, mat("#cc7453"), g, -20, 6, -19);
+  cyl(1.9, 1.9, 1.5, mat("#cc7453"), g, -20, 6, -19).userData.detail =
+    "resetButton";
   for (let [x, z] of [
     [23, 14],
     [26, 14],
@@ -477,10 +485,13 @@ function wire(start, end, color, height) {
   return g;
 }
 export class Workbench {
-  constructor({ onPart, onReady, onError }) {
+  constructor({ onPart, onReady, onInspectChange = () => {} }) {
     this.canvas = document.querySelector("#workbench");
     this.host = document.querySelector("#scene");
     this.onPart = onPart;
+    this.onInspectChange = onInspectChange;
+    this.mode = "rotate";
+    this.inspection = null;
     this.step = 0;
     this.parts = {};
     this.animations = [];
@@ -498,7 +509,14 @@ export class Workbench {
     this.renderer.toneMappingExposure = 1.3;
     this.scene = new T.Scene();
     this.camera = new T.OrthographicCamera(-80, 80, 65, -65, 1, 700);
-    this.view = { x: -35, z: 0, scale: 100, azimuth: 0.63, y: 0 };
+    this.view = {
+      x: -35,
+      z: 0,
+      scale: 100,
+      azimuth: 0.63,
+      elevation: Math.PI / 4,
+      y: 0,
+    };
     this.goal = { ...this.view };
     this.scene.add(new T.HemisphereLight("#fff9dd", "#94a18c", 2.3));
     let sun = new T.DirectionalLight("#fff9e3", 3);
@@ -559,7 +577,10 @@ export class Workbench {
     this.labelItems = [];
     for (let [key, label, pos] of [
       ["board", "ARDUINO UNO", [-12, 12, 24]],
-      ["usb", "POWER + IDEAS", [-72, 16, -8]],
+      ["usb", "USB PORT", [-72, 16, -8]],
+      ["microcontroller", "THE TINY BRAIN", [-29, 16, 11]],
+      ["digitalPins", "DIGITAL PINS", [-30, 20, -23]],
+      ["powerJack", "POWER SOCKET", [-72, 16, 13]],
       ["breadboard", "A PLACE TO CONNECT", [78, 7, 18]],
       ["led", "YOUR LITTLE LIGHT", [35, 38, 0]],
       ["resistor", "220 Ω · SLOWS THE FLOW", [75, 18, -9]],
@@ -569,8 +590,17 @@ export class Workbench {
       let el = document.createElement("button");
       el.className = "label";
       el.textContent = label;
-      el.onclick = () =>
-        onPart(key === "usb" || key === "d13" || key === "gnd" ? "board" : key);
+      el.onclick = () => {
+        const detail = {
+          usb: "usbPort",
+          microcontroller: "microcontroller",
+          digitalPins: "digitalPins",
+          powerJack: "powerJack",
+          d13: "digitalPins",
+          gnd: "powerPins",
+        }[key];
+        onPart(detail ? "board" : key, detail);
+      };
       document.querySelector("#labels").append(el);
       this.labelItems.push({ key, el, pos: new T.Vector3(...pos) });
     }
@@ -588,6 +618,8 @@ export class Workbench {
     this.aspect = w / h;
   }
   setStep(step, animate = true) {
+    this.inspection = null;
+    this.onInspectChange(null);
     let wasKit = this.step === -1;
     this.step = step;
     this.animations = [];
@@ -633,6 +665,9 @@ export class Workbench {
     this.home();
   }
   resetKit() {
+    this.inspection = null;
+    this.returnView = null;
+    this.onInspectChange(null);
     for (const part of Object.values(this.parts)) part.visible = true;
     this.selectedKit = null;
     this.popAnimation = {
@@ -646,78 +681,103 @@ export class Workbench {
         endScale: k === "wires" ? 0.35 : 1,
       })),
     };
-    Object.assign(this.goal, { x: 5, y: 3, z: 4, scale: 170, azimuth: 0.35 });
-  }
-  popout(key) {
-    if (this.step !== -1) {
-      if (!this.parts[key]?.visible) return false;
-      this.focus(key);
-      let p = this.parts[key];
-      this.animations.push({
-        p,
-        from: performance.now(),
-        duration: 1000,
-        home: p.userData.home.clone(),
-      });
-      p.position.y = 15;
-      return true;
-    }
-    if (!this.parts[key]) return false;
-    if (this.selectedKit === key) this.parts[key].position.y -= 8;
-    for (const [name, part] of Object.entries(this.parts))
-      part.visible = name === key;
-    this.selectedKit = key;
-    let homes = this.kitHomes;
-    this.popAnimation = {
-      from: performance.now(),
-      duration: reduced ? 1 : 900,
-      items: Object.entries(this.parts).map(([k, p]) => ({
-        p,
-        start: p.position.clone(),
-        end: homes[k].clone().add(new T.Vector3(0, k === key ? 18 : 0, 0)),
-        startScale: p.scale.x,
-        endScale:
-          k === "wires"
-            ? k === key
-              ? 0.5
-              : 0.35
-            : k === key
-              ? { led: 2.5, resistor: 2, usb: 1.45 }[k] || 1.04
-              : 1,
-      })),
-    };
-    let center = homes[key];
     Object.assign(this.goal, {
-      x: center.x + (key === "resistor" ? 15.24 : key === "wires" ? 2 : 0),
-      z: center.z + (key === "resistor" ? -18.16 : 0),
-      y: {
-        board: 24,
-        breadboard: 22,
-        led: 43,
-        resistor: 30,
-        wires: 28,
-        usb: 21,
-      }[key],
-      scale: {
-        board: 105,
-        breadboard: 105,
-        led: 42,
-        resistor: 50,
-        wires: 65,
-        usb: 50,
-      }[key],
-      azimuth: 0.4,
+      x: 5,
+      y: 3,
+      z: 4,
+      scale: 170,
+      azimuth: 0.35,
+      elevation: Math.PI / 4,
     });
+  }
+  popout(key, detail = null) {
+    const part = this.parts[key];
+    if (!part) return false;
+    if (this.step !== -1 && !part.visible) return false;
+    if (!this.inspection) this.returnView = { ...this.goal };
+    this.animations = [];
+    this.popAnimation = null;
+    if (this.step === -1) {
+      this.selectedKit = key;
+      for (const [name, p] of Object.entries(this.parts)) {
+        p.visible = name === key;
+        p.position.copy(this.kitHomes[name]);
+        p.scale.setScalar(name === "wires" ? 0.35 : 1);
+      }
+    } else {
+      // Inspect in place so connections and breadboard positions remain truthful.
+      for (const p of Object.values(this.parts))
+        p.position.copy(p.userData.home);
+    }
+    let targets = [];
+    if (detail)
+      part.traverse((object) => {
+        if (object.userData.detail === detail) targets.push(object);
+      });
+    if (!targets.length) targets = [part];
+    this.scene.updateMatrixWorld(true);
+    const bounds = new T.Box3();
+    for (const target of targets)
+      bounds.union(new T.Box3().setFromObject(target));
+    const center = bounds.getCenter(new T.Vector3());
+    const size = bounds.getSize(new T.Vector3());
+    this.inspection = { key, detail, point: center.clone() };
+    Object.assign(this.goal, {
+      x: center.x,
+      y: center.y,
+      z: center.z,
+      scale: Math.max(
+        22,
+        Math.max(size.x / this.aspect, size.z, size.y) * 1.75,
+      ),
+      elevation: 0.75,
+      azimuth: 0.5,
+    });
+    // Leave a little breathing room for the floating field-note card.
+    const offset = this.goal.scale * this.aspect * 0.1;
+    this.goal.x -= Math.cos(this.goal.azimuth) * offset;
+    this.goal.z += Math.sin(this.goal.azimuth) * offset;
+    this.goal.y -= (this.goal.scale * 0.14) / Math.cos(this.goal.elevation);
+    this.onInspectChange(this.inspection);
     return true;
   }
+  retreat() {
+    if (!this.inspection) {
+      this.home();
+      return;
+    }
+    if (this.step === -1) {
+      this.resetKit();
+    } else if (this.returnView) Object.assign(this.goal, this.returnView);
+    this.inspection = null;
+    this.returnView = null;
+    this.onInspectChange(null);
+  }
+  setMode(mode) {
+    this.mode = mode === "pan" ? "pan" : "rotate";
+    for (const [id, value] of [
+      ["rotate-mode", "rotate"],
+      ["pan-mode", "pan"],
+    ]) {
+      const button = document.querySelector("#" + id);
+      button.setAttribute("aria-pressed", String(this.mode === value));
+    }
+    document.querySelector("#drag-hint").textContent =
+      this.mode === "rotate"
+        ? "DRAG TO TURN · SCROLL TO ZOOM"
+        : "DRAG TO MOVE · SCROLL TO ZOOM";
+  }
   home() {
+    this.inspection = null;
+    this.returnView = null;
+    this.onInspectChange(null);
     if (this.step === -1) {
       this.resetKit();
       return;
     }
     Object.assign(
       this.goal,
-      { y: 0 },
+      { y: 0, elevation: Math.PI / 4 },
       this.step === 0
         ? { x: -35, z: 0, scale: 99, azimuth: 0.63 }
         : this.step === 2 || this.step === 3
@@ -725,31 +785,8 @@ export class Workbench {
           : { x: 10, z: 0, scale: 181, azimuth: 0.58 },
     );
   }
-  focus(key) {
-    if (this.step === -1) return this.popout(key);
-    let p = this.parts[key];
-    if (!p || !p.visible) return false;
-    this.goal.y = 5;
-    this.goal.x =
-      key === "board"
-        ? -38
-        : key === "wires"
-          ? 10
-          : key === "led"
-            ? 43.57
-            : key === "resistor"
-              ? 51.19
-              : 55;
-    this.goal.z = key === "resistor" ? -18.16 : 0;
-    this.goal.scale =
-      key === "board"
-        ? 87
-        : key === "breadboard"
-          ? 75
-          : key === "wires"
-            ? 150
-            : 40;
-    return true;
+  focus(key, detail = null) {
+    return this.popout(key, detail);
   }
   replay() {
     if (this.step === -1) {
@@ -790,28 +827,51 @@ export class Workbench {
     l.userData.glow.intensity = on ? 22 : 0;
   }
   zoom(factor, px, py) {
-    let old = this.goal.scale;
-    let next = T.MathUtils.clamp(old * factor, 28, 280);
+    const old = this.goal.scale;
+    zoomView(this.goal, factor);
     if (px !== undefined) {
-      let u = px / this.host.clientWidth - 0.5,
-        v = py / this.host.clientHeight - 0.5;
-      let delta = old - next;
-      this.goal.x +=
-        u * delta * this.aspect * Math.cos(this.goal.azimuth) +
-        v * delta * Math.sin(this.goal.azimuth);
-      this.goal.z -=
-        u * delta * this.aspect * Math.sin(this.goal.azimuth) -
-        v * delta * Math.cos(this.goal.azimuth);
+      const ratio = (old - this.goal.scale) / old;
+      panView(
+        this.goal,
+        (-(px - this.host.clientWidth / 2) * ratio * old) / this.goal.scale,
+        (-(py - this.host.clientHeight / 2) * ratio * old) / this.goal.scale,
+        this.host.clientHeight,
+      );
     }
-    this.goal.scale = next;
+  }
+  pick(clientX, clientY) {
+    const r = this.canvas.getBoundingClientRect();
+    this.mouse.set(
+      ((clientX - r.left) / r.width) * 2 - 1,
+      (-(clientY - r.top) / r.height) * 2 + 1,
+    );
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    for (const hit of this.raycaster.intersectObjects(
+      Object.values(this.parts),
+      true,
+    )) {
+      if (!hit.object.isMesh) continue;
+      let p = hit.object,
+        key = null,
+        detail = null,
+        visible = true;
+      while (p) {
+        if (!p.visible) visible = false;
+        detail ??= p.userData.detail;
+        key ??= p.userData.part;
+        p = p.parent;
+      }
+      if (visible && key) return { key, detail };
+    }
+    return null;
   }
   bind() {
-    let c = this.canvas;
+    const c = this.canvas;
     c.addEventListener(
       "wheel",
       (e) => {
         e.preventDefault();
-        let r = c.getBoundingClientRect();
+        const r = c.getBoundingClientRect();
         this.zoom(
           Math.exp(e.deltaY * 0.0015),
           e.clientX - r.left,
@@ -821,112 +881,138 @@ export class Workbench {
       { passive: false },
     );
     c.addEventListener("pointerdown", (e) => {
+      if (![0, 1, 2].includes(e.button)) return;
+      c.focus({ preventScroll: true });
       c.setPointerCapture(e.pointerId);
-      this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      this.drag = {
+      this.pointers.set(e.pointerId, {
         x: e.clientX,
         y: e.clientY,
         startX: e.clientX,
         startY: e.clientY,
-        shift: e.shiftKey,
-      };
+        button: e.button,
+        moved: false,
+      });
+      if (this.pointers.size > 1)
+        for (const p of this.pointers.values()) p.moved = true;
+      c.style.cursor = "grabbing";
     });
     c.addEventListener("pointermove", (e) => {
-      if (!this.pointers.has(e.pointerId)) return;
-      let prev = this.pointers.get(e.pointerId);
-      this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      if (this.pointers.size === 2) {
-        let p = [...this.pointers.values()],
-          dist = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
-        if (this.pinch) this.zoom(this.pinch / dist);
-        this.pinch = dist;
+      const pointer = this.pointers.get(e.pointerId);
+      if (!pointer) {
+        c.style.cursor = this.pick(e.clientX, e.clientY) ? "pointer" : "grab";
         return;
       }
-      let dx = e.clientX - prev.x,
-        dy = e.clientY - prev.y;
-      if (e.shiftKey || e.buttons === 2) this.goal.azimuth -= dx * 0.008;
-      else {
-        let f = this.goal.scale / this.host.clientHeight;
-        this.goal.x -=
-          dx * f * Math.cos(this.goal.azimuth) +
-          dy * f * Math.sin(this.goal.azimuth);
-        this.goal.z +=
-          dx * f * Math.sin(this.goal.azimuth) -
-          dy * f * Math.cos(this.goal.azimuth);
-      }
-    });
-    c.addEventListener("pointerup", (e) => {
-      if (
-        this.drag &&
-        Math.hypot(e.clientX - this.drag.startX, e.clientY - this.drag.startY) <
-          5
-      ) {
-        let r = c.getBoundingClientRect();
-        this.mouse.set(
-          ((e.clientX - r.left) / r.width) * 2 - 1,
-          (-(e.clientY - r.top) / r.height) * 2 + 1,
+      const previous = [...this.pointers.values()].map((p) => ({ ...p }));
+      const dx = e.clientX - pointer.x,
+        dy = e.clientY - pointer.y;
+      pointer.x = e.clientX;
+      pointer.y = e.clientY;
+      pointer.moved ||=
+        Math.hypot(e.clientX - pointer.startX, e.clientY - pointer.startY) > 5;
+      if (this.pointers.size === 2) {
+        const now = [...this.pointers.values()];
+        const oldDistance = Math.hypot(
+          previous[0].x - previous[1].x,
+          previous[0].y - previous[1].y,
         );
-        this.raycaster.setFromCamera(this.mouse, this.camera);
-        let hit = this.raycaster
-          .intersectObjects(Object.values(this.parts), true)
-          .find((h) => {
-            let p = h.object;
-            while (p) {
-              if (!p.visible) return false;
-              p = p.parent;
-            }
-            return h.object.isMesh;
-          });
-        if (hit) {
-          let p = hit.object;
-          while (p && !p.userData.part) p = p.parent;
-          if (p) this.onPart(p.userData.part);
-        }
+        const distance = Math.hypot(now[0].x - now[1].x, now[0].y - now[1].y);
+        if (distance > 2 && oldDistance > 2) this.zoom(oldDistance / distance);
+        panView(this.goal, dx / 2, dy / 2, this.host.clientHeight);
+      } else if (this.mode === "pan" || e.shiftKey || pointer.button !== 0) {
+        panView(this.goal, dx, dy, this.host.clientHeight);
+      } else orbitView(this.goal, dx, dy);
+    });
+    const release = (e, cancelled = false) => {
+      const pointer = this.pointers.get(e.pointerId);
+      if (
+        !cancelled &&
+        pointer &&
+        !pointer.moved &&
+        pointer.button === 0 &&
+        this.pointers.size === 1
+      ) {
+        const hit = this.pick(e.clientX, e.clientY);
+        if (hit) this.onPart(hit.key, hit.detail);
       }
       this.pointers.delete(e.pointerId);
-      this.pinch = null;
-      this.drag = null;
-    });
-    c.addEventListener("pointercancel", (e) => {
-      this.pointers.delete(e.pointerId);
-      this.pinch = null;
-      this.drag = null;
-    });
+      if (c.hasPointerCapture(e.pointerId))
+        c.releasePointerCapture(e.pointerId);
+      c.style.cursor = "grab";
+    };
+    c.addEventListener("pointerup", (e) => release(e));
+    c.addEventListener("pointercancel", (e) => release(e, true));
+    c.addEventListener("lostpointercapture", (e) =>
+      this.pointers.delete(e.pointerId),
+    );
     c.addEventListener("contextmenu", (e) => e.preventDefault());
     window.addEventListener("keydown", (e) => {
       if (
+        e.metaKey ||
+        e.ctrlKey ||
+        e.altKey ||
         document.querySelector("dialog[open]") ||
-        ["INPUT", "TEXTAREA"].includes(e.target.tagName)
+        e.target.closest('input,textarea,select,[contenteditable="true"]')
       )
         return;
-      let key = e.key.toLowerCase();
-      if (["q", "e", "r", "+", "-", "w", "a", "s", "d"].includes(key))
+      const key = e.key.toLowerCase();
+      if (
+        [
+          "q",
+          "e",
+          "r",
+          "+",
+          "=",
+          "-",
+          "w",
+          "a",
+          "s",
+          "d",
+          "arrowup",
+          "arrowdown",
+          "escape",
+        ].includes(key)
+      )
         e.preventDefault();
-      if (key === "q") this.goal.azimuth -= Math.PI / 4;
-      if (key === "e") this.goal.azimuth += Math.PI / 4;
+      if (key === "escape") {
+        if (this.inspection) this.retreat();
+        return;
+      }
+      if (key === "q") orbitView(this.goal, 50, 0);
+      if (key === "e") orbitView(this.goal, -50, 0);
+      if (key === "arrowup") orbitView(this.goal, 0, 20);
+      if (key === "arrowdown") orbitView(this.goal, 0, -20);
       if (key === "r") this.home();
-      if (key === "+") this.zoom(0.8);
+      if (key === "+" || key === "=") this.zoom(0.8);
       if (key === "-") this.zoom(1.25);
-      if (key === "a") this.goal.x -= 5;
-      if (key === "d") this.goal.x += 5;
-      if (key === "w") this.goal.z -= 5;
-      if (key === "s") this.goal.z += 5;
+      if (key === "a") panView(this.goal, 25, 0, this.host.clientHeight);
+      if (key === "d") panView(this.goal, -25, 0, this.host.clientHeight);
+      if (key === "w") panView(this.goal, 0, 25, this.host.clientHeight);
+      if (key === "s") panView(this.goal, 0, -25, this.host.clientHeight);
     });
+    document.querySelector("#rotate-mode").onclick = () =>
+      this.setMode("rotate");
+    document.querySelector("#pan-mode").onclick = () => this.setMode("pan");
     document.querySelector("#zoom-in").onclick = () => this.zoom(0.8);
     document.querySelector("#zoom-out").onclick = () => this.zoom(1.25);
     document.querySelector("#rotate-left").onclick = () =>
-      (this.goal.azimuth -= Math.PI / 4);
+      orbitView(this.goal, 50, 0);
     document.querySelector("#rotate-right").onclick = () =>
-      (this.goal.azimuth += Math.PI / 4);
+      orbitView(this.goal, -50, 0);
+    document.querySelector("#tilt-up").onclick = () =>
+      orbitView(this.goal, 0, 25);
+    document.querySelector("#tilt-down").onclick = () =>
+      orbitView(this.goal, 0, -25);
     document.querySelector("#reset-view").onclick = () => this.home();
-    document.querySelector("#view-mode").onclick = () => {
-      this.goal.azimuth += Math.PI / 4;
-    };
+    document.querySelector("#controls-help").innerHTML = Object.values(
+      CAMERA_HELP,
+    )
+      .map((text) => "<p>" + text + "</p>")
+      .join("");
   }
   loop() {
     requestAnimationFrame(() => this.loop());
     let now = performance.now();
-    for (let k of ["x", "y", "z", "scale", "azimuth"])
+    for (let k of ["x", "y", "z", "scale", "azimuth", "elevation"])
       this.view[k] += (this.goal[k] - this.view[k]) * (reduced ? 1 : 0.085);
     let v = this.view;
     let w = (v.scale * this.aspect) / 2;
@@ -935,9 +1021,9 @@ export class Workbench {
     this.camera.top = v.scale / 2;
     this.camera.bottom = -v.scale / 2;
     this.camera.position.set(
-      v.x + 160 * Math.sin(v.azimuth),
-      160 + v.y,
-      v.z + 160 * Math.cos(v.azimuth),
+      v.x + 225 * Math.cos(v.elevation) * Math.sin(v.azimuth),
+      v.y + 225 * Math.sin(v.elevation),
+      v.z + 225 * Math.cos(v.elevation) * Math.cos(v.azimuth),
     );
     this.camera.lookAt(v.x, v.y, v.z);
     this.camera.updateProjectionMatrix();
@@ -977,7 +1063,9 @@ export class Workbench {
       let visible =
         l.key === "board"
           ? this.step === 0
-          : l.key === "usb"
+          : ["usb", "microcontroller", "digitalPins", "powerJack"].includes(
+                l.key,
+              )
             ? this.step === 0
             : l.key === "breadboard"
               ? this.step === 1
@@ -989,6 +1077,7 @@ export class Workbench {
       let p = l.pos.clone().project(this.camera);
       l.el.style.display =
         this.step !== -1 &&
+        !this.inspection &&
         visible &&
         Math.abs(p.x) < 0.9 &&
         Math.abs(p.y) < 0.8
@@ -996,6 +1085,27 @@ export class Workbench {
           : "none";
       l.el.style.left = ((p.x + 1) / 2) * 100 + "%";
       l.el.style.top = ((-p.y + 1) / 2) * 100 + "%";
+    }
+    if (this.inspection?.point) {
+      const point = this.inspection.point.clone().project(this.camera);
+      const width = this.host.clientWidth,
+        height = this.host.clientHeight;
+      const x = ((point.x + 1) / 2) * width,
+        y = ((-point.y + 1) / 2) * height;
+      const panel = document.querySelector("#inspection-panel");
+      const anchorX = panel.offsetLeft + panel.offsetWidth * 0.78;
+      const anchorY = panel.offsetTop;
+      document
+        .querySelector("#inspection-annotation")
+        .setAttribute("viewBox", `0 0 ${width} ${height}`);
+      document
+        .querySelector("#inspection-leader")
+        .setAttribute(
+          "d",
+          `M ${x} ${y} L ${x} ${anchorY - 10} L ${anchorX} ${anchorY}`,
+        );
+      document.querySelector("#inspection-marker").setAttribute("cx", x);
+      document.querySelector("#inspection-marker").setAttribute("cy", y);
     }
     this.renderer.render(this.scene, this.camera);
   }

@@ -1600,3 +1600,461 @@ dialog .button {
     font-size: 10px;
   }
 }
+[hidden] {
+  display: none !important;
+}
+.interaction-modes {
+  pointer-events: auto;
+  display: flex;
+  gap: 2px;
+  background: #f9f8ef;
+  border: 1px solid #ccd5c0;
+  padding: 3px;
+  border-radius: 6px;
+}
+.interaction-modes button {
+  border: 0;
+  background: transparent;
+  border-radius: 4px;
+  padding: 6px 9px;
+  font-size: 10px;
+  color: #7c8b70;
+}
+.interaction-modes button[aria-pressed="true"] {
+  background: #dfe8d5;
+  color: #38563a;
+}
+.back-to-step {
+  position: absolute;
+  right: 15px;
+  top: 62px;
+  z-index: 4;
+  border: 1px solid #b7c7aa;
+  background: #fafbf1ed;
+  box-shadow: 0 3px 12px #263f3912;
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-size: 11px;
+  color: #45633f;
+}
+.inspection-panel {
+  background: #f2f5e9;
+  border-top: 1px solid #d2ddc6;
+  padding: 16px 20px;
+}
+.inspection-panel .eyebrow {
+  font-size: 7px;
+}
+.inspection-panel h3 {
+  font: 500 19px var(--display);
+  margin: 5px 0 7px;
+}
+.inspection-panel p {
+  font-size: 11px;
+  line-height: 1.7;
+  margin: 0;
+  color: #788c68;
+  max-width: 550px;
+}
+.controls-disclosure {
+  padding: 9px 16px;
+  border-top: 1px solid #d7ddca;
+  background: #f9f8ef;
+  color: #839174;
+  font-size: 9px;
+}
+.controls-disclosure summary {
+  cursor: pointer;
+}
+.controls-disclosure p {
+  line-height: 1.7;
+  margin: 7px 0;
+  font-size: 10px;
+}
+.tour-lesson {
+  width: 100%;
+  border: 1px solid #d3ddc8;
+  border-radius: 6px;
+  background: #f7f8ef;
+  padding: 10px 8px;
+  text-align: left;
+  margin: 0 0 15px;
+  font-size: 10px;
+}
+.tour-lesson small {
+  display: block;
+  font-size: 8px;
+  color: #8f9d81;
+  margin: 5px 0 0 15px;
+}
+.tour-lesson.active {
+  background: #e0e9d4;
+  border-color: #a2b78f;
+}
+.tour-dots {
+  display: flex;
+  gap: 5px;
+  margin: 18px 0 10px;
+}
+.tour-dots i {
+  height: 4px;
+  flex: 1;
+  background: #e1e7d7;
+  border-radius: 3px;
+}
+.tour-dots i.active {
+  background: #64835b;
+}
+.tour-practice {
+  border: 1px solid #ccdaba;
+  background: #edf2e3;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 10px;
+  line-height: 1.8;
+  color: #7b8d67;
+}
+.tour-practice strong {
+  display: block;
+  color: #49643c;
+  font-size: 11px;
+}
+.tour-exit {
+  display: block;
+  width: 100%;
+  font-size: 10px;
+  border: 0;
+  background: transparent;
+  padding: 12px;
+  color: #879775;
+}
+.tour-target {
+  outline: 3px solid #d9b260 !important;
+  outline-offset: 5px;
+}
+.code-settings {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border-bottom: 1px solid #e3e7d8;
+  font-size: 10px;
+}
+.code-settings label {
+  font-weight: 500;
+}
+.code-settings select {
+  border: 1px solid #cbd7bd;
+  border-radius: 5px;
+  background: #f1f5e8;
+  color: #547148;
+  padding: 6px 8px;
+  font:
+    10px "DM Sans",
+    sans-serif;
+}
+.code-settings > span {
+  font-size: 8px;
+  color: #8c9b7d;
+}
+#tour-demo {
+  margin-top: 8px;
+  width: 100%;
+  font-size: 10px;
+}
+body.in-tour .step-art {
+  font-size: 55px;
+  margin-block: 20px 15px;
+}
+body.in-tour .instruction-card > p {
+  font-size: 12px;
+}
+body.in-tour .instruction-card {
+  min-height: 560px;
+}
+body.in-tour .step-link.active {
+  background: none;
+  border-color: transparent;
+  box-shadow: none;
+}
+body.in-tour .step-link.active:after {
+  display: none;
+}
+@media (max-width: 760px) {
+  .header-right {
+    gap: 5px;
+  }
+  #app-tour-button {
+    font-size: 10px;
+    padding: 8px;
+  }
+  .sidebar > :not(nav) {
+    display: none;
+  }
+  .sidebar > #tour-lesson {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 8px;
+    margin: 0 0 9px;
+    font-size: 10px;
+  }
+  .tour-lesson small {
+    display: none;
+  }
+  .code-settings {
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .code-settings > span {
+    flex-basis: 100%;
+  }
+  .view-controls > button {
+    width: 28px;
+  }
+  .interaction-modes button {
+    font-size: 9px;
+    padding: 5px 7px;
+  }
+  .back-to-step {
+    font-size: 10px;
+    top: 54px;
+  }
+  .drag-hint {
+    display: none;
+  }
+  body.in-tour .instruction-card {
+    min-height: 0;
+  }
+  body.in-tour .step-art {
+    font-size: 45px;
+    position: absolute;
+    right: 20px;
+    top: 10px;
+  }
+}
+.tour-nav {
+  position: fixed;
+  z-index: 15;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 1px solid #c4d3b4;
+  box-shadow: 0 8px 35px #263f3925;
+  border-radius: 9px;
+  background: #f8f9ef;
+  padding: 11px 15px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  width: max-content;
+  max-width: calc(100vw - 24px);
+}
+.tour-nav > span {
+  font-size: 10px;
+  color: #6d855c;
+}
+.tour-nav > div {
+  display: flex;
+  gap: 6px;
+}
+.tour-nav button {
+  font-size: 10px;
+  border: 1px solid #c9d5bc;
+  border-radius: 5px;
+  background: #eef3e4;
+  padding: 8px 11px;
+  white-space: nowrap;
+}
+.tour-nav button#tour-forward {
+  background: #38553c;
+  color: #fff;
+  border-color: #38553c;
+}
+.tour-nav button#tour-quit {
+  background: none;
+  border: 0;
+  color: #8b987d;
+}
+body.in-tour .instruction-card {
+  position: sticky;
+  top: 16px;
+  align-self: start;
+}
+body.in-tour main {
+  padding-bottom: 110px;
+}
+@media (max-width: 760px) {
+  .tour-nav {
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 14px;
+  }
+  .tour-nav > span {
+    font-size: 10px;
+  }
+  body.in-tour .instruction-card {
+    position: static;
+  }
+}
+@media (max-width: 500px) {
+  .header {
+    padding-inline: 12px;
+    gap: 8px;
+  }
+  .brand {
+    font-size: 20px;
+    gap: 6px;
+  }
+  .brand-icon {
+    width: 28px;
+    height: 32px;
+    font-size: 28px;
+  }
+  .header-right .quiet {
+    font-size: 9px;
+    padding: 7px;
+    gap: 5px;
+  }
+  #app-tour-button {
+    font-size: 0 !important;
+  }
+  #app-tour-button:before {
+    content: "✧ Tour";
+    font-size: 9px;
+  }
+  #board-button {
+    white-space: nowrap;
+  }
+}
+#scene {
+  isolation: isolate;
+}
+.inspection-panel {
+  position: absolute;
+  left: 16px;
+  bottom: 68px;
+  z-index: 3;
+  width: 250px;
+  max-width: calc(100% - 32px);
+  padding: 14px 17px;
+  border: 1px solid #c9cfb9;
+  border-radius: 8px;
+  background: #fbfaf1ed;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 6px 20px #253b2c18;
+  animation: field-note-in 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    opacity 0.14s,
+    transform 0.14s;
+}
+.inspection-panel.is-closing {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.inspection-panel h3 {
+  font: 600 17px var(--display);
+  margin: 7px 19px 7px 0;
+}
+.inspection-panel p {
+  font-size: 10px;
+  line-height: 1.7;
+  color: #7b8970;
+}
+.inspection-panel .eyebrow {
+  letter-spacing: 1px;
+  color: #8a9879;
+}
+.inspection-panel #inspection-close {
+  position: absolute;
+  right: 8px;
+  top: 7px;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #89987b;
+  font-size: 19px;
+}
+.inspection-annotation {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  overflow: visible;
+}
+.inspection-annotation path {
+  fill: none;
+  stroke: #829975;
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+.inspection-annotation circle {
+  fill: #fafbea;
+  stroke: #79a790;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 3px #83b298);
+}
+dialog[open] {
+  position: fixed;
+  top: 84px;
+  right: 22px;
+  left: auto;
+  bottom: auto;
+  margin: 0;
+  z-index: 25;
+  max-height: calc(100dvh - 105px);
+  overflow: auto;
+  width: min(420px, calc(100vw - 28px));
+  box-shadow: 0 10px 45px #253b2c24;
+  animation: field-note-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+dialog h2 {
+  font-size: 25px;
+}
+dialog::backdrop {
+  display: none;
+}
+#scene:has(.inspection-panel:not([hidden])) .scene-caption {
+  opacity: 0;
+}
+.view-controls {
+  z-index: 4;
+}
+.back-to-step {
+  z-index: 5;
+}
+.stage-heading {
+  z-index: 5;
+}
+@keyframes field-note-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@media (max-width: 760px) {
+  .inspection-panel {
+    width: 230px;
+    left: 12px;
+    bottom: 65px;
+    padding: 12px 14px;
+  }
+  .inspection-panel h3 {
+    font-size: 16px;
+  }
+  .inspection-panel p {
+    font-size: 10px;
+  }
+  dialog[open] {
+    right: 14px;
+    top: 80px;
+  }
+}

@@ -2,6 +2,8 @@ import "./style.css";
 import { Workbench } from "./scene.js";
 import { parseHex } from "./firmware.js";
 import { UnoConnection } from "./uploader.js";
+import { BOARD_DETAILS } from "./component-details.js";
+import { TOUR_STEPS } from "./app-tour.js";
 const $ = (s) => document.querySelector(s);
 const unboxing = {
   short: "Unbox your kit",
@@ -60,6 +62,14 @@ const kitItems = [
   },
 ];
 let selectedKit = null;
+let tourIndex = -1,
+  tourSnapshot = null,
+  lastTourStep = -1,
+  simulationEpoch = 0;
+const originalIntro = document.querySelector(".intro").innerHTML;
+function isTour() {
+  return tourIndex >= 0;
+}
 const steps = [
   {
     short: "Meet your board",
@@ -245,34 +255,42 @@ const parts = {
     ],
   },
 };
-function openPart(key) {
-  if (!parts[key]) return;
-  if (state.step === -1) {
-    selectedKit = key;
-    workbench?.popout(key);
-    render();
+function showInspection(info) {
+  clearTimeout(showInspection.closeTimer);
+  $("#back-to-step").hidden = !info;
+  $("#inspection-annotation").toggleAttribute("hidden", !info);
+  const panel = $("#inspection-panel");
+  panel.classList.toggle("is-closing", !info);
+  if (info) panel.hidden = false;
+  else
+    showInspection.closeTimer = setTimeout(() => {
+      panel.hidden = true;
+    }, 140);
+  if (!info) {
+    selectedKit = null;
+    if (state.step === -1 && !isTour()) render();
     return;
   }
-  workbench?.popout(key);
-  inspectKey = key;
-  const p = parts[key];
-  $("#part-title").textContent = p.title;
-  $("#part-description").textContent = p.description;
-  $("#part-details").innerHTML = p.specs
-    .map(
-      ([a, b]) =>
-        `<div class="part-spec"><span>${a}</span><span>${b}</span></div>`,
-    )
-    .join("");
-  $("#focus-part").disabled = !workbench?.parts[key]?.visible;
-  $("#focus-part").textContent = workbench?.parts[key]?.visible
-    ? "Take a closer look ⌖"
-    : "This part arrives in a later step";
-  $("#inspector").showModal();
+  const content =
+    (info.detail && BOARD_DETAILS[info.detail]) || parts[info.key];
+  $("#inspection-title").textContent = content.title;
+  $("#inspection-description").textContent = content.description;
+}
+function openPart(key, detail = null) {
+  if (!parts[key]) return;
+  if (!workbench?.popout(key, detail)) {
+    toast("This part arrives in a later step.");
+    return;
+  }
+  if (state.step === -1 && !isTour()) {
+    selectedKit = key;
+    render();
+  }
 }
 try {
   workbench = new Workbench({
     onPart: openPart,
+    onInspectChange: showInspection,
     onReady: () => $("#scene-loading").remove(),
   });
 } catch (e) {
@@ -284,6 +302,7 @@ function codeText() {
   return `// Our first little light\nvoid setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(${state.speed});\n  digitalWrite(13, LOW);\n  delay(${state.speed});\n}`;
 }
 function renderCode() {
+  $("#code-delay").value = String(state.speed);
   const escape = (s) =>
     s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
   $("#code").innerHTML = codeText()
@@ -311,6 +330,7 @@ function simStatus(text, status = "") {
   $(".simulation-status").className = "simulation-status " + status;
 }
 function invalidate() {
+  simulationEpoch++;
   worker?.terminate();
   worker = null;
   verified = null;
@@ -320,6 +340,10 @@ function invalidate() {
   updateUpload();
 }
 function render() {
+  if (isTour()) {
+    renderTour();
+    return;
+  }
   const step = state.step === -1 ? unboxing : steps[state.step];
   $("#step-list").innerHTML = [unboxing, ...steps]
     .map((s, navIndex) => {
@@ -418,22 +442,13 @@ function render() {
     if ($("#back-to-kit"))
       $("#back-to-kit").onclick = () => {
         selectedKit = null;
-        workbench?.resetKit();
+        workbench?.retreat();
         render();
       };
   }
-  document.querySelectorAll("[data-speed]").forEach(
-    (b) =>
-      (b.onclick = () => {
-        state.speed = Number(b.dataset.speed);
-        invalidate();
-        simStatus(
-          "New rhythm! Test this version before sending it to a board.",
-        );
-        save();
-        render();
-      }),
-  );
+  document.querySelectorAll("[data-speed]").forEach((button) => {
+    button.onclick = () => changeSpeed(Number(button.dataset.speed));
+  });
   document.querySelectorAll("[data-color]").forEach(
     (b) =>
       (b.onclick = () => {
@@ -447,6 +462,7 @@ function render() {
   save();
 }
 function go(step) {
+  if (isTour()) exitTour(false);
   if (step !== state.step) {
     invalidate();
     simStatus(
@@ -460,6 +476,10 @@ function go(step) {
   render();
 }
 $("#next-step").onclick = () => {
+  if (isTour()) {
+    advanceTour(1);
+    return;
+  }
   if (state.step < 5) {
     if (state.step === -1 && state.found.length < 6) return;
     if (!state.completed.includes(state.step)) state.completed.push(state.step);
@@ -473,12 +493,18 @@ $("#next-step").onclick = () => {
     render();
   } else runTest();
 };
-$("#previous-step").onclick = () => go(Math.max(-1, state.step - 1));
+$("#previous-step").onclick = () =>
+  isTour() ? advanceTour(-1) : go(Math.max(-1, state.step - 1));
 $("#replay").onclick = () => {
+  if (isTour()) {
+    demoTour();
+    return;
+  }
   workbench?.replay();
   if (state.step === 5 && !running) runTest();
 };
 $("#restart").onclick = () => {
+  if (isTour()) exitTour(false);
   state.completed = [];
   state.found = [];
   selectedKit = null;
@@ -488,6 +514,8 @@ $("#restart").onclick = () => {
 };
 async function runTest() {
   invalidate();
+  const epoch = simulationEpoch;
+  const chosenSpeed = state.speed;
   busy = true;
   render();
   simStatus(
@@ -499,7 +527,7 @@ async function runTest() {
       if (!r.ok) throw Error("Firmware library is unavailable.");
       return r.json();
     });
-    const record = manifest.variants[String(state.speed)];
+    const record = manifest.variants[String(chosenSpeed)];
     if (!record) throw Error("This speed is not available.");
     let response = await fetch(record.path);
     if (!response.ok) throw Error("Could not load the Arduino program.");
@@ -512,8 +540,8 @@ async function runTest() {
     ).join("");
     if (digest !== record.sha256)
       throw Error("Firmware integrity check failed.");
+    if (epoch !== simulationEpoch) return;
     let image = parseHex(text);
-    let chosenSpeed = state.speed;
     worker = new Worker(new URL("./emulator.worker.js", import.meta.url), {
       type: "module",
     });
@@ -532,7 +560,7 @@ async function runTest() {
         verified = { image, halfPeriod: chosenSpeed, digest };
         running = true;
         busy = false;
-        if (!state.completed.includes(5)) state.completed.push(5);
+        if (!isTour() && !state.completed.includes(5)) state.completed.push(5);
         simStatus(
           `Test passed · ${data.edges} LED changes checked · ${Math.round(data.measuredMs)} ms on / off`,
           "passed",
@@ -556,6 +584,7 @@ async function runTest() {
     };
     worker.postMessage({ type: "run", image, halfPeriod: chosenSpeed });
   } catch (e) {
+    if (epoch !== simulationEpoch) return;
     invalidate();
     simStatus(e.message);
     toast(e.message);
@@ -573,10 +602,9 @@ $("#copy-code").onclick = async () => {
 document
   .querySelectorAll("[data-part]")
   .forEach((b) => (b.onclick = () => openPart(b.dataset.part)));
-$("#focus-part").onclick = () => {
-  workbench?.focus(inspectKey);
-  $("#inspector").close();
-};
+$("#back-to-step").onclick = () => workbench?.retreat();
+$("#inspection-close").onclick = () => workbench?.retreat();
+$("#code-delay").onchange = (e) => changeSpeed(Number(e.target.value));
 document
   .querySelectorAll(".dialog-close")
   .forEach((b) => (b.onclick = () => b.closest("dialog").close()));
@@ -594,7 +622,7 @@ document.querySelectorAll("dialog").forEach((d) =>
     }
   }),
 );
-$("#parent-notes").onclick = () => $("#notes-dialog").showModal();
+$("#parent-notes").onclick = () => $("#notes-dialog").show();
 $(".close-notes").onclick = () => $("#notes-dialog").close();
 function updateUpload() {
   let supported = "serial" in navigator;
@@ -614,7 +642,7 @@ function updateUpload() {
 }
 $("#board-button").onclick = () => {
   updateUpload();
-  $("#board-dialog").showModal();
+  $("#board-dialog").show();
 };
 $("#adult-check").onchange = updateUpload;
 $("#connect-usb").onclick = async () => {
@@ -674,5 +702,165 @@ navigator.serial?.addEventListener("disconnect", async () => {
   $("#board-button").innerHTML =
     '<span>⌁</span> Connect a board <span class="status-dot"></span>';
   updateUpload();
+});
+function changeSpeed(speed) {
+  if (![250, 500, 1000].includes(speed)) return;
+  state.speed = speed;
+  invalidate();
+  simStatus("New rhythm! Test this version before sending it to a board.");
+  if (!isTour()) save();
+  render();
+}
+function startTour() {
+  if (isTour()) return;
+  tourSnapshot = { speed: state.speed, color: state.color };
+  invalidate();
+  tourIndex = 0;
+  lastTourStep = -1;
+  simStatus("Practice workbench. Your circuit lesson is saved.");
+  document.body.classList.add("in-tour");
+  $("#tour-lesson").classList.add("active");
+  $("#tour-nav").hidden = false;
+  workbench?.setStep(5, false);
+  workbench?.setMode("rotate");
+  renderTour();
+}
+function exitTour(restoreScene = true) {
+  if (!isTour()) return;
+  const finished = tourIndex === TOUR_STEPS.length - 1;
+  tourIndex = -1;
+  lastTourStep = -1;
+  invalidate();
+  simStatus("Back to your adventure. Test your current program in step 7.");
+  state.speed = tourSnapshot.speed;
+  state.color = tourSnapshot.color;
+  tourSnapshot = null;
+  selectedKit = null;
+  document.body.classList.remove("in-tour");
+  $("#tour-lesson").classList.remove("active");
+  $("#tour-nav").hidden = true;
+  document
+    .querySelectorAll(".tour-target")
+    .forEach((el) => el.classList.remove("tour-target"));
+  document.querySelector(".intro").innerHTML = originalIntro;
+  try {
+    localStorage.setItem(
+      "little-sparks-tour-v1",
+      JSON.stringify({ completed: finished }),
+    );
+  } catch {}
+  $("#replay").textContent = "↻ Watch that again";
+  if (restoreScene) {
+    workbench?.setStep(state.step, false);
+    render();
+    document
+      .querySelector(".intro")
+      .scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+function advanceTour(direction) {
+  if (!isTour() || busy) return;
+  if (direction > 0 && tourIndex === TOUR_STEPS.length - 1) {
+    exitTour();
+    return;
+  }
+  invalidate();
+  tourIndex = Math.max(
+    0,
+    Math.min(TOUR_STEPS.length - 1, tourIndex + direction),
+  );
+  workbench?.home();
+  renderTour();
+}
+function renderTour() {
+  const step = TOUR_STEPS[tourIndex];
+  document.querySelector(".intro h1").innerHTML =
+    "A little tour. A lot to explore<span>.</span>";
+  document.querySelector(".intro>div>p").textContent =
+    "Learn the controls, then make something wonderful.";
+  $("#step-count").textContent =
+    `APP TOUR · ${tourIndex + 1} / ${TOUR_STEPS.length}`;
+  $("#step-time").textContent = "TRY IT OUT";
+  $("#step-art").innerHTML =
+    String(tourIndex + 1).padStart(2, "0") + "<span>✧</span>";
+  $("#step-title").textContent = step.title;
+  $("#step-description").textContent = step.description;
+  $("#tip-title").textContent = step.tip;
+  $("#tip-text").textContent = step.detail;
+  $("#scene-number").textContent = "PRACTICE WORKBENCH";
+  $("#scene-title").textContent = "YOUR CIRCUIT LESSON IS SAVED";
+  $("#step-extra").innerHTML =
+    `<div class="tour-dots">${TOUR_STEPS.map((s, i) => `<i class="${i === tourIndex ? "active" : ""}"></i>`).join("")}</div><div class="tour-practice"><strong>Have a little go.</strong>Try the real controls, or use the practice button below.</div><button id="tour-demo" class="button secondary" ${busy ? "disabled" : ""}>${busy ? "Testing…" : step.action}</button><button id="exit-tour" class="tour-exit">← Back to my adventure</button>`;
+  $("#tour-demo").onclick = demoTour;
+  $("#exit-tour").onclick = () => exitTour();
+  $("#next-step").innerHTML =
+    tourIndex === TOUR_STEPS.length - 1
+      ? "Back to my adventure <span>→</span>"
+      : "Next discovery <span>→</span>";
+  $("#next-step").disabled = busy;
+  $("#previous-step").disabled = tourIndex === 0;
+  $("#replay").textContent = "↻ Show me again";
+  $("#tour-nav-label").textContent =
+    `${tourIndex + 1}/${TOUR_STEPS.length} · ${step.title}`;
+  $("#tour-back").disabled = tourIndex === 0 || busy;
+  $("#tour-forward").disabled = busy;
+  $("#tour-forward").textContent =
+    tourIndex === TOUR_STEPS.length - 1 ? "Finish ✓" : "Next →";
+  renderCode();
+  if (lastTourStep !== tourIndex) {
+    document
+      .querySelectorAll(".tour-target")
+      .forEach((el) => el.classList.remove("tour-target"));
+    document.querySelector(step.target)?.classList.add("tour-target");
+    lastTourStep = tourIndex;
+  }
+}
+function demoTour() {
+  if (!isTour() || busy) return;
+  switch (TOUR_STEPS[tourIndex].demo) {
+    case "lessons":
+      $("#tour-lesson").scrollIntoView({ behavior: "smooth", block: "center" });
+      break;
+    case "rotate":
+      workbench?.setMode("rotate");
+      if (workbench) {
+        workbench.goal.azimuth += Math.PI / 3;
+        workbench.goal.elevation = 0.95;
+      }
+      break;
+    case "pan":
+      workbench?.retreat();
+      workbench?.setMode("pan");
+      workbench?.zoom(0.8);
+      toast("Move mode is on. Drag the workbench to slide it.");
+      break;
+    case "inspect":
+      openPart("board", "microcontroller");
+      break;
+    case "code":
+      changeSpeed(250);
+      $("#code-notebook").scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      $("#code-delay").focus({ preventScroll: true });
+      break;
+    case "test":
+      runTest();
+      break;
+    case "hardware":
+      updateUpload();
+      $("#board-dialog").show();
+      break;
+  }
+}
+$("#app-tour-button").onclick = () => (isTour() ? exitTour() : startTour());
+$("#tour-lesson").onclick = () => (isTour() ? exitTour() : startTour());
+$("#tour-back").onclick = () => advanceTour(-1);
+$("#tour-forward").onclick = () => advanceTour(1);
+$("#tour-quit").onclick = () => exitTour();
+document.addEventListener("pointerdown", (event) => {
+  for (const panel of document.querySelectorAll("dialog[open]"))
+    if (!panel.contains(event.target)) panel.close();
 });
 go(state.step);

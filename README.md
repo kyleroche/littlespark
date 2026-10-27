@@ -45,7 +45,7 @@ The GitHub Actions workflow compiles fresh firmware on Ubuntu, tests the output,
 
 ## Controls
 
-Drag to pan; Shift-drag to rotate; scroll/pinch to zoom; Q/E to rotate; WASD to pan; R to reset. Buttons provide the same camera functions. Reduced-motion preferences disable transition easing.
+Drag to rotate and tilt. Choose **Move**, Shift-drag, right-drag, or middle-drag to pan. Scroll or pinch to zoom. Touch: one finger rotates, two fingers pan and pinch. Q/E turn; up/down arrows tilt; WASD pan; +/− zoom; R resets. Buttons offer the same camera functions. Click a component, chip, port, or pin header to animate into its detail; **Back to this step** or Escape returns to the previous diagram. Close-ups keep the circuit connected and the model visible. A compact floating field-note card uses a dotted leader and a marker to identify the selected component; its close button also returns to the diagram. Connection and parent guides open as non-blocking floating panels. Reduced-motion preferences disable camera easing.
 
 ## Assets and dependencies
 
@@ -55,4 +55,12 @@ The visual exploration was inspired by Dilum Sanjaya's Learn Arduino (https://le
 
 ## Official Starter Kit unboxing
 
-The first step identifies one Uno R3, one USB-A to USB-B cable, one 400-point breadboard, one red two-legged LED, one 220 Ω resistor, and two solid-core jumper wires. Each item has a persistent found checklist and animated lift/zoom inspection. Other kit components are not needed for this adventure. Inventory source: https://store-usa.arduino.cc/products/arduino-starter-kit-multi-language
+The first step identifies one Uno R3, one USB-A to USB-B cable, one 400-point breadboard, one red two-legged LED, one 220 Ω resistor, and two solid-core jumper wires. Each item has a persistent found checklist and animated close-up inspection. Other kit components are not needed for this adventure. Inventory source: https://store-usa.arduino.cc/products/arduino-starter-kit-multi-language
+
+## App tour and guided editor
+
+**App tour** in the header and **Learn your way around** in the field guide open a separate eight-part practice lesson covering navigation, rotation/tilt, pan/zoom, detail inspection and return, code, testing, USB upload, and saved progress. Floating Back/Next controls stay available while exploring the actual interface. Practice does not complete circuit steps or change the saved checklist; the previous blink settings are restored on exit. USB connection and upload are never automatic.
+
+The guided code editor edits both wait instructions with **Blink delay** (250 / 500 / 1000 ms). It is intentionally not a free-text compiler. Changes invalidate the old emulator result. Copy code exports the matching sketch to the clipboard.
+
+`AGENTS.md` requires tutorial updates in the same change as every new, removed, or changed user-facing feature. UI regions declare `data-tour-feature`; tests verify every declared feature is covered by `src/app-tour.js` and every tutorial target exists. Camera help lives in `src/view-controls.js`.

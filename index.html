@@ -22,8 +22,14 @@
           ><span>little sparks<span class="brand-dot">.</span></span></a
         ><span class="header-caption">BIG IDEAS START SMALL</span>
         <div class="header-right">
-          <span class="save-state"><span></span> Your progress is saved</span
-          ><button class="button quiet" id="board-button">
+          <button class="button quiet" id="app-tour-button">✧ App tour</button>
+          <span class="save-state" data-tour-feature="progress"
+            ><span></span> Your progress is saved</span
+          ><button
+            class="button quiet"
+            id="board-button"
+            data-tour-feature="hardware"
+          >
             <span>⌁</span> Connect a board <span class="status-dot"></span>
           </button>
         </div>
@@ -39,7 +45,14 @@
           </div>
           <div class="progress-track"><i id="progress-fill"></i></div>
         </div>
-        <nav id="step-list" aria-label="Lesson steps"></nav>
+        <button id="tour-lesson" class="tour-lesson">
+          ✧ Learn your way around <small>A little app tour</small>
+        </button>
+        <nav
+          data-tour-feature="lessons"
+          id="step-list"
+          aria-label="Lesson steps"
+        ></nav>
         <div class="side-note">
           <span class="note-star">✳</span>
           <p>
@@ -78,24 +91,52 @@
             aria-label="Interactive electronics workbench"
           >
             <div class="stage-heading">
-              <span><i></i> YOUR WORKBENCH</span
-              ><button id="view-mode" class="view-badge">
-                ↗ &nbsp; 3D VIEW
-              </button>
+              <span><i></i> YOUR WORKBENCH</span>
+              <div class="interaction-modes" aria-label="Drag mode">
+                <button id="rotate-mode" aria-pressed="true">↻ Rotate</button
+                ><button id="pan-mode" aria-pressed="false">✥ Move</button>
+              </div>
             </div>
             <div id="scene">
               <canvas
                 id="workbench"
-                aria-label="3D Arduino circuit. Drag to pan, scroll to zoom, Q and E to rotate."
+                aria-label="3D Arduino circuit. Drag to rotate, Shift-drag to move, scroll to zoom. Choose Move mode to pan."
                 tabindex="0"
               ></canvas>
               <div id="labels"></div>
+              <button id="back-to-step" class="back-to-step" hidden>
+                ← Back to this step
+              </button>
+              <svg
+                id="inspection-annotation"
+                class="inspection-annotation"
+                aria-hidden="true"
+                hidden
+              >
+                <path id="inspection-leader" />
+                <circle id="inspection-marker" r="4" />
+              </svg>
+              <div
+                id="inspection-panel"
+                class="inspection-panel"
+                data-tour-feature="inspection"
+                hidden
+              >
+                <button
+                  id="inspection-close"
+                  aria-label="Close detail and return to diagram"
+                >
+                  ×</button
+                ><span class="eyebrow">⌖ A CLOSER LOOK</span>
+                <h3 id="inspection-title"></h3>
+                <p id="inspection-description"></p>
+              </div>
               <div id="scene-loading">Setting out your workbench…</div>
               <div class="scene-caption">
                 <span id="scene-number">FIG. 01</span
                 ><span id="scene-title">THE LITTLE BRAIN OF YOUR CIRCUIT</span>
               </div>
-              <div class="view-controls">
+              <div class="view-controls" data-tour-feature="camera">
                 <button
                   id="rotate-left"
                   aria-label="Rotate left"
@@ -108,6 +149,18 @@
                   title="Rotate right (E)"
                 >
                   ↷</button
+                ><button
+                  id="tilt-up"
+                  aria-label="Tilt view up"
+                  title="Look from higher up"
+                >
+                  ⌃</button
+                ><button
+                  id="tilt-down"
+                  aria-label="Tilt view down"
+                  title="Look from lower down"
+                >
+                  ⌄</button
                 ><span></span
                 ><button id="zoom-out" aria-label="Zoom out">−</button
                 ><button id="zoom-in" aria-label="Zoom in">+</button
@@ -120,10 +173,14 @@
                   ⌖
                 </button>
               </div>
-              <div class="drag-hint">
-                DRAG TO EXPLORE <span>·</span> SCROLL TO ZOOM
+              <div class="drag-hint" id="drag-hint">
+                DRAG TO TURN <span>·</span> SCROLL TO ZOOM
               </div>
             </div>
+            <details class="controls-disclosure">
+              <summary>How to move the 3D view</summary>
+              <div id="controls-help"></div>
+            </details>
             <div class="parts-tray">
               <span>IN YOUR KIT</span
               ><button data-part="board">
@@ -177,12 +234,20 @@
           </aside>
         </div>
         <section class="lower">
-          <div class="notebook">
+          <div class="notebook" id="code-notebook" data-tour-feature="code">
             <div class="notebook-heading">
               <span
-                ><span class="code-icon">&lt;/&gt;</span> A PEEK AT THE
-                CODE</span
+                ><span class="code-icon">&lt;/&gt;</span> GUIDED CODE
+                EDITOR</span
               ><button id="copy-code">Copy code <span>⧉</span></button>
+            </div>
+            <div class="code-settings">
+              <label for="code-delay">Blink delay</label
+              ><select id="code-delay">
+                <option value="1000">Slow · 1 second</option>
+                <option value="500" selected>Steady · ½ second</option>
+                <option value="250">Fast · ¼ second</option></select
+              ><span>Changes both wait instructions below.</span>
             </div>
             <div class="code-content">
               <pre id="code"></pre>
@@ -196,7 +261,11 @@
                 <span class="code-tag">THAT’S A LOOP!</span>
               </div>
             </div>
-            <div class="simulation-status">
+            <div
+              class="simulation-status"
+              id="simulation-status"
+              data-tour-feature="simulation"
+            >
               <span id="sim-dot"></span
               ><span id="sim-status" role="status"
                 >Ready when you are. We’ll test your circuit in step 7.</span
@@ -218,18 +287,6 @@
           ><button id="parent-notes">A note for grown-ups ↗</button>
         </footer>
       </main>
-      <dialog id="inspector">
-        <button class="dialog-close" aria-label="Close component details">
-          ×
-        </button>
-        <div class="eyebrow">A CLOSER LOOK</div>
-        <h2 id="part-title"></h2>
-        <p id="part-description"></p>
-        <div id="part-details"></div>
-        <button id="focus-part" class="button primary">
-          Take a closer look <span>⌖</span>
-        </button>
-      </dialog>
       <dialog id="board-dialog">
         <button class="dialog-close" aria-label="Close board connection">
           ×
@@ -308,6 +365,14 @@
         </p>
         <button class="button primary close-notes">Let’s explore →</button>
       </dialog>
+      <div id="tour-nav" class="tour-nav" hidden>
+        <span id="tour-nav-label"></span>
+        <div>
+          <button id="tour-back">← Back</button
+          ><button id="tour-forward">Next →</button
+          ><button id="tour-quit">Exit tour</button>
+        </div>
+      </div>
       <div id="toast" role="status"></div>
     </div>
     <script type="module" src="/src/app.js"></script>
