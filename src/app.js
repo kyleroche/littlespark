@@ -851,6 +851,11 @@ function renderTour() {
 function demoTour() {
   if (!isTour() || busy) return;
   switch (TOUR_STEPS[tourIndex].demo) {
+    case "home-store":
+      document
+        .querySelector(".header")
+        .scrollIntoView({ behavior: "smooth", block: "start" });
+      break;
     case "accounts":
       document.querySelector("#account-button").click();
       break;

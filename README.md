@@ -2,6 +2,12 @@
 
 An illustrated Arduino workbench for a child's first electronics project. Seven animated steps lead from meeting a classic Uno R3 to wiring and blinking a real LED.
 
+## Home page and gear store
+
+`/` introduces the project with a parallax circuit illustration, a scrolling parts/build/test walkthrough, an interactive blink-delay preview, family account explanations, and FAQs. Gear Store beside Sign in opens https://littlespark.vtc.store in a new tab. The shirt drawing is an illustration, not a product listing. Motion respects reduced-motion preferences; mobile layouts use a static illustration.
+
+The lesson workspace is at `/learn/`. Home-page sign-in opens its account panel through `/learn/?signin=1`. Parent and child magic links continue to open the lab, and existing browser progress keys are unchanged. The app tour covers Home, the lab, and the gear link. Vite builds both HTML entry points; Vercel rewrites magic-link routes to the lab entry point.
+
 ## Run
 
 ```sh

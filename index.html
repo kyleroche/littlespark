@@ -3,412 +3,559 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="theme-color" content="#f4f1e8" />
+    <meta name="theme-color" content="#f6f3e9" />
+    <title>Little Spark — Make your first circuit</title>
     <meta
       name="description"
-      content="Build your first Arduino circuit, one animated step at a time. Arduino lessons with animated wiring and a code editor."
+      content="Learn Arduino one connection at a time. Explore a 3D workbench, follow animated steps, test your program, and make a real LED blink."
     />
-    <title>Little Spark — Your first circuit</title>
     <link rel="canonical" href="https://littlespark.tech/" />
-    <meta property="og:site_name" content="Little Spark" />
-    <meta property="og:title" content="Little Spark — Your first circuit" />
+    <meta
+      property="og:title"
+      content="Little Spark — Make your first circuit"
+    />
+    <meta
+      property="og:description"
+      content="Arduino lessons you can see, turn, and try. Start in your browser."
+    />
     <meta property="og:url" content="https://littlespark.tech/" />
+    <meta
+      property="og:image"
+      content="https://littlespark.tech/images/blink-circuit.png"
+    />
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23264e46'/%3E%3Cpath d='M23 5L10 23h10l-3 12 14-19H21z' fill='%23efbd68'/%3E%3C/svg%3E"
     />
+    <link rel="stylesheet" href="/src/home.css" />
   </head>
   <body>
-    <div id="app">
-      <header class="header">
-        <a class="brand" href="/" aria-label="Little Spark home"
-          ><span class="brand-icon">ϟ</span
-          ><span>little spark<span class="brand-dot">.</span></span></a
-        ><span class="header-caption">ARDUINO LAB</span>
-        <div class="header-right">
-          <button
-            class="button quiet"
-            id="account-button"
-            data-tour-feature="accounts"
-          >
-            Sign in
-          </button>
-          <button class="button quiet" id="app-tour-button">✧ App tour</button>
-          <span class="save-state" data-tour-feature="progress"
-            ><span></span> Saved on this device</span
-          ><button
-            class="button quiet"
-            id="board-button"
-            data-tour-feature="hardware"
-          >
-            <span>⌁</span> Connect a board <span class="status-dot"></span>
-          </button>
-        </div>
-      </header>
-      <aside class="sidebar">
-        <div class="course-label">YOUR FIELD GUIDE <span>01</span></div>
-        <h2>Blink an LED</h2>
-        <p class="course-description">Starter Kit · Lesson 1</p>
-        <div class="course-progress">
-          <div>
-            <span id="progress-label">0 of 7 steps explored</span
-            ><span id="progress-percent">0%</span>
-          </div>
-          <div class="progress-track"><i id="progress-fill"></i></div>
-        </div>
-        <button id="tour-lesson" class="tour-lesson">
-          ✧ Learn your way around <small>Controls and accounts</small>
-        </button>
-        <nav
-          data-tour-feature="lessons"
-          id="step-list"
-          aria-label="Lesson steps"
-        ></nav>
-        <div class="side-note">
-          <span class="note-star">✳</span>
-          <p>No kit yet?<br /><strong>Use the virtual workbench.</strong></p>
-        </div>
-        <button id="restart" class="restart">↺ Reset lesson progress</button>
-        <div class="side-footer">LITTLESPARK.TECH <span>↗</span></div>
-      </aside>
-      <main>
-        <section class="intro">
-          <div>
-            <div class="eyebrow">
-              <span class="tiny-spark">✦</span> LESSON 01
-              <span class="separator">/</span> YOUR FIRST CIRCUIT
-            </div>
-            <h1>Blink an LED<span>.</span></h1>
-            <p>Follow the steps, connect the parts, and test your code.</p>
-          </div>
-          <div class="difficulty">
-            <span>✳</span>
-            <div>Beginner<small>7 steps · 10 minutes</small></div>
-          </div>
-        </section>
-        <div
-          id="layout-controls"
-          class="layout-controls"
-          data-tour-feature="layout"
-          aria-label="Workspace layout"
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="home-header">
+      <a class="home-brand" href="/" aria-label="Little Spark home"
+        ><span class="brand-mark">ϟ</span
+        ><span>little spark<span class="brand-period">.</span></span></a
+      >
+      <nav class="section-nav" aria-label="About Little Spark">
+        <a href="#how-it-works">How it works</a
+        ><a href="#families">For families</a>
+      </nav>
+      <nav class="header-actions" aria-label="Get started">
+        <a
+          class="gear-link"
+          href="https://littlespark.vtc.store"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Gear store <span aria-hidden="true">↗</span
+          ><span class="sr-only"> (opens in a new tab)</span></a
+        ><a id="home-signin" href="/learn/?signin=1">Sign in</a
+        ><a class="pill small dark" href="/learn/"
+          >Open the lab <span aria-hidden="true">↗</span></a
         >
-          <span>WORKSPACE</span>
-          <div role="group" aria-label="Choose layout">
-            <button data-layout="split" aria-pressed="true">Build + Code</button
-            ><button data-layout="build" aria-pressed="false">Build only</button
-            ><button data-layout="code" aria-pressed="false">Code only</button
-            ><button data-layout="guided" aria-pressed="false">Guided</button>
-          </div>
-        </div>
-        <div id="learning-layout" class="learning-layout" data-layout="split">
-          <div class="workspace">
-            <section
-              class="stage-card"
-              aria-label="Interactive electronics workbench"
+      </nav>
+    </header>
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-grid" aria-hidden="true"></div>
+        <span class="hero-orbit orbit-one" aria-hidden="true"></span
+        ><span class="hero-orbit orbit-two" aria-hidden="true"></span>
+        <div class="hero-copy">
+          <p class="eyebrow">
+            <span class="live-dot"></span> ARDUINO, ONE CONNECTION AT A TIME
+          </p>
+          <h1 id="hero-title">
+            Make your<br />first
+            <span class="circuit-word"
+              >circuit<svg viewBox="0 0 500 28" aria-hidden="true">
+                <path d="M4 20 Q240 -8 494 12" /></svg></span
+            ><span class="orange">.</span>
+          </h1>
+          <p class="hero-description">
+            See where every wire goes.<br />Try the code. Make a real light
+            blink.
+          </p>
+          <div class="hero-buttons">
+            <a class="pill dark" href="/learn/"
+              >Start building <span aria-hidden="true">↗</span></a
+            ><a class="text-link" href="#how-it-works"
+              >Take a look around <span aria-hidden="true">↓</span></a
             >
-              <div class="stage-heading">
-                <span><i></i> YOUR WORKBENCH</span>
-                <div class="interaction-modes" aria-label="Drag mode">
-                  <button id="rotate-mode" aria-pressed="true">↻ Rotate</button
-                  ><button id="pan-mode" aria-pressed="false">✥ Move</button>
-                </div>
-              </div>
-              <div id="scene">
-                <canvas
-                  id="workbench"
-                  aria-label="3D Arduino circuit. Drag to rotate, Shift-drag to move, scroll to zoom. Choose Move mode to pan."
-                  tabindex="0"
-                ></canvas>
-                <div id="labels"></div>
-                <button id="back-to-step" class="back-to-step" hidden>
-                  ← Back to this step
-                </button>
-                <svg
-                  id="inspection-annotation"
-                  class="inspection-annotation"
-                  aria-hidden="true"
-                  hidden
-                >
-                  <path id="inspection-leader" />
-                  <circle id="inspection-marker" r="4" />
-                </svg>
-                <div
-                  id="inspection-panel"
-                  class="inspection-panel"
-                  data-tour-feature="inspection"
-                  hidden
-                >
-                  <button
-                    id="inspection-close"
-                    aria-label="Close detail and return to diagram"
-                  >
-                    ×</button
-                  ><span class="eyebrow">⌖ A CLOSER LOOK</span>
-                  <h3 id="inspection-title"></h3>
-                  <p id="inspection-description"></p>
-                </div>
-                <div id="scene-loading">Setting out your workbench…</div>
-                <div class="scene-caption">
-                  <span id="scene-number">FIG. 01</span
-                  ><span id="scene-title"
-                    >ARDUINO UNO R3</span
-                  >
-                </div>
-                <div class="view-controls" data-tour-feature="camera">
-                  <button
-                    id="rotate-left"
-                    aria-label="Rotate left"
-                    title="Rotate left (Q)"
-                  >
-                    ↶</button
-                  ><button
-                    id="rotate-right"
-                    aria-label="Rotate right"
-                    title="Rotate right (E)"
-                  >
-                    ↷</button
-                  ><button
-                    id="tilt-up"
-                    aria-label="Tilt view up"
-                    title="Look from higher up"
-                  >
-                    ⌃</button
-                  ><button
-                    id="tilt-down"
-                    aria-label="Tilt view down"
-                    title="Look from lower down"
-                  >
-                    ⌄</button
-                  ><span></span
-                  ><button id="zoom-out" aria-label="Zoom out">−</button
-                  ><button id="zoom-in" aria-label="Zoom in">+</button
-                  ><span></span
-                  ><button
-                    id="reset-view"
-                    aria-label="Reset view"
-                    title="Reset view (R)"
-                  >
-                    ⌖
-                  </button>
-                </div>
-                <div class="drag-hint" id="drag-hint">
-                  DRAG TO TURN <span>·</span> SCROLL TO ZOOM
-                </div>
-              </div>
-              <details class="controls-disclosure">
-                <summary>How to move the 3D view</summary>
-                <div id="controls-help"></div>
-              </details>
-              <div class="parts-tray">
-                <span>IN YOUR KIT</span
-                ><button data-part="board">
-                  <i class="part-glyph board-glyph">▤</i><span>Arduino Uno</span
-                  ><b>1×</b></button
-                ><button data-part="breadboard">
-                  <i class="part-glyph bread-glyph">⠿</i><span>Breadboard</span
-                  ><b>1×</b></button
-                ><button data-part="led">
-                  <i class="part-glyph led-glyph">♟</i><span>LED</span
-                  ><b>1×</b></button
-                ><button data-part="resistor">
-                  <i class="part-glyph resistor-glyph">▰</i><span>Resistor</span
-                  ><b>1×</b></button
-                ><button data-part="usb">
-                  <i class="part-glyph usb-glyph">⌁</i><span>USB cable</span
-                  ><b>1×</b></button
-                ><button data-part="wires">
-                  <i class="part-glyph wire-glyph">∿</i><span>Wires</span
-                  ><b>2×</b>
-                </button>
-              </div>
-            </section>
-            <aside class="instruction-card">
-              <div class="instruction-content">
-                <div class="step-kicker">
-                  <span id="step-count">STEP 01 / 07</span
-                  ><span class="time-label" id="step-time">~1 MIN</span>
-                </div>
-                <div id="step-art" class="step-art">01<span>✦</span></div>
-                <h2 id="step-title"></h2>
-                <p id="step-description"></p>
-              </div>
-              <div class="instruction-details">
-                <div class="why-box">
-                  <span>☀</span>
-                  <div>
-                    <strong id="tip-title"></strong>
-                    <p id="tip-text"></p>
-                  </div>
-                </div>
-                <div id="step-extra"></div>
-              </div>
-              <div class="instruction-actions">
-                <button id="replay" class="replay">↻ Watch that again</button
-                ><button id="next-step" class="button primary">
-                  Got it, let’s go <span>→</span></button
-                ><button id="previous-step" class="previous">
-                  ← Previous step
-                </button>
-              </div>
-            </aside>
           </div>
-          <section class="lower">
-            <div class="notebook" id="code-notebook" data-tour-feature="code">
-              <div class="notebook-heading">
-                <span
-                  ><span class="code-icon">&lt;/&gt;</span> GUIDED CODE
-                  EDITOR</span
-                ><button id="copy-code">Copy code <span>⧉</span></button>
-              </div>
-              <div class="code-settings">
-                <label for="code-delay">Blink delay</label
-                ><select id="code-delay">
-                  <option value="1000">Slow · 1 second</option>
-                  <option value="500" selected>Steady · ½ second</option>
-                  <option value="250">Fast · ¼ second</option></select
-                ><span>Changes both wait instructions below.</span>
-              </div>
-              <div class="code-content">
-                <pre id="code"></pre>
-                <div class="code-explanation">
-                  <span class="hand-arrow">↙</span
-                  ><strong>Read the loop.</strong>
-                  <p>
-                    Turn the light on.<br />Wait.<br />Turn it off.<br />Do it
-                    all again.
-                  </p>
-                  <span class="code-tag">REPEAT</span>
-                </div>
-              </div>
-              <div
-                class="simulation-status"
-                id="simulation-status"
-                data-tour-feature="simulation"
-              >
-                <span id="sim-dot"></span
-                ><span id="sim-status" role="status"
-                  >Ready when you are. We’ll test your circuit in step 7.</span
-                >
-              </div>
-            </div>
-            <div class="discovery">
-              <div class="eyebrow">THE BIG LITTLE IDEA</div>
-              <div class="discovery-icon">∞</div>
-              <h3>You’re telling electricity<br />where to go.</h3>
-              <p>And when it gets to your LED…<br />hello, light!</p>
-              <div class="discovery-bottom">
-                EXPLORE <span>→</span> BUILD <span>→</span> MAKE IT REAL
-              </div>
-            </div>
-          </section>
+          <p class="hero-note">
+            <span aria-hidden="true">✳</span> No kit? Start with the virtual
+            workbench.
+          </p>
         </div>
-        <footer class="main-footer">
-          <span>Little Spark · Arduino lessons</span
-          ><button id="parent-notes">A note for grown-ups ↗</button>
-        </footer>
-      </main>
-      <dialog
-        id="family-panel"
-        class="family-panel"
-        data-tour-feature="family"
-        aria-label="Family accounts"
-      ></dialog>
-      <dialog id="board-dialog">
-        <button class="dialog-close" aria-label="Close board connection">
-          ×
-        </button>
-        <div class="eyebrow">USB UPLOAD</div>
-        <h2>Upload to your Uno</h2>
-        <p>
-          With a grown-up, connect a
-          <strong>classic Arduino Uno R3 (ATmega328P)</strong> using its USB
-          cable.
-        </p>
-        <div class="hardware-checks">
-          <div>
-            <span>1</span>
-            <p>
-              Build the circuit with USB unplugged. Ask a grown-up to check the
-              LED, 220 Ω resistor, and wires.
-            </p>
+        <figure class="hero-art" data-parallax="0.12">
+          <div class="art-disc" aria-hidden="true"></div>
+          <span class="figure-label">FIG. 01 / YOUR FIRST BUILD</span
+          ><img
+            src="/images/blink-circuit.png"
+            width="3600"
+            height="2800"
+            fetchpriority="high"
+            alt="Illustrated Arduino Uno connected to a breadboard, LED, resistor, and two jumper wires"
+          />
+          <figcaption class="art-caption">
+            <span class="live-dot"></span> UNO R3 + ONE LED
+          </figcaption>
+          <div class="sticker" aria-hidden="true">
+            LESSON<br /><strong>01</strong><span>BLINK AN LED ↗</span>
           </div>
-          <div>
-            <span>2</span>
-            <p>
-              Run the virtual test in step 7. We test the same compiled program
-              that goes to your board.
-            </p>
-          </div>
-          <div>
-            <span>3</span>
-            <p>
-              Plug in USB, connect, then send the program. This needs a desktop
-              browser with Web Serial, such as Chrome or Edge.
-            </p>
-          </div>
+          <span class="hand-note">Every connection,<br />explained.</span
+          ><svg class="note-arrow" viewBox="0 0 120 100" aria-hidden="true">
+            <path d="M10 8 Q110 4 92 81 M76 70 L92 84 L106 67" />
+          </svg>
+        </figure>
+        <div class="hero-bottom">
+          <span>A WORKBENCH FOR CURIOUS KIDS & THEIR GROWN-UPS</span
+          ><span>SCROLL TO EXPLORE <b aria-hidden="true">↓</b></span>
         </div>
-        <label class="adult-check"
-          ><input type="checkbox" id="adult-check" /> A grown-up checked our Uno
-          R3 and wiring.</label
-        >
-        <div id="hardware-status" role="status"></div>
-        <button id="download-sketch" class="button secondary">
-          Download sketch for Arduino IDE
-        </button>
-        <p class="small-print">
-          Safari can run every lesson and the simulator. For USB upload in
-          Safari, download the sketch and open it in the Arduino IDE.
-        </p>
-        <div class="hardware-actions">
-          <button id="connect-usb" class="button secondary">
-            1. Connect Uno</button
-          ><button id="upload-usb" class="button primary" disabled>
-            2. Send tested code →
-          </button>
-        </div>
-        <p class="small-print">
-          The virtual test checks program behavior. It cannot inspect the wires
-          on your real board. This lesson doesn’t support Uno R4, Nano, or
-          ESP32.
-        </p>
-      </dialog>
-      <dialog id="notes-dialog">
-        <button class="dialog-close" aria-label="Close parent notes">×</button>
-        <div class="eyebrow">FOR PARENTS</div>
-        <h2>Before you start</h2>
-        <p>
-          This first lesson uses a classic Uno R3, a breadboard, a standard LED,
-          a 220 Ω resistor, and two jumper wires.
-        </p>
-        <p>
-          Follow each animated step with the board unplugged. Check the LED’s
-          long leg connects through the resistor to D13, and its short leg
-          connects to GND. Use USB power for this activity.
-        </p>
-        <p>
-          The browser runs the actual precompiled AVR program in an emulator.
-          After the test passes, the identical firmware can be uploaded using
-          Web Serial and the Uno’s bootloader. Physical uploads still need a
-          hands-on check.
-        </p>
-        <p>
-          Guest progress stays in this browser. Signed-in child profiles sync
-          progress to their parent-managed account. There are no ads or tracking
-          scripts. The editor uses guided timing controls.
-        </p>
-        <button class="button primary close-notes">Back to the lesson →</button>
-      </dialog>
-      <div id="lesson-nav" class="lesson-nav"><span id="lesson-nav-label"></span><div><button id="lesson-nav-back" aria-label="Previous lesson step">← Back</button><button id="lesson-nav-next" aria-label="Continue lesson">Next →</button></div></div>
-      <div id="tour-nav" class="tour-nav" hidden>
-        <span id="tour-nav-label"></span>
-        <div>
-          <button id="tour-back">← Back</button
-          ><button id="tour-forward">Next →</button
-          ><button id="tour-quit">Exit tour</button>
-        </div>
+      </section>
+      <div class="process-strip" aria-hidden="true">
+        <span>TURN IT</span><i>↻</i><span>WIRE IT</span><i>⌁</i
+        ><span>TEST IT</span><i>▷</i><span>MAKE IT BLINK</span><i>✳</i>
       </div>
-      <div id="toast" role="status"></div>
-    </div>
-    <script type="module" src="/src/app.js"></script>
+      <section class="story" id="how-it-works" aria-labelledby="story-title">
+        <div class="story-intro">
+          <p class="eyebrow">FROM PARTS TO PROGRAM</p>
+          <h2 id="story-title">
+            Follow the wire.<br />Understand the circuit.
+          </h2>
+          <p>Small steps, with time to see what changed.</p>
+        </div>
+        <div class="story-grid">
+          <div class="story-stage" aria-hidden="true">
+            <div class="stage-grid"></div>
+            <div class="stage-orbit"></div>
+            <span class="stage-tag">THE 3D WORKBENCH</span
+            ><img
+              class="story-board"
+              src="/images/arduino-uno.png"
+              width="3600"
+              height="2800"
+              loading="lazy"
+              alt=""
+            /><img
+              class="story-circuit"
+              src="/images/blink-circuit.png"
+              width="3600"
+              height="2800"
+              loading="lazy"
+              alt=""
+            />
+            <div class="connection-line"><span></span><i></i><b></b></div>
+            <span class="stage-caption">01 / MEET YOUR BOARD</span>
+            <div class="stage-controls">
+              <span>↻ ROTATE</span><span>+ ZOOM</span><span>⌕ INSPECT</span>
+            </div>
+          </div>
+          <div class="story-steps">
+            <article class="story-step" data-story-step="0">
+              <span class="step-index">01</span>
+              <div>
+                <p class="eyebrow">FIND IT</p>
+                <h3>Meet the parts.</h3>
+                <p>
+                  Start with a simple checklist for the official Arduino Starter
+                  Kit. Take a closer look at the board, LED, resistor,
+                  breadboard, and wires before you build.
+                </p>
+                <span class="step-detail"
+                  >CLICK A PART → GET A CLOSER LOOK</span
+                >
+              </div>
+            </article>
+            <article class="story-step" data-story-step="1">
+              <span class="step-index">02</span>
+              <div>
+                <p class="eyebrow">BUILD IT</p>
+                <h3>One connection.<br />Then the next.</h3>
+                <p>
+                  Watch each part and wire move into place. Rotate the diagram,
+                  zoom into a pin, or replay a step whenever you need another
+                  look.
+                </p>
+                <span class="step-detail">TURN IT AROUND. TAKE YOUR TIME.</span>
+              </div>
+            </article>
+            <article class="story-step" data-story-step="2">
+              <span class="step-index">03</span>
+              <div>
+                <p class="eyebrow">TRY IT</p>
+                <h3>Code. Test.<br />Then connect.</h3>
+                <p>
+                  Change the blink timing and run the program on a virtual
+                  Arduino. Once it passes, a grown-up can check the real wiring
+                  and help upload to a classic Uno R3.
+                </p>
+                <a class="light-link" href="/learn/"
+                  >Try the first lesson <span aria-hidden="true">↗</span></a
+                >
+              </div>
+            </article>
+          </div>
+        </div>
+        <div class="story-footnote">
+          <span aria-hidden="true">⌁</span>
+          <p>
+            The virtual test checks the program. A grown-up still needs to check
+            your real wires. Direct USB upload needs a computer browser with Web
+            Serial, such as Chrome or Edge.
+          </p>
+        </div>
+      </section>
+      <section class="code-section" aria-labelledby="code-heading">
+        <div class="code-copy">
+          <p class="eyebrow">A LITTLE PREVIEW</p>
+          <h2 id="code-heading">
+            Change the wait.<br /><span class="serif">Find your rhythm.</span>
+          </h2>
+          <p>
+            The number inside <code>delay()</code> tells the Arduino how long to
+            wait. Shorter waits make a faster blink.
+          </p>
+          <p class="preview-note">
+            Try it here. In the lesson, you’ll test the compiled program on the
+            virtual board.
+          </p>
+          <a class="text-link" href="/learn/"
+            >Open the guided code editor <span aria-hidden="true">↗</span></a
+          >
+        </div>
+        <div class="code-demo">
+          <div class="demo-header">
+            <span><i></i> BLINK PREVIEW</span><span>sketch.ino</span>
+          </div>
+          <div class="demo-body">
+            <div class="code-lines" aria-label="Example Arduino loop">
+              <span class="code-comment">// Do this again and again.</span
+              ><br /><span class="code-purple">void</span>
+              <span class="code-green">loop</span>() {<br />&nbsp;
+              digitalWrite(13,
+              <span class="code-orange">HIGH</span>);<br />&nbsp; delay(<mark
+                class="delay-value"
+                >500</mark
+              >);<br />&nbsp; digitalWrite(13,
+              <span class="code-orange">LOW</span>);<br />&nbsp; delay(<mark
+                class="delay-value"
+                >500</mark
+              >);<br />}
+            </div>
+            <div class="led-preview" aria-hidden="true">
+              <div class="led-cap"></div>
+              <div class="led-base"></div>
+              <div class="led-leg long"></div>
+              <div class="led-leg short"></div>
+              <span>YOUR LED</span>
+            </div>
+          </div>
+          <fieldset class="delay-choices">
+            <legend>Blink delay</legend>
+            <button type="button" data-delay="1000" aria-pressed="false">
+              Slow <small>1 second</small></button
+            ><button type="button" data-delay="500" aria-pressed="true">
+              Steady <small>½ second</small></button
+            ><button type="button" data-delay="250" aria-pressed="false">
+              Fast <small>¼ second</small>
+            </button>
+          </fieldset>
+          <p class="demo-status" role="status">500 ms on. 500 ms off.</p>
+        </div>
+      </section>
+      <section
+        class="family-section"
+        id="families"
+        aria-labelledby="family-title"
+      >
+        <div
+          class="family-visual"
+          aria-label="Illustration of a parent account creating a temporary learner link"
+        >
+          <div class="family-sheet">
+            <span class="eyebrow">THE PARENT VIEW</span>
+            <div class="sample-profile">
+              <span class="profile-icon">↗</span>
+              <div><strong>Learner 01</strong><small>BLINK AN LED</small></div>
+              <span class="sample-percent">3 / 7</span>
+            </div>
+            <div class="sample-progress"><i></i></div>
+            <div class="sample-steps">
+              <span>✓ Parts found</span><span>✓ Board explored</span
+              ><span>✓ Breadboard placed</span>
+            </div>
+            <div class="sample-link">
+              <span aria-hidden="true">⌁</span>
+              <div>
+                <strong>A link just for them.</strong
+                ><small>ONE USE · FIVE MINUTES</small>
+              </div>
+              <span aria-hidden="true">↗</span>
+            </div>
+            <span class="sample-label">SAMPLE PROFILE</span>
+          </div>
+          <span class="family-spark" aria-hidden="true">✳</span
+          ><span class="family-note"
+            >A separate profile<br />for each builder.</span
+          >
+        </div>
+        <div class="family-copy">
+          <p class="eyebrow">FOR THE GROWN-UPS</p>
+          <h2 id="family-title">Their project.<br />Your overview.</h2>
+          <p>
+            Create a profile for each child and see how their lesson is going.
+            Make a temporary login link or QR code so they can open their own
+            workbench.
+          </p>
+          <ul>
+            <li>Parents sign in with an email link.</li>
+            <li>Kids don’t need email or passwords.</li>
+            <li>Signed-in progress follows them across devices.</li>
+          </ul>
+          <a class="pill dark" href="/learn/?signin=1"
+            >Set up your family <span aria-hidden="true">↗</span></a
+          >
+          <p class="small-note">
+            Just exploring? Start a lesson without an account.
+          </p>
+        </div>
+      </section>
+      <section class="gear-section" id="gear" aria-labelledby="gear-title">
+        <div class="gear-copy">
+          <p class="eyebrow">OFF THE WORKBENCH</p>
+          <h2 id="gear-title">
+            Wear your<br /><span class="serif">Little Spark.</span>
+          </h2>
+          <p>Little Spark tees and caps.<br />For kids and grown-ups.</p>
+          <a
+            class="pill dark"
+            href="https://littlespark.vtc.store"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Visit the gear store <span aria-hidden="true">↗</span
+            ><span class="sr-only"> (opens in a new tab)</span></a
+          ><span class="gear-address">LITTLESPARK.VTC.STORE</span>
+        </div>
+        <div class="gear-art" data-parallax="0.06">
+          <svg
+            viewBox="0 0 540 470"
+            role="img"
+            aria-label="Illustrated Little Spark shirt; visit the store to see available gear"
+          >
+            <defs>
+              <pattern
+                id="shirt-grid"
+                width="22"
+                height="22"
+                patternUnits="userSpaceOnUse"
+              >
+                <path
+                  d="M22 0H0V22"
+                  fill="none"
+                  stroke="#365447"
+                  stroke-width=".6"
+                  opacity=".18"
+                />
+              </pattern>
+            </defs>
+            <ellipse
+              cx="280"
+              cy="422"
+              rx="150"
+              ry="15"
+              fill="#9e5f2d"
+              opacity=".12"
+            />
+            <g transform="rotate(-9 270 230)">
+              <path
+                d="M182 64 106 91 44 198 130 243 160 195 146 412Q270 434 394 412L380 195 410 243 496 198 434 91 358 64Q270 95 182 64Z"
+                fill="#e9e5cf"
+                stroke="#29483d"
+                stroke-width="3"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M182 64Q270 95 358 64 334 123 270 123 206 123 182 64Z"
+                fill="#bcbaa4"
+                stroke="#29483d"
+                stroke-width="3"
+              />
+              <path
+                d="M190 68Q270 102 350 68"
+                fill="none"
+                stroke="#29483d"
+                stroke-width="2"
+              />
+              <path
+                d="M160 195 172 129M380 195 368 129M153 400Q270 419 387 400M54 188 133 230M486 188 407 230"
+                fill="none"
+                stroke="#29483d"
+                stroke-width="1.5"
+              />
+              <path d="M168 143H372V380H168Z" fill="url(#shirt-grid)" />
+              <rect
+                x="232"
+                y="175"
+                width="76"
+                height="76"
+                rx="23"
+                fill="#29483d"
+              />
+              <path
+                d="M276 184 250 221H270L262 244 293 206H273Z"
+                fill="#ecc36f"
+              />
+              <text
+                x="270"
+                y="281"
+                text-anchor="middle"
+                fill="#29483d"
+                font-size="27"
+                font-family="sans-serif"
+                font-weight="700"
+                letter-spacing="-1"
+              >
+                little spark.
+              </text>
+              <text
+                x="270"
+                y="303"
+                text-anchor="middle"
+                fill="#29483d"
+                font-size="8"
+                font-family="monospace"
+                letter-spacing="2"
+              >
+                BUILD SOMETHING.
+              </text>
+            </g>
+            <g transform="rotate(10 445 337)">
+              <rect
+                x="395"
+                y="300"
+                width="95"
+                height="104"
+                rx="3"
+                fill="#29483d"
+              />
+              <circle cx="443" cy="311" r="3" fill="#e5b865" />
+              <text
+                x="443"
+                y="345"
+                text-anchor="middle"
+                fill="#f6f3e9"
+                font-size="12"
+                font-family="monospace"
+              >
+                GEAR
+              </text>
+              <text
+                x="443"
+                y="378"
+                text-anchor="middle"
+                fill="#e5b865"
+                font-size="29"
+              >
+                ↗
+              </text>
+            </g></svg
+          ><span class="gear-art-note"
+            >A LITTLE SPARK ILLUSTRATION.<br />SEE THE STORE FOR AVAILABLE
+            PRODUCTS.</span
+          >
+        </div>
+      </section>
+      <section class="faq-section" aria-labelledby="faq-title">
+        <div>
+          <p class="eyebrow">BEFORE YOU START</p>
+          <h2 id="faq-title">A few good<br />questions.</h2>
+        </div>
+        <div class="faq-list">
+          <details>
+            <summary>
+              Do we need an Arduino kit?<span aria-hidden="true">+</span>
+            </summary>
+            <p>
+              No. You can explore the 3D workbench and test the code in your
+              browser. When you’re ready to build physically, the first lesson
+              uses parts from the official Arduino Uno R3 Starter Kit.
+            </p>
+          </details>
+          <details>
+            <summary>
+              What can kids change in the code?<span aria-hidden="true">+</span>
+            </summary>
+            <p>
+              The first lesson has a guided editor with three blink timings. It
+              changes both delay instructions in the sketch. It isn’t a
+              free-text compiler; you can copy or download the sketch to use in
+              the Arduino IDE.
+            </p>
+          </details>
+          <details>
+            <summary>
+              Can we send the code to a real board?<span aria-hidden="true"
+                >+</span
+              >
+            </summary>
+            <p>
+              Yes, the app includes an uploader for a classic Uno R3. Pass the
+              virtual test, have a grown-up check the wiring, then connect over
+              USB using desktop Chrome or Edge. Physical uploads still need a
+              hands-on hardware check. Other boards aren’t supported by this
+              lesson.
+            </p>
+          </details>
+          <details>
+            <summary>
+              Does it work in Safari?<span aria-hidden="true">+</span>
+            </summary>
+            <p>
+              The lessons, 3D view, and simulator work in Safari. Direct USB
+              upload needs Web Serial, which Safari doesn’t provide. You can
+              download the sketch for Arduino IDE or use desktop Chrome or Edge
+              to connect.
+            </p>
+          </details>
+          <details>
+            <summary>
+              Is progress saved?<span aria-hidden="true">+</span>
+            </summary>
+            <p>
+              Guest progress stays in that browser. Child profiles save to an
+              account so the parent can follow progress and the learner can
+              continue on another device. Kid login links expire after five
+              minutes and work once.
+            </p>
+          </details>
+        </div>
+      </section>
+      <section class="final-cta">
+        <p class="eyebrow">LESSON 01 / BLINK AN LED</p>
+        <h2>Start with<br />one LED<span>.</span></h2>
+        <a class="pill cream" href="/learn/"
+          >Let’s build it <span aria-hidden="true">↗</span></a
+        >
+        <div class="footer-circuit" aria-hidden="true">
+          <i></i><span>⌁</span><i></i><span>✳</span><i></i>
+        </div>
+      </section>
+    </main>
+    <footer class="home-footer">
+      <a class="home-brand" href="/"
+        >little spark<span class="brand-period">.</span></a
+      >
+      <p>Arduino lessons, one connection at a time.</p>
+      <nav aria-label="Footer">
+        <a href="/learn/">Open the lab ↗</a
+        ><a
+          href="https://littlespark.vtc.store"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Gear store ↗</a
+        ><a href="#main">Back to top ↑</a>
+      </nav>
+    </footer>
+    <script type="module" src="/src/home.js"></script>
   </body>
 </html>

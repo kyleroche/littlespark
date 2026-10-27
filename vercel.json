@@ -58,11 +58,11 @@
   "rewrites": [
     {
       "source": "/login/:token",
-      "destination": "/"
+      "destination": "/learn/index.html"
     },
     {
       "source": "/parent-login/:token",
-      "destination": "/"
+      "destination": "/learn/index.html"
     }
   ]
 }

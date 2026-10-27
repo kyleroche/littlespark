@@ -282,7 +282,7 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
   }
   async function logout() {
     await api("logout", {});
-    location.assign("/");
+    location.assign("/learn/");
   }
   button.onclick = async () => {
     try {
@@ -369,7 +369,7 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
           match[1] === "login" ? "consume-kid-link" : "consume-parent-link",
           { token: decodeURIComponent(match[2]) },
         );
-        history.replaceState(null, "", "/");
+        history.replaceState(null, "", "/learn/");
         page.remove();
         await load();
       } catch (error) {
@@ -377,6 +377,13 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
         e.target.disabled = false;
       }
     };
-  } else queueMicrotask(load);
+  } else
+    queueMicrotask(async () => {
+      await load();
+      if (new URLSearchParams(location.search).get("signin") === "1") {
+        history.replaceState(null, "", "/learn/");
+        button.click();
+      }
+    });
   return controller;
 }

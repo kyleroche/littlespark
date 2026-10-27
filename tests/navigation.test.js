@@ -48,7 +48,10 @@ test("zoom stays usable at both extremes", () => {
   assert.equal(view.scale, 320);
 });
 test("every user-facing feature declared in the UI has a tutorial and all tour targets exist", () => {
-  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const html = readFileSync(
+    new URL("../learn/index.html", import.meta.url),
+    "utf8",
+  );
   const features = new Set(
     [...html.matchAll(/data-tour-feature="([^"]+)"/g)].map((match) => match[1]),
   );

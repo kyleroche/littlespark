@@ -2592,3 +2592,21 @@ body.in-tour .lesson-nav {
 .sync-notice .sync-reload {
   flex-shrink: 0;
 }
+
+.lab-home-link {
+  font-size: 11px;
+  color: #60735d;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.lab-home-link:hover {
+  color: #b87644;
+}
+@media (max-width: 760px) {
+  .header-right {
+    gap: 10px;
+  }
+  .lab-home-link {
+    font-size: 10px;
+  }
+}

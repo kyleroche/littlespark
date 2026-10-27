@@ -1,6 +1,19 @@
 // Every data-tour-feature in the UI must be covered here. See AGENTS.md.
 export const TOUR_STEPS = [
   {
+    id: "home-store",
+    feature: "home-store",
+    target: "#account-button",
+    title: "Home, lessons, and gear",
+    description:
+      "Home explains how the project works. Open the lab starts a lesson. Gear store opens the Little Spark apparel store in a new tab.",
+    tip: "Your workbench stays here.",
+    detail:
+      "The store link is beside Sign in on the home page and beside Home in the lab. Switch back to this tab to continue building. Your saved lesson progress stays separate from the store.",
+    action: "Show the home and store links",
+    demo: "home-store",
+  },
+  {
     id: "accounts",
     feature: "accounts",
     target: "#account-button",
