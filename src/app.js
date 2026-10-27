@@ -1,4 +1,7 @@
 import "./style.css";
+import { initWorkspaceLayout } from "./workspace-layout.js";
+import { initAccounts } from "./accounts.js";
+initWorkspaceLayout();
 import { Workbench } from "./scene.js";
 import { parseHex } from "./firmware.js";
 import { UnoConnection } from "./uploader.js";
@@ -7,14 +10,13 @@ import { TOUR_STEPS } from "./app-tour.js";
 const $ = (s) => document.querySelector(s);
 const unboxing = {
   short: "Unbox your kit",
-  sub: "Find six little essentials",
+  sub: "Find the parts",
   title: "Find these six things.",
   description:
     "Take these parts out of your official Arduino Starter Kit. Tap a name for a close-up, then tick it off when you find it.",
   tip: "Just a few parts today.",
-  detail:
-    "Leave the other treasures in the box. Keep the USB cable unplugged while we build.",
-  caption: "SIX LITTLE FINDS · ONE BRIGHT IDEA",
+  detail: "Keep spare parts in the box. Leave USB unplugged while building.",
+  caption: "PARTS CHECKLIST",
   next: "My parts are ready!",
 };
 const kitItems = [
@@ -43,7 +45,7 @@ const kitItems = [
     key: "led",
     name: "Red LED",
     qty: "1 · two legs",
-    hint: "A tiny red light with two metal legs. Pick the one with TWO legs, not the four-legged RGB LED.",
+    hint: "A red light with two metal legs. Pick the one with TWO legs, not the four-legged RGB LED.",
     glyph: "♟",
   },
   {
@@ -62,6 +64,8 @@ const kitItems = [
   },
 ];
 let selectedKit = null;
+let accounts = null,
+  profileStorageKey = "little-sparks-v2";
 let tourIndex = -1,
   tourSnapshot = null,
   lastTourStep = -1,
@@ -73,49 +77,50 @@ function isTour() {
 const steps = [
   {
     short: "Meet your board",
-    sub: "Say hello to the brain",
-    title: "Meet your new little brain.",
+    sub: "Explore the board",
+    title: "Meet the Arduino Uno",
     description:
       "This is an Arduino. It follows your instructions to make things happen. Try dragging the board to explore it!",
-    tip: "Think of it like a tiny helper.",
-    detail: "You give it a plan. It does the same little job, over and over.",
-    caption: "THE LITTLE BRAIN OF YOUR CIRCUIT",
-    next: "Hello, Arduino!",
+    tip: "The board follows your code.",
+    detail:
+      "Your program runs on the board, even when it is disconnected from the computer.",
+    caption: "ARDUINO UNO R3",
+    next: "Add the breadboard",
   },
   {
-    short: "Make some room",
+    short: "Place the breadboard",
     sub: "Bring in the breadboard",
-    title: "A playground for your parts.",
+    title: "Set out the breadboard",
     description:
-      "Watch the breadboard slide into place. Its tiny holes let us connect parts without glue or solder.",
-    tip: "Some holes are secret friends.",
+      "Watch the breadboard slide into place. Push parts into its holes to connect them without soldering.",
+    tip: "Five holes share a connection.",
     detail:
       "Each group of five holes is connected underneath. The middle gap keeps the two sides apart.",
-    caption: "A LITTLE PLAYGROUND FOR ELECTRICITY",
+    caption: "BREADBOARD",
     next: "Let’s add a light",
   },
   {
     short: "Add your light",
-    sub: "Meet the mighty little LED",
-    title: "A tiny light with two legs.",
+    sub: "Check the two legs",
+    title: "Place the LED",
     description:
       "The LED lands across the breadboard’s middle gap. Its long leg goes in E11. Its short leg goes in F11.",
     tip: "Legs matter!",
     detail:
       "The long leg is the way in (+). The short leg is the way out (−). Electricity needs to go the right way.",
     caption: "LONG LEG IN · SHORT LEG OUT",
-    next: "Keep our LED happy",
+    next: "Add the resistor",
   },
   {
     short: "Slow things down",
-    sub: "A resistor to the rescue",
-    title: "Every little light needs a friend.",
+    sub: "Limit the LED current",
+    title: "Add a 220 Ω resistor",
     description:
       "The 220 Ω resistor connects C11 to C17. It slows the electricity down so our LED gets just enough.",
-    tip: "Like a gentle squeeze on a hose.",
+    tip: "The resistor limits current.",
     detail:
       "The resistor limits the flow. Our LED’s long leg shares a connected group with one end of the resistor.",
-    caption: "A SMALL RESISTOR WITH A BIG JOB",
+    caption: "220 Ω RESISTOR",
     next: "Let’s connect it",
   },
   {
@@ -128,18 +133,17 @@ const steps = [
     detail:
       "D13 → resistor → LED → GND. The path has to go all the way around for the light to shine.",
     caption: "OUT THROUGH D13 · HOME THROUGH GND",
-    next: "Time for a little magic",
+    next: "Test the circuit",
   },
   {
     short: "Make it blink!",
-    sub: "Your first bright idea",
-    title: "Ready, set… little light!",
-    description:
-      "Choose a speed, then test your program. We’ll run the real Arduino instructions in a tiny virtual brain.",
-    tip: "You’re the one making it happen.",
+    sub: "Run your code",
+    title: "Make it blink",
+    description: "Choose a speed and test your code on the virtual Arduino.",
+    tip: "Change the delay to change the rhythm.",
     detail:
       "Changing the wait changes the rhythm. Try a slow blink, then a fast one. What do you notice?",
-    caption: "YOUR FIRST CIRCUIT, ALIVE",
+    caption: "BLINK TEST",
     next: "Test my circuit",
   },
 ];
@@ -184,7 +188,8 @@ let workbench,
   hardwareBusy = false;
 function save() {
   try {
-    localStorage.setItem("little-sparks-v2", JSON.stringify(state));
+    localStorage.setItem(profileStorageKey, JSON.stringify(state));
+    if (!isTour()) accounts?.saveProgress(state);
   } catch {}
 }
 function toast(text) {
@@ -195,7 +200,7 @@ function toast(text) {
 }
 const parts = {
   usb: {
-    title: "Power and ideas, in one cable",
+    title: "USB cable",
     description:
       "Find the USB cable with one flat USB-A end and one square USB-B end. It will bring power and our program to the Uno. Leave it unplugged until our circuit is ready.",
     specs: [
@@ -207,7 +212,7 @@ const parts = {
   board: {
     title: "Arduino Uno R3",
     description:
-      "Your circuit’s tiny brain. The USB port brings it power and new instructions. Pin D13 can turn our light on and off.",
+      "The board runs your program. The USB port brings it power and new instructions. Pin D13 can turn our light on and off.",
     specs: [
       ["BRAIN", "ATmega328P"],
       ["POWER", "5 V from USB"],
@@ -215,7 +220,7 @@ const parts = {
     ],
   },
   breadboard: {
-    title: "A home for your circuit",
+    title: "Breadboard",
     description:
       "Build, change, and try again! The five holes in each short group are connected underneath. The middle gap separates the two sides.",
     specs: [
@@ -225,9 +230,9 @@ const parts = {
     ],
   },
   led: {
-    title: "A mighty little LED",
+    title: "LED",
     description:
-      "LED means light-emitting diode. That’s a fancy way of saying: a tiny part that lights up when electricity flows the right way.",
+      "LED means light-emitting diode. It lights up when current flows in the right direction.",
     specs: [
       ["LONG LEG (+)", "E11 · to resistor"],
       ["SHORT LEG (−)", "F11 · to ground"],
@@ -235,7 +240,7 @@ const parts = {
     ],
   },
   resistor: {
-    title: "Slow and steady",
+    title: "220 Ω resistor",
     description:
       "Our resistor limits current so the LED stays happy. Connect it from C11 to C17. Either direction works.",
     specs: [
@@ -245,7 +250,7 @@ const parts = {
     ],
   },
   wires: {
-    title: "Little roads for electricity",
+    title: "Jumper wires",
     description:
       "Jumper wires join the board to the breadboard. Together they complete the trip from D13 through the resistor and LED, then back to GND.",
     specs: [
@@ -299,7 +304,7 @@ try {
   console.error(e);
 }
 function codeText() {
-  return `// Our first little light\nvoid setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(${state.speed});\n  digitalWrite(13, LOW);\n  delay(${state.speed});\n}`;
+  return `// Blink an LED\nvoid setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(${state.speed});\n  digitalWrite(13, LOW);\n  delay(${state.speed});\n}`;
 }
 function renderCode() {
   $("#code-delay").value = String(state.speed);
@@ -373,7 +378,7 @@ function render() {
   $("#next-step").innerHTML =
     state.step === 5
       ? busy
-        ? "Testing the tiny brain…"
+        ? "Testing…"
         : running
           ? "Pause the light <span>Ⅱ</span>"
           : verified
@@ -416,7 +421,7 @@ function render() {
       : "";
   if (state.step === -1) {
     $("#step-extra").innerHTML =
-      `<div class="kit-checklist"><div class="kit-count"><span>YOUR FIRST-CIRCUIT CHECKLIST</span><b>${state.found.length} / 6</b></div>${kitItems.map((item) => `<div class="kit-row ${state.found.includes(item.key) ? "found" : ""} ${selectedKit === item.key ? "selected" : ""}"><button class="kit-look" data-kit="${item.key}" aria-label="Look closely at ${item.name}"><span class="kit-glyph ${item.key}-glyph">${item.glyph}</span><span><strong>${item.name}</strong><small>${item.qty}</small></span><i>⌕</i></button><button class="kit-check" data-found="${item.key}" aria-label="${state.found.includes(item.key) ? "Unmark" : "Found"} ${item.name}" aria-pressed="${state.found.includes(item.key)}">${state.found.includes(item.key) ? "✓" : "+"}</button></div>`).join("")}</div>${selectedKit ? `<div class="kit-detail"><strong>${kitItems.find((i) => i.key === selectedKit).name}</strong><p>${kitItems.find((i) => i.key === selectedKit).hint}</p><button id="back-to-kit">↶ See all six parts</button></div>` : '<p class="kit-hint">Tap + when you find a part. No kit yet? Find them on screen!</p>'}<a class="kit-source" href="https://store-usa.arduino.cc/products/arduino-starter-kit-multi-language" target="_blank" rel="noopener noreferrer">Based on the official Uno R3 Starter Kit ↗</a>`;
+      `<div class="kit-checklist"><div class="kit-count"><span>YOUR FIRST-CIRCUIT CHECKLIST</span><b>${state.found.length} / 6</b></div>${kitItems.map((item) => `<div class="kit-row ${state.found.includes(item.key) ? "found" : ""} ${selectedKit === item.key ? "selected" : ""}"><button class="kit-look" data-kit="${item.key}" aria-label="Look closely at ${item.name}"><span class="kit-glyph ${item.key}-glyph">${item.glyph}</span><span><strong>${item.name}</strong><small>${item.qty}</small></span><i>⌕</i></button><button class="kit-check" data-found="${item.key}" aria-label="${state.found.includes(item.key) ? "Unmark" : "Found"} ${item.name}" aria-pressed="${state.found.includes(item.key)}">${state.found.includes(item.key) ? "✓" : "+"}</button></div>`).join("")}</div>${selectedKit ? `<div class="kit-detail"><strong>${kitItems.find((i) => i.key === selectedKit).name}</strong><p>${kitItems.find((i) => i.key === selectedKit).hint}</p><button id="back-to-kit">↶ See all six parts</button></div>` : '<p class="kit-hint">Check off each part. You can also identify them on screen.</p>'}<a class="kit-source" href="https://store-usa.arduino.cc/products/arduino-starter-kit-multi-language" target="_blank" rel="noopener noreferrer">Based on the official Uno R3 Starter Kit ↗</a>`;
     document.querySelectorAll("[data-kit]").forEach(
       (b) =>
         (b.onclick = () => {
@@ -458,6 +463,17 @@ function render() {
         render();
       }),
   );
+  $("#lesson-nav-label").textContent = `${state.step + 2}/7 · ${step.short}`;
+  $("#lesson-nav-back").disabled = state.step === -1;
+  $("#lesson-nav-next").disabled = $("#next-step").disabled;
+  $("#lesson-nav-next").textContent =
+    state.step === 5
+      ? busy
+        ? "Testing…"
+        : running
+          ? "Pause Ⅱ"
+          : "Test circuit ▷"
+      : "Next →";
   renderCode();
   save();
 }
@@ -510,7 +526,8 @@ $("#restart").onclick = () => {
   selectedKit = null;
   invalidate();
   go(-1);
-  toast("A fresh little adventure. Let’s begin!");
+  accounts?.resetProgress(state);
+  toast("Lesson progress reset.");
 };
 async function runTest() {
   invalidate();
@@ -567,7 +584,7 @@ async function runTest() {
         );
         updateUpload();
         render();
-        toast("You did it! You made a little light. ✦");
+        toast("Test passed. Your LED is blinking.");
       } else if (data.type === "pin") workbench?.setLed(data.high, state.color);
       else if (data.type === "error") {
         clearTimeout(timeout);
@@ -631,7 +648,7 @@ function updateUpload() {
     !connection || !verified || !$("#adult-check").checked || hardwareBusy;
   if (!supported)
     $("#hardware-status").textContent =
-      "USB connection isn’t available in this browser. Open this site in desktop Chrome or Edge. Your virtual adventure still works here.";
+      "This browser can run the lessons and simulator, but does not provide Web Serial for direct USB upload. Download the sketch below and upload it using the Arduino IDE, or use a browser with Web Serial.";
   else if (!verified && !hardwareBusy)
     $("#hardware-status").textContent =
       "Finish step 7 and pass the virtual test to unlock upload.";
@@ -645,6 +662,15 @@ $("#board-button").onclick = () => {
   $("#board-dialog").show();
 };
 $("#adult-check").onchange = updateUpload;
+$("#download-sketch").onclick = () => {
+  const blob = new Blob([codeText()], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "little_spark_blink.ino";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
 $("#connect-usb").onclick = async () => {
   if (connection) {
     await connection.close();
@@ -713,7 +739,12 @@ function changeSpeed(speed) {
 }
 function startTour() {
   if (isTour()) return;
-  tourSnapshot = { speed: state.speed, color: state.color };
+  tourSnapshot = {
+    speed: state.speed,
+    color: state.color,
+    layout: $("#learning-layout").dataset.layout,
+  };
+  document.querySelector('#layout-controls [data-layout="split"]').click();
   invalidate();
   tourIndex = 0;
   lastTourStep = -1;
@@ -731,9 +762,12 @@ function exitTour(restoreScene = true) {
   tourIndex = -1;
   lastTourStep = -1;
   invalidate();
-  simStatus("Back to your adventure. Test your current program in step 7.");
+  simStatus("Back to your lesson. Test your current program in step 7.");
   state.speed = tourSnapshot.speed;
   state.color = tourSnapshot.color;
+  document
+    .querySelector(`#layout-controls [data-layout="${tourSnapshot.layout}"]`)
+    ?.click();
   tourSnapshot = null;
   selectedKit = null;
   document.body.classList.remove("in-tour");
@@ -774,10 +808,9 @@ function advanceTour(direction) {
 }
 function renderTour() {
   const step = TOUR_STEPS[tourIndex];
-  document.querySelector(".intro h1").innerHTML =
-    "A little tour. A lot to explore<span>.</span>";
+  document.querySelector(".intro h1").innerHTML = "App tour<span>.</span>";
   document.querySelector(".intro>div>p").textContent =
-    "Learn the controls, then make something wonderful.";
+    "Try the controls and learn how progress is saved.";
   $("#step-count").textContent =
     `APP TOUR · ${tourIndex + 1} / ${TOUR_STEPS.length}`;
   $("#step-time").textContent = "TRY IT OUT";
@@ -788,15 +821,15 @@ function renderTour() {
   $("#tip-title").textContent = step.tip;
   $("#tip-text").textContent = step.detail;
   $("#scene-number").textContent = "PRACTICE WORKBENCH";
-  $("#scene-title").textContent = "YOUR CIRCUIT LESSON IS SAVED";
+  $("#scene-title").textContent = "PRACTICE MODE";
   $("#step-extra").innerHTML =
-    `<div class="tour-dots">${TOUR_STEPS.map((s, i) => `<i class="${i === tourIndex ? "active" : ""}"></i>`).join("")}</div><div class="tour-practice"><strong>Have a little go.</strong>Try the real controls, or use the practice button below.</div><button id="tour-demo" class="button secondary" ${busy ? "disabled" : ""}>${busy ? "Testing…" : step.action}</button><button id="exit-tour" class="tour-exit">← Back to my adventure</button>`;
+    `<div class="tour-dots">${TOUR_STEPS.map((s, i) => `<i class="${i === tourIndex ? "active" : ""}"></i>`).join("")}</div><div class="tour-practice"><strong>Try it.</strong>Try the real controls, or use the practice button below.</div><button id="tour-demo" class="button secondary" ${busy ? "disabled" : ""}>${busy ? "Testing…" : step.action}</button><button id="exit-tour" class="tour-exit">← Back to the lesson</button>`;
   $("#tour-demo").onclick = demoTour;
   $("#exit-tour").onclick = () => exitTour();
   $("#next-step").innerHTML =
     tourIndex === TOUR_STEPS.length - 1
-      ? "Back to my adventure <span>→</span>"
-      : "Next discovery <span>→</span>";
+      ? "Back to the lesson <span>→</span>"
+      : "Next <span>→</span>";
   $("#next-step").disabled = busy;
   $("#previous-step").disabled = tourIndex === 0;
   $("#replay").textContent = "↻ Show me again";
@@ -818,6 +851,12 @@ function renderTour() {
 function demoTour() {
   if (!isTour() || busy) return;
   switch (TOUR_STEPS[tourIndex].demo) {
+    case "accounts":
+      document.querySelector("#account-button").click();
+      break;
+    case "layout":
+      document.querySelector('#layout-controls [data-layout="split"]').click();
+      break;
     case "lessons":
       $("#tour-lesson").scrollIntoView({ behavior: "smooth", block: "center" });
       break;
@@ -854,6 +893,8 @@ function demoTour() {
       break;
   }
 }
+$("#lesson-nav-back").onclick = () => $("#previous-step").click();
+$("#lesson-nav-next").onclick = () => $("#next-step").click();
 $("#app-tour-button").onclick = () => (isTour() ? exitTour() : startTour());
 $("#tour-lesson").onclick = () => (isTour() ? exitTour() : startTour());
 $("#tour-back").onclick = () => advanceTour(-1);
@@ -864,3 +905,20 @@ document.addEventListener("pointerdown", (event) => {
     if (!panel.contains(event.target)) panel.close();
 });
 go(state.step);
+accounts = initAccounts({
+  onProfile(user, progress) {
+    if (user?.role === "kid") {
+      profileStorageKey = `little-spark-profile-${user.id}`;
+      state = progress || {
+        step: -1,
+        speed: 500,
+        color: "#d25f4d",
+        completed: [],
+        found: [],
+      };
+      invalidate();
+      go(state.step);
+    }
+  },
+  onNotice: (message) => console.info("Progress sync:", message),
+});

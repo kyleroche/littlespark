@@ -2058,3 +2058,504 @@ dialog::backdrop {
     top: 80px;
   }
 }
+.layout-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+.layout-controls > span {
+  font: 8px var(--mono);
+  color: #8c987f;
+  letter-spacing: 1px;
+}
+.layout-controls > div {
+  display: flex;
+  gap: 3px;
+  border: 1px solid #d4ddc8;
+  padding: 4px;
+  border-radius: 7px;
+  background: #f8f9f1;
+}
+.layout-controls button {
+  font-size: 10px;
+  border: 0;
+  background: transparent;
+  padding: 8px 11px;
+  border-radius: 4px;
+  color: #7a8c6b;
+}
+.layout-controls button[aria-pressed="true"] {
+  background: #dfe8d5;
+  color: #395533;
+}
+.instruction-content,
+.instruction-details {
+  display: contents;
+}
+.learning-layout:not([data-layout="guided"]) {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+  gap: 18px;
+}
+.learning-layout:not([data-layout="guided"]) > .workspace,
+.learning-layout:not([data-layout="guided"]) > .lower {
+  display: contents;
+}
+.learning-layout:not([data-layout="guided"]) .stage-card {
+  grid-column: 1;
+  grid-row: 1;
+}
+.learning-layout:not([data-layout="guided"]) .notebook {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+}
+.learning-layout:not([data-layout="guided"]) .code-content {
+  flex: 1;
+  align-items: flex-start;
+  padding-top: 24px;
+}
+.learning-layout:not([data-layout="guided"]) .code-explanation {
+  display: none;
+}
+.learning-layout:not([data-layout="guided"]) pre {
+  font-size: 11px;
+  line-height: 2;
+}
+.learning-layout:not([data-layout="guided"]) .code-settings {
+  flex-wrap: wrap;
+}
+.learning-layout:not([data-layout="guided"]) .code-settings > span {
+  flex-basis: 100%;
+}
+.learning-layout:not([data-layout="guided"]) .discovery {
+  display: none;
+}
+.learning-layout:not([data-layout="guided"]) .instruction-card {
+  grid-column: 1/-1;
+  grid-row: 2;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) 180px;
+  gap: 20px;
+  padding: 22px;
+}
+.learning-layout:not([data-layout="guided"]) .instruction-content,
+.learning-layout:not([data-layout="guided"]) .instruction-details {
+  display: block;
+}
+.learning-layout:not([data-layout="guided"]) .instruction-card .step-art {
+  display: none;
+}
+.learning-layout:not([data-layout="guided"]) .instruction-card h2 {
+  margin-top: 13px;
+  max-width: none;
+  font-size: 24px;
+}
+.learning-layout:not([data-layout="guided"]) .instruction-content > p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #7d8d70;
+  margin: 8px 0 0;
+}
+.learning-layout:not([data-layout="guided"]) .instruction-actions {
+  align-self: center;
+  margin: 0;
+  padding: 0;
+}
+.learning-layout:not([data-layout="guided"]) #scene {
+  height: 475px;
+}
+.learning-layout[data-layout="build"],
+.learning-layout[data-layout="code"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+.learning-layout[data-layout="build"] .notebook {
+  display: none;
+}
+.learning-layout[data-layout="code"] .stage-card {
+  display: none;
+}
+.learning-layout[data-layout="code"] .notebook {
+  grid-column: 1;
+}
+.learning-layout[data-layout="build"] #scene {
+  height: 550px;
+}
+.learning-layout[data-layout="code"] .code-content {
+  min-height: 390px;
+}
+.learning-layout[data-layout="code"] pre {
+  font-size: 14px;
+  line-height: 2;
+}
+.learning-layout:not([data-layout="guided"]) .kit-checklist {
+  margin-top: 12px;
+}
+.learning-layout:not([data-layout="guided"]) .kit-look {
+  padding: 7px;
+}
+.learning-layout:not([data-layout="guided"])
+  .instruction-card:has(.kit-checklist)
+  .why-box {
+  display: none;
+}
+.instruction-card .step-art {
+  font-size: 55px;
+}
+.header-caption {
+  font-size: 8px;
+}
+.side-footer {
+  margin-top: 26px;
+}
+.code-explanation .hand-arrow {
+  display: none;
+}
+.discovery {
+  display: none;
+}
+.learning-layout[data-layout="guided"] .lower {
+  grid-template-columns: 1fr;
+}
+.main-footer > span {
+  font-size: 8px;
+}
+body.in-tour .learning-layout .instruction-card {
+  position: static;
+  min-height: 0;
+}
+body.in-tour .learning-layout[data-layout="guided"] .instruction-card {
+  position: sticky;
+  top: 16px;
+}
+@media (max-width: 1000px) {
+  .learning-layout:not([data-layout="guided"]) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .learning-layout:not([data-layout="guided"]) .stage-card {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .learning-layout:not([data-layout="guided"]) .notebook {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .learning-layout:not([data-layout="guided"]) .instruction-card {
+    grid-row: 3;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .learning-layout:not([data-layout="guided"]) .instruction-actions {
+    grid-column: 1/-1;
+    max-width: 360px;
+    justify-self: center;
+    width: 100%;
+  }
+  .learning-layout:not([data-layout="guided"]) #scene {
+    height: 400px;
+  }
+  .learning-layout:not([data-layout="guided"]) .code-content {
+    min-height: 280px;
+  }
+  .learning-layout[data-layout="code"] .instruction-card {
+    grid-row: 2;
+  }
+}
+@media (max-width: 760px) {
+  .layout-controls > span {
+    display: none;
+  }
+  .layout-controls {
+    justify-content: center;
+  }
+  .layout-controls button {
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+  .learning-layout:not([data-layout="guided"]) .instruction-card {
+    display: block;
+    padding: 20px;
+  }
+  .learning-layout:not([data-layout="guided"]) .instruction-actions {
+    max-width: none;
+    margin-top: 20px;
+  }
+  .learning-layout:not([data-layout="guided"]) .instruction-details {
+    margin-top: 14px;
+  }
+  .learning-layout:not([data-layout="guided"]) #scene {
+    height: 380px;
+  }
+  .learning-layout[data-layout="code"] .code-content {
+    min-height: 340px;
+  }
+}
+.family-panel[open] {
+  width: min(520px, calc(100vw - 28px));
+  padding: 28px;
+}
+.family-panel label {
+  display: block;
+  font-size: 11px;
+  margin: 12px 0 5px;
+}
+.family-panel input,
+.family-panel select {
+  display: block;
+  width: 100%;
+  border: 1px solid #cad6bc;
+  background: #fafbf4;
+  border-radius: 5px;
+  padding: 9px 10px;
+  font:
+    12px "DM Sans",
+    sans-serif;
+  color: #365534;
+  margin-top: 6px;
+}
+.family-email {
+  font-size: 11px !important;
+}
+.kid-list {
+  display: grid;
+  gap: 12px;
+  margin: 18px 0;
+}
+.kid-card {
+  border: 1px solid #d3ddc6;
+  border-radius: 8px;
+  padding: 15px;
+  background: #f7f9ef;
+}
+.kid-heading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 15px;
+}
+.kid-heading > span:first-child {
+  font-size: 25px;
+}
+.kid-percent {
+  margin-left: auto;
+  font: 12px var(--mono);
+  color: #7f936a;
+}
+.kid-progress {
+  height: 5px;
+  background: #e2e9d7;
+  margin-top: 11px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.kid-progress i {
+  display: block;
+  height: 100%;
+  background: #779769;
+}
+.kid-card > p {
+  font-size: 10px;
+  margin: 7px 0 0;
+  line-height: 1.5;
+}
+.kid-updated {
+  color: #9aa58a !important;
+}
+.kid-card .button {
+  font-size: 10px;
+  padding: 9px;
+  margin-top: 12px;
+}
+.kid-edit,
+.add-child {
+  margin-top: 14px;
+  border-top: 1px solid #dce4d1;
+  padding-top: 12px;
+  font-size: 11px;
+}
+.kid-edit summary,
+.add-child summary {
+  cursor: pointer;
+}
+.kid-edit form {
+  display: grid;
+  grid-template-columns: 1fr 100px;
+  gap: 10px;
+}
+.kid-edit form button {
+  grid-column: 1/-1;
+}
+.revoke-kid,
+.family-signout {
+  background: none;
+  border: 0;
+  color: #8c896b;
+  font-size: 10px;
+  padding: 12px 0 0;
+}
+.kid-link-result {
+  margin-top: 14px;
+  border-top: 1px dashed #ccd9bb;
+  padding-top: 3px;
+}
+.kid-link-result input {
+  font: 10px var(--mono);
+}
+.kid-qr img {
+  width: 150px;
+  height: 150px;
+  display: block;
+  margin: 14px auto;
+}
+.link-expiry {
+  text-align: center;
+  color: #7d8e68;
+  font: 11px var(--mono);
+}
+#family-message {
+  font-size: 11px;
+  color: #9d7747;
+  line-height: 1.7;
+}
+.login-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: #f5f4eb;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.login-card {
+  width: min(430px, 100%);
+  border: 1px solid #d1dbc4;
+  background: #fbfcf5;
+  border-radius: 14px;
+  padding: 34px;
+  box-shadow: 0 10px 40px #263f390a;
+}
+.login-card .brand {
+  font-size: 25px;
+}
+.login-card h1 {
+  font-size: 29px;
+  margin-top: 30px;
+}
+.login-card p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #839375;
+}
+.login-card .button {
+  width: 100%;
+  margin: 10px 0;
+}
+.login-card > a {
+  font-size: 11px;
+  color: #8c9c7b;
+  display: block;
+  text-align: center;
+  margin-top: 15px;
+}
+#magic-status {
+  color: #a07c49;
+}
+#account-button {
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  .header {
+    height: auto;
+    min-height: 70px;
+    flex-wrap: wrap;
+    padding-block: 12px;
+    gap: 10px;
+  }
+  .header-right {
+    gap: 5px;
+  }
+  .header-right .quiet {
+    padding: 7px;
+    font-size: 9px;
+  }
+  .family-panel[open] {
+    top: 85px;
+  }
+  .layout-controls {
+    margin-top: 0;
+  }
+}
+.lesson-nav {
+  position: fixed;
+  left: calc(50% + 110px);
+  bottom: 15px;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  padding: 10px 14px;
+  border: 1px solid #ced9c2;
+  background: #fafbf3f5;
+  backdrop-filter: blur(8px);
+  border-radius: 9px;
+  box-shadow: 0 5px 25px #253b2c18;
+  width: min(680px, calc(100vw - 280px));
+  z-index: 12;
+}
+.lesson-nav > span {
+  font-size: 11px;
+  color: #6e845d;
+}
+.lesson-nav > div {
+  display: flex;
+  gap: 7px;
+}
+.lesson-nav button {
+  border: 1px solid #c9d7bb;
+  border-radius: 5px;
+  background: #eff4e6;
+  font-size: 10px;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+.lesson-nav #lesson-nav-next {
+  background: #2c4935;
+  border-color: #2c4935;
+  color: white;
+}
+main {
+  padding-bottom: 95px;
+}
+body.in-tour .lesson-nav {
+  display: none;
+}
+@media (max-width: 1200px) {
+  .lesson-nav {
+    left: calc(50% + 95px);
+    width: min(640px, calc(100vw - 235px));
+  }
+}
+@media (max-width: 980px) {
+  .lesson-nav {
+    left: calc(50% + 77px);
+    width: calc(100vw - 200px);
+  }
+}
+@media (max-width: 760px) {
+  .lesson-nav {
+    left: 50%;
+    width: calc(100vw - 28px);
+    bottom: 12px;
+    gap: 10px;
+  }
+  .lesson-nav > span {
+    font-size: 10px;
+  }
+  .lesson-nav button {
+    padding: 8px 10px;
+  }
+}

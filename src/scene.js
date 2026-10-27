@@ -511,6 +511,7 @@ export class Workbench {
     this.inspection = null;
     this.step = 0;
     this.parts = {};
+    this.aspect = 1;
     this.animations = [];
     this.pointers = new Map();
     this.needsRender = true;
@@ -599,11 +600,11 @@ export class Workbench {
     for (let [key, label, pos] of [
       ["board", "ARDUINO UNO", [-12, 12, 24]],
       ["usb", "USB PORT", [-72, 16, -8]],
-      ["microcontroller", "THE TINY BRAIN", [-29, 16, 11]],
+      ["microcontroller", "MICROCONTROLLER", [-29, 16, 11]],
       ["digitalPins", "DIGITAL PINS", [-30, 20, -23]],
       ["powerJack", "POWER SOCKET", [-72, 16, 13]],
       ["breadboard", "A PLACE TO CONNECT", [78, 7, 18]],
-      ["led", "YOUR LITTLE LIGHT", [35, 38, 0]],
+      ["led", "LED", [35, 38, 0]],
       ["resistor", "220 Ω · SLOWS THE FLOW", [75, 18, -9]],
       ["d13", "D13", [-44.84, 18, -23]],
       ["gnd", "GND", [-50.38, 11, -23]],
@@ -635,6 +636,7 @@ export class Workbench {
     this.needsRender = true;
     let w = this.host.clientWidth,
       h = this.host.clientHeight;
+    if (w <= 0 || h <= 0) return;
     this.renderer.setSize(w, h, false);
     outlineMat.uniforms.resolution.value.set(w, h);
     this.aspect = w / h;
@@ -1152,3 +1154,12 @@ export class Workbench {
     this.renderer.render(this.scene, this.camera);
   }
 }
+
+// The artwork exporter uses the same geometry as the learning workbench.
+export {
+  board as createBoard,
+  breadboard as createBreadboard,
+  led as createLed,
+  resistor as createResistor,
+  wire as createWire,
+};

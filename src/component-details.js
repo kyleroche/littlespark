@@ -5,9 +5,9 @@ export const BOARD_DETAILS = {
       "The square socket brings power and your program from the computer to the Uno. The square end of your USB cable goes here.",
   },
   microcontroller: {
-    title: "The tiny brain",
+    title: "Microcontroller",
     description:
-      "This long black chip is the ATmega328P. It follows your code, one little instruction at a time.",
+      "This long black chip is the ATmega328P. It runs the instructions in your program.",
   },
   digitalPins: {
     title: "The digital pins",
@@ -22,16 +22,16 @@ export const BOARD_DETAILS = {
   analogPins: {
     title: "The analog pins",
     description:
-      "A0 to A5 can read changing signals, like how far a knob has turned. We’ll use these in future adventures.",
+      "A0 to A5 can read changing signals, like how far a knob has turned. We’ll use these in future lessons.",
   },
   powerJack: {
     title: "The round power socket",
     description:
-      "This socket is for an external power supply. For this adventure, leave it empty and use the USB cable.",
+      "This socket is for an external power supply. For this lesson, leave it empty and use the USB cable.",
   },
   resetButton: {
     title: "The reset button",
     description:
-      "Pressing this little button starts the program over from the beginning.",
+      "Pressing this button starts the program over from the beginning.",
   },
 };

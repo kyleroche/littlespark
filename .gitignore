@@ -3,3 +3,13 @@ dist/
 .vercel/
 .DS_Store
 .openai/
+.vercel
+.env*
+.env
+.env.*
+!.env.example
+.artwork-export/
+.agents/
+skills-lock.json
+*.pem
+*.key

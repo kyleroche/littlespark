@@ -1,6 +1,6 @@
 # Little Spark
 
-An illustrated Arduino workbench for a child's first electronics adventure. Seven animated steps lead from meeting a classic Uno R3 to wiring and blinking a real LED.
+An illustrated Arduino workbench for a child's first electronics project. Seven animated steps lead from meeting a classic Uno R3 to wiring and blinking a real LED.
 
 ## Run
 
@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-Brand: **Little Spark**. Canonical domain: **https://littlespark.tech/**. The existing GitHub repository and Vercel project retain their `little-sparks` identifiers. Existing browser storage keys are preserved so the rename does not reset progress.
+Brand: **Little Spark**. Canonical domain: **https://littlespark.tech/**. The GitHub repository is `kyleroche/littlespark`; the existing Vercel project retains its `little-sparks` identifier. Existing browser storage keys are preserved so the rename does not reset progress.
 
 Production: `npm run build`. Deploy the resulting `dist` directory to Vercel (configuration included).
 
@@ -21,7 +21,7 @@ Production: `npm run build`. Deploy the resulting `dist` directory to Vercel (co
 - Real AVR8js execution of compiled Arduino firmware in a Web Worker. The test checks six D13 transitions and their timing.
 - SHA-256 checks for the firmware artifacts. Upload uses the exact byte image that passed emulation.
 - Desktop Web Serial connection and STK500v1 upload for classic Uno R3 / ATmega328P / Optiboot at 115200 baud. Verifies chip signature before writing and reads flash back after writing.
-- Browser-local lesson progress. No account, analytics, or external compilation service.
+- Guest progress is browser-local; signed-in child progress syncs to an account. No analytics or external compilation service.
 
 ## Real board
 
@@ -57,11 +57,11 @@ The visual exploration was inspired by Dilum Sanjaya's Learn Arduino (https://le
 
 ## Official Starter Kit unboxing
 
-The first step identifies one Uno R3, one USB-A to USB-B cable, one 400-point breadboard, one red two-legged LED, one 220 Ω resistor, and two solid-core jumper wires. Each item has a persistent found checklist and animated close-up inspection. Other kit components are not needed for this adventure. Inventory source: https://store-usa.arduino.cc/products/arduino-starter-kit-multi-language
+The first step identifies one Uno R3, one USB-A to USB-B cable, one 400-point breadboard, one red two-legged LED, one 220 Ω resistor, and two solid-core jumper wires. Each item has a persistent found checklist and animated close-up inspection. Other kit components are not needed for this lesson. Inventory source: https://store-usa.arduino.cc/products/arduino-starter-kit-multi-language
 
 ## App tour and guided editor
 
-**App tour** in the header and **Learn your way around** in the field guide open a separate eight-part practice lesson covering navigation, rotation/tilt, pan/zoom, detail inspection and return, code, testing, USB upload, and saved progress. Floating Back/Next controls stay available while exploring the actual interface. Practice does not complete circuit steps or change the saved checklist; the previous blink settings are restored on exit. USB connection and upload are never automatic.
+**App tour** in the header and **Learn your way around** in the field guide open a separate practice lesson covering navigation, rotation/tilt, pan/zoom, detail inspection and return, code, testing, USB upload, workspace layouts, family accounts, and saved progress. Floating Back/Next controls stay available while exploring the actual interface. Practice does not complete circuit steps or change the saved checklist; the previous blink settings are restored on exit. USB connection and upload are never automatic.
 
 The guided code editor edits both wait instructions with **Blink delay** (250 / 500 / 1000 ms). It is intentionally not a free-text compiler. Changes invalidate the old emulator result. Copy code exports the matching sketch to the clipboard.
 
@@ -81,3 +81,21 @@ Camera easing is time-based and snaps to its exact destination below a subpixel 
 | A | @ | 216.150.16.1 |
 
 Keep unrelated mail records. Verify after DNS changes with `vercel domains verify littlespark.tech`. Until DNS is configured, use https://little-sparks-delta.vercel.app/.
+
+## Workspace and accounts
+
+Choose **Build + Code**, **Build only**, **Code only**, or **Guided** above the workbench. Build + Code displays both panes side by side on wider screens and stacks them on narrow screens. The lesson controls stay available below the panes. Layout preference is browser-local.
+
+Parents sign in with a single-use email link. The parent dashboard can create and rename child profiles, view step completion, generate a five-minute child login link/QR code, and revoke child sessions. Kids do not provide email addresses or passwords. Links use friendly words plus a random suffix, are stored as hashes, and are consumed atomically. Signed-in child progress is stored in Neon Postgres; guest progress stays on the device. Progress resets invalidate stale writes from other devices.
+
+Backend setup: copy `.env.example` to `.env.local`, supply server credentials, and run `node --env-file=.env.local scripts/migrate.mjs`. Production uses Vercel Functions, Neon, and Resend. Sender-domain DNS must be verified before email sign-in works. Never put production credentials in PR preview deployments.
+
+Run `node --env-file=.env.local scripts/check-accounts.mjs` for database integration checks. It creates temporary test families and removes them afterward; it does not send email.
+
+## Safari
+
+Safari supports the workbench, lessons, accounts, and simulator. Direct USB upload requires the browser's Web Serial API. If that API is unavailable, use **Download sketch for Arduino IDE** and upload through the Arduino IDE. A future local helper could provide a Safari USB bridge; the website does not currently include one.
+
+## Community lessons
+
+See [the proposed contribution format](docs/LESSON-CONTRIBUTIONS.md). The current application still uses a fixed scene for its first circuit; the document describes the schema and preview workflow to implement before accepting drop-in lesson packages. See [SECURITY.md](SECURITY.md) for remaining public-release checks. The repository remains private.
