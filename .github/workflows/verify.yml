@@ -1,0 +1,30 @@
+name: Verify lesson and firmware
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: arduino/setup-arduino-cli@v2
+      - name: Install pinned Uno core
+        run: arduino-cli core update-index && arduino-cli core install arduino:avr@1.8.8
+      - name: Compile all three lesson variants
+        run: node scripts/build-firmware.mjs
+      - name: Test actual firmware and upload protocol
+        run: npm test
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verified-firmware
+          path: public/firmware/
