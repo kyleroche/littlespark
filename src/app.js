@@ -920,5 +920,5 @@ accounts = initAccounts({
       go(state.step);
     }
   },
-  onNotice: (message) => console.info("Progress sync:", message),
+  onNotice: toast,
 });

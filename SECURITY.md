@@ -8,6 +8,7 @@ This repository is private pending an explicit release decision by its owner. Do
 - Parent email links and child login links expire after five minutes and are consumed with an atomic database update. Only hashes are stored.
 - Session cookies are HTTP-only, host-only, SameSite=Lax, and Secure in production. State-changing API requests require an approved Origin.
 - Database-backed rate limits protect email requests, token redemption, and profile/link operations.
+- Authenticated edits bind the displayed profile to the cookie session, preventing old tabs from writing to a newly selected account.
 - Child accounts have no access to sibling profiles or parent account operations. Parents can revoke child sessions and links.
 - Production secrets must not be present in community PR or preview builds.
 - Emulator success validates the program's behavior, not the physical wiring of a real board. Physical USB uploads remain unverified until tested on hardware.

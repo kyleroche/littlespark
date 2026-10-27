@@ -86,7 +86,7 @@ Keep unrelated mail records. Verify after DNS changes with `vercel domains verif
 
 Choose **Build + Code**, **Build only**, **Code only**, or **Guided** above the workbench. Build + Code displays both panes side by side on wider screens and stacks them on narrow screens. The lesson controls stay available below the panes. Layout preference is browser-local.
 
-Parents sign in with a single-use email link. The parent dashboard can create and rename child profiles, view step completion, generate a five-minute child login link/QR code, and revoke child sessions. Kids do not provide email addresses or passwords. Links use friendly words plus a random suffix, are stored as hashes, and are consumed atomically. Signed-in child progress is stored in Neon Postgres; guest progress stays on the device. Progress resets invalidate stale writes from other devices.
+Parents sign in with a single-use email link. The parent dashboard can create and rename child profiles, view step completion, generate a five-minute child login link/QR code, and revoke child sessions. Kids do not provide email addresses or passwords. Links use friendly words plus a random suffix, are stored as hashes, and are consumed atomically. Signed-in child progress is stored in Neon Postgres; guest progress stays on the device. Progress resets invalidate stale writes from other devices. Account changes in another tab block stale saves and show a persistent message with Reload. Locally recovered progress is sent back to the server after sign-in.
 
 Backend setup: copy `.env.example` to `.env.local`, supply server credentials, and run `node --env-file=.env.local scripts/migrate.mjs`. Production uses Vercel Functions, Neon, and Resend. Sender-domain DNS must be verified before email sign-in works. Never put production credentials in PR preview deployments.
 
@@ -98,4 +98,4 @@ Safari supports the workbench, lessons, accounts, and simulator. Direct USB uplo
 
 ## Community lessons
 
-See [the proposed contribution format](docs/LESSON-CONTRIBUTIONS.md). The current application still uses a fixed scene for its first circuit; the document describes the schema and preview workflow to implement before accepting drop-in lesson packages. See [SECURITY.md](SECURITY.md) for remaining public-release checks. The repository remains private.
+See [the proposed contribution format](docs/LESSON-CONTRIBUTIONS.md). The current application still uses a fixed scene for its first circuit; the document describes the schema and preview workflow to implement before accepting drop-in lesson packages. See [the release review](docs/PUBLIC-RELEASE-REVIEW.md) and [SECURITY.md](SECURITY.md) for evidence and remaining public-release checks. The repository remains private.

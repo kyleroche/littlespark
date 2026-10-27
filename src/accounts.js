@@ -17,6 +17,7 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
   let user = null,
     generation = 0,
     hydrating = false,
+    syncBlocked = false,
     pending = null,
     timer = null,
     queue = Promise.resolve(),
@@ -34,15 +35,43 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
       credentials: "same-origin",
       cache: "no-store",
       headers: data === undefined ? {} : { "Content-Type": "application/json" },
-      body: data === undefined ? undefined : JSON.stringify(data),
+      body:
+        data === undefined
+          ? undefined
+          : JSON.stringify({ ...data, profileId: user?.id }),
     });
     const result = await response.json();
-    if (!response.ok)
-      throw Error(result.error || "Could not complete the request.");
+    if (!response.ok) {
+      const error = Error(result.error || "Could not complete the request.");
+      error.status = response.status;
+      error.code = result.code;
+      if (result.code === "SESSION_CHANGED")
+        blockSync("Profile changed", error.message);
+      throw error;
+    }
     return result;
   }
   function message(text) {
     document.querySelector("#family-message").textContent = text;
+  }
+  function blockSync(label, detail) {
+    if (syncBlocked) return;
+    syncBlocked = true;
+    pending = null;
+    clearTimeout(timer);
+    status(label);
+    const reload = document.createElement("button");
+    reload.textContent = "Reload";
+    reload.className = "sync-reload";
+    reload.title = detail;
+    reload.onclick = () => location.reload();
+    const notice = document.createElement("aside");
+    notice.className = "sync-notice";
+    notice.setAttribute("role", "alert");
+    const text = document.createElement("span");
+    text.textContent = detail;
+    notice.append(text, reload);
+    document.body.append(notice);
   }
   async function load() {
     try {
@@ -77,7 +106,7 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
         } catch {}
         onProfile(user, progress);
         hydrating = false;
-        status("Progress synced");
+        controller.saveProgress(progress);
       } else {
         onProfile(user, null);
         status("Saved on this device");
@@ -240,6 +269,14 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
   }
   async function refresh() {
     const result = await api("me");
+    if (
+      (user && user.id !== result.user?.id) ||
+      (!user && result.user?.role === "kid")
+    ) {
+      const detail = "The signed-in profile changed. Reload before continuing.";
+      blockSync("Profile changed", detail);
+      throw Error(detail);
+    }
     user = result.user;
     render(result.kids || []);
   }
@@ -256,14 +293,15 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
     if (!panel.open) panel.show();
   };
   function flush() {
-    if (!pending || !user || user.role !== "kid" || hydrating) return;
+    if (!pending || !user || user.role !== "kid" || hydrating || syncBlocked)
+      return;
     const current = pending;
     pending = null;
     const kidId = user.id;
     queue = queue
       .catch(() => {})
       .then(async () => {
-        if (user?.id !== kidId) return;
+        if (user?.id !== kidId || syncBlocked) return;
         try {
           const result = await api("save-progress", {
             state: current.state,
@@ -274,6 +312,21 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
           localStorage.setItem(storage() + "-generation", String(generation));
           status("Progress synced");
         } catch (error) {
+          if (
+            error.status === 401 ||
+            error.code === "SESSION_CHANGED" ||
+            error.code === "PROGRESS_RESET"
+          ) {
+            blockSync(
+              error.status === 401
+                ? "Sign in again"
+                : error.code === "PROGRESS_RESET"
+                  ? "Progress reset elsewhere"
+                  : "Profile changed",
+              error.message,
+            );
+            return;
+          }
           pending ??= current;
           status("Saved here · sync pending");
           onNotice(error.message);
@@ -282,7 +335,7 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
   }
   const controller = {
     saveProgress(state) {
-      if (hydrating || user?.role !== "kid") return;
+      if (hydrating || syncBlocked || user?.role !== "kid") return;
       pending = {
         state: structuredClone(state),
         reset: pending?.reset || false,
@@ -292,7 +345,7 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
       timer = setTimeout(flush, 650);
     },
     resetProgress(state) {
-      if (user?.role !== "kid") return;
+      if (syncBlocked || user?.role !== "kid") return;
       clearTimeout(timer);
       pending = { state: structuredClone(state), reset: true };
       flush();

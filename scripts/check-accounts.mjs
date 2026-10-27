@@ -10,6 +10,9 @@ async function request(
   origin = process.env.APP_ORIGIN,
   method = "POST",
 ) {
+  if (body && token && !Object.hasOwn(body, "profileId")) {
+    body = { ...body, profileId: (await store.session(token))?.id };
+  }
   const req = {
     method,
     url: "/api/family?action=" + action,
@@ -70,6 +73,30 @@ try {
   const session = await store.session(login.token);
   assert.equal(session.role, "kid");
   assert.equal(session.id, kid.id);
+  const sibling = await store.addChild(parentA.user.id, "QA sibling", "fox");
+  const siblingLink = await store.childLink(parentA.user.id, sibling.id);
+  const siblingLogin = await store.consumeChild(siblingLink.code);
+  const wrongProfile = await request("save-progress", siblingLogin.token, {
+    profileId: kid.id,
+    state: { step: 5, completed: [5] },
+    generation: 0,
+  });
+  assert.equal(
+    wrongProfile.status,
+    409,
+    "a stale tab cannot write to a different signed-in child",
+  );
+  assert.equal(wrongProfile.code, "SESSION_CHANGED");
+  assert.equal((await store.progress(sibling.id)).state, null);
+  assert.equal(
+    (
+      await request("add-child", parentB.token, {
+        profileId: parentA.user.id,
+        name: "Wrong family",
+      })
+    ).status,
+    409,
+  );
   assert.equal(
     (await request("add-child", login.token, { name: "Forbidden" })).status,
     403,
@@ -145,5 +172,6 @@ try {
   );
 } finally {
   await sql`DELETE FROM ls_parents WHERE email IN(${emailA},${emailB})`;
+  await sql`DELETE FROM ls_parent_links WHERE email IN(${emailA},${emailB})`;
   await sql`DELETE FROM ls_limits WHERE key=${"qa-" + suffix}`;
 }

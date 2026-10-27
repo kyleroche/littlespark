@@ -197,6 +197,22 @@ export default async function handler(req, res) {
       return send(res, 200, { ok: true });
     }
     if (!session) return send(res, 401, { error: "Sign in to continue." });
+    if (
+      req.method === "POST" &&
+      [
+        "save-progress",
+        "add-child",
+        "kid-link",
+        "update-child",
+        "revoke-child",
+      ].includes(action) &&
+      input.profileId !== session.id
+    )
+      return send(res, 409, {
+        code: "SESSION_CHANGED",
+        error:
+          "The signed-in profile changed in another tab. Reload before continuing.",
+      });
     if (action === "save-progress" && req.method === "POST") {
       if (session.role !== "kid")
         return send(res, 403, {
@@ -213,6 +229,7 @@ export default async function handler(req, res) {
       return saved
         ? send(res, 200, { progress: saved })
         : send(res, 409, {
+            code: "PROGRESS_RESET",
             error:
               "Progress was reset on another device. Reload before continuing.",
           });

@@ -2559,3 +2559,36 @@ body.in-tour .lesson-nav {
     padding: 8px 10px;
   }
 }
+
+.sync-reload {
+  border: 0;
+  background: transparent;
+  color: #294a36;
+  text-decoration: underline;
+  font: inherit;
+  cursor: pointer;
+  padding: 3px 5px;
+}
+
+.sync-notice {
+  position: fixed;
+  bottom: 82px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  width: min(680px, calc(100vw - 28px));
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+  background: #fff9e9;
+  border: 1px solid #b78b45;
+  border-radius: 8px;
+  box-shadow: 0 5px 25px #253b2c18;
+  font-size: 13px;
+  color: #4d4634;
+}
+.sync-notice .sync-reload {
+  flex-shrink: 0;
+}

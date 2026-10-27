@@ -136,7 +136,7 @@ export const TOUR_STEPS = [
     target: "#tour-lesson",
     title: "Save your progress",
     description:
-      "Guest progress is saved in this browser. Signed-in child profiles save progress to their account. The tour does not complete circuit steps.",
+      "Guest progress is saved in this browser. Signed-in child profiles save progress to their account. The tour does not complete circuit steps. If a profile changes in another tab, use Reload in the message before continuing.",
     tip: "You can come back to this tour anytime.",
     detail:
       "Use App tour at the top or Learn your way around in the field guide. Reset lesson progress resets the circuit lesson’s checklist and progress.",
