@@ -6,6 +6,7 @@ import {
   kidCode,
   LINK_TTL_MS,
   normalizeProgress,
+  normalizeLesson,
   normalizeName,
 } from "./auth-utils.js";
 export function createStore(url = process.env.DATABASE_URL) {
@@ -87,20 +88,22 @@ export function createStore(url = process.env.DATABASE_URL) {
         await sql`WITH consumed AS(UPDATE ls_kid_links l SET used_at=now() FROM ls_kids k WHERE l.hash=${hashToken(code)} AND l.kid_id=k.id AND k.active=true AND l.used_at IS NULL AND l.expires_at>now() RETURNING l.kid_id), session AS(INSERT INTO ls_sessions(hash,kid_id,expires_at) SELECT ${hashToken(token)},kid_id,now()+interval '7 days' FROM consumed RETURNING kid_id) SELECT k.id,k.name,k.avatar FROM ls_kids k JOIN session ON session.kid_id=k.id`;
       return rows[0] ? { token, user: { role: "kid", ...rows[0] } } : null;
     },
-    async progress(kidId) {
+    async progress(kidId, lesson = "first-circuit") {
+      normalizeLesson(lesson);
       const rows =
-        await sql`SELECT state,generation,updated_at FROM ls_progress WHERE kid_id=${kidId} AND lesson_id='first-circuit'`;
+        await sql`SELECT state,generation,updated_at FROM ls_progress WHERE kid_id=${kidId} AND lesson_id=${lesson}`;
       return rows[0] || { state: null, generation: 0, updated_at: null };
     },
-    async saveProgress(kidId, input, generation = 0, reset = false) {
-      const state = normalizeProgress(input);
+    async saveProgress(kidId, input, generation = 0, reset = false, lesson = "first-circuit") {
+      normalizeLesson(lesson);
+      const state = normalizeProgress(input, lesson);
       if (reset) {
         const rows =
-          await sql`INSERT INTO ls_progress(kid_id,lesson_id,state,generation) VALUES(${kidId},'first-circuit',${JSON.stringify(state)}::jsonb,1) ON CONFLICT(kid_id,lesson_id) DO UPDATE SET state=EXCLUDED.state,generation=ls_progress.generation+1,updated_at=now() RETURNING state,generation,updated_at`;
+          await sql`INSERT INTO ls_progress(kid_id,lesson_id,state,generation) VALUES(${kidId},${lesson},${JSON.stringify(state)}::jsonb,1) ON CONFLICT(kid_id,lesson_id) DO UPDATE SET state=EXCLUDED.state,generation=ls_progress.generation+1,updated_at=now() RETURNING state,generation,updated_at`;
         return rows[0];
       }
       const rows =
-        await sql`INSERT INTO ls_progress(kid_id,lesson_id,state,generation) VALUES(${kidId},'first-circuit',${JSON.stringify(state)}::jsonb,${generation}) ON CONFLICT(kid_id,lesson_id) DO UPDATE SET state=EXCLUDED.state || jsonb_build_object('completed',(SELECT COALESCE(jsonb_agg(DISTINCT value),'[]'::jsonb) FROM jsonb_array_elements(COALESCE(ls_progress.state->'completed','[]'::jsonb)||(EXCLUDED.state->'completed'))),'found',(SELECT COALESCE(jsonb_agg(DISTINCT value),'[]'::jsonb) FROM jsonb_array_elements(COALESCE(ls_progress.state->'found','[]'::jsonb)||(EXCLUDED.state->'found')))),updated_at=now() WHERE ls_progress.generation=${generation} RETURNING state,generation,updated_at`;
+        await sql`INSERT INTO ls_progress(kid_id,lesson_id,state,generation) VALUES(${kidId},${lesson},${JSON.stringify(state)}::jsonb,${generation}) ON CONFLICT(kid_id,lesson_id) DO UPDATE SET state=EXCLUDED.state || jsonb_build_object('completed',(SELECT COALESCE(jsonb_agg(DISTINCT value),'[]'::jsonb) FROM jsonb_array_elements(COALESCE(ls_progress.state->'completed','[]'::jsonb)||(EXCLUDED.state->'completed'))),'found',(SELECT COALESCE(jsonb_agg(DISTINCT value),'[]'::jsonb) FROM jsonb_array_elements(COALESCE(ls_progress.state->'found','[]'::jsonb)||(EXCLUDED.state->'found')))),updated_at=now() WHERE ls_progress.generation=${generation} RETURNING state,generation,updated_at`;
       return rows[0] || null;
     },
     async cleanup() {

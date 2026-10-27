@@ -13,7 +13,7 @@ const fresh = () => ({
   completed: [],
   found: [],
 });
-export function initAccounts({ onProfile, onNotice = () => {} }) {
+export function initAccounts({ onProfile, onNotice = () => {}, lesson = "first-circuit" }) {
   let user = null,
     generation = 0,
     hydrating = false,
@@ -25,12 +25,12 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
   const panel = document.querySelector("#family-panel"),
     button = document.querySelector("#account-button"),
     saveState = document.querySelector(".save-state");
-  const storage = () => `little-spark-profile-${user?.id}`;
+  const storage = () => `little-spark-profile-${user?.id}${lesson === "first-circuit" ? "" : "-" + lesson}`;
   const status = (text) => {
     saveState.innerHTML = "<span></span>" + escape(text);
   };
   async function api(action, data) {
-    const response = await fetch("/api/family?action=" + action, {
+    const response = await fetch("/api/family?action=" + action + "&lesson=" + encodeURIComponent(lesson), {
       method: data === undefined ? "GET" : "POST",
       credentials: "same-origin",
       cache: "no-store",
@@ -154,10 +154,17 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
       return;
     }
     const grouped = [...new Map(kids.map((k) => [k.id, k])).values()];
+    const lessons = [["first-circuit", "Blink an LED"], ["fruit-piano", "Fruit Piano"]];
+    const rowsFor = (kid) => lessons.map(([id, name]) => {
+      const row = kids.find((k) => k.id === kid.id && k.lesson_id === id);
+      const complete = row?.state?.completed?.length || 0;
+      return {name, complete, updated: row?.updated_at};
+    });
     content.innerHTML = `<div class="eyebrow">PARENT DASHBOARD</div><h2>Your family</h2><p class="family-email">${escape(user.email)}</p><div class="kid-list">${grouped
       .map((k) => {
-        const complete = k.state?.completed?.length || 0;
-        return `<section class="kid-card"><div class="kid-heading"><span>${avatars[k.avatar] || "🤖"}</span><strong>${escape(k.name)}</strong><span class="kid-percent">${Math.round((complete / 7) * 100)}%</span></div><div class="kid-progress"><i style="width:${Math.min(100, (complete / 7) * 100)}%"></i></div><p>${complete} of 7 steps · Blink an LED</p><p class="kid-updated">${k.updated_at ? "Last saved " + new Date(k.updated_at).toLocaleString() : "No saved progress yet"}</p><button class="button secondary" data-kid-link="${k.id}">Make a 5-minute login link</button><details class="kid-edit"><summary>Edit profile</summary><form data-edit-child="${k.id}"><label>Nickname<input name="name" value="${escape(k.name)}" maxlength="32" required></label><label>Icon<select name="avatar">${Object.entries(
+        const rows = rowsFor(k);
+        const complete = rows.reduce((sum, row) => sum + row.complete, 0);
+        return `<section class="kid-card"><div class="kid-heading"><span>${avatars[k.avatar] || "🤖"}</span><strong>${escape(k.name)}</strong><span class="kid-percent">${Math.round((complete / 14) * 100)}%</span></div><div class="kid-progress"><i style="width:${Math.min(100, (complete / 14) * 100)}%"></i></div>${rows.map((row) => `<p>${row.complete} of 7 steps · ${row.name}</p><p class="kid-updated">${row.updated ? "Last saved " + new Date(row.updated).toLocaleString() : "Not started"}</p>`).join("")}<button class="button secondary" data-kid-link="${k.id}">Make a 5-minute login link</button><details class="kid-edit"><summary>Edit profile</summary><form data-edit-child="${k.id}"><label>Nickname<input name="name" value="${escape(k.name)}" maxlength="32" required></label><label>Icon<select name="avatar">${Object.entries(
           avatars,
         )
           .map(
@@ -355,7 +362,18 @@ export function initAccounts({ onProfile, onNotice = () => {} }) {
       flush();
     },
     getUser: () => user,
+    async navigate(url) {
+      clearTimeout(timer);
+      flush();
+      await queue;
+      location.assign(url);
+    },
   };
+  document.querySelectorAll("[data-lesson-link]").forEach((link) => link.addEventListener("click", (event) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    controller.navigate(link.href);
+  }));
   window.addEventListener("online", flush);
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) flush();

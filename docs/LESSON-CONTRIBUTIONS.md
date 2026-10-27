@@ -1,6 +1,6 @@
 # Community lessons: proposed extension format
 
-The current app contains one circuit with a fixed model/firmware implementation. Adding a JSON file alone does not yet add a working lesson. The next extension step should separate lesson content, circuit scenes, animation cues, and tests from the app shell.
+The current app contains two reviewed, built-in lessons: Arduino Blink (fixed 3D scene/firmware variants) and Makey Makey Fruit Piano (animated SVG connection diagram and keyboard/Web Audio instrument). Adding a JSON file alone does not yet add a working lesson. The next extension step should separate lesson content, circuit scenes, animation cues, and tests from the app shell.
 
 ## Recommended approach
 
@@ -42,7 +42,7 @@ Use allowlisted component builders, named connection points, and a small animati
 
 CI should validate IDs and connections, compile the sketch in an isolated job, run the emulator checks, and build a preview without production credentials. Maintain a reviewed component library rather than letting lessons register code at runtime. Firmware uploads must use exactly the artifact that passed the emulator checks.
 
-New lessons should explain their parts, demonstrate each connection, and retain the app's camera controls, layouts, account saving, and parent view. Changes to app features must also update the App tour under `AGENTS.md`.
+New lessons should explain their parts, demonstrate each connection, and retain the app's camera controls, layouts, account saving, and parent view. Changes to app features must also update the relevant App tour, public How-to, and home page for major features under `AGENTS.md`. Keep lesson progress under an allowlisted lesson ID; resets must not affect another lesson. Fruit Piano is a built-in implementation, not a drop-in lesson loader. Keyboard input is distinct from AVR emulation and cannot verify physical wiring.
 
 ## Suggested rollout
 

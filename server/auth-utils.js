@@ -33,10 +33,15 @@ export function sessionCookie(
 ) {
   return `${COOKIE_NAME}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${secure ? "; Secure" : ""}`;
 }
-export function normalizeProgress(input) {
+export function normalizeLesson(value = "first-circuit") {
+  if (!["first-circuit", "fruit-piano"].includes(value)) throw Error("Invalid progress lesson.");
+  return value;
+}
+export function normalizeProgress(input, lesson = "first-circuit") {
+  normalizeLesson(lesson);
   if (!input || typeof input !== "object" || Array.isArray(input))
     throw Error("Invalid progress.");
-  const parts = ["board", "usb", "breadboard", "led", "resistor", "wires"];
+  const parts = lesson === "fruit-piano" ? ["board", "usb", "clips", "fruit", "computer", "mat"] : ["board", "usb", "breadboard", "led", "resistor", "wires"];
   const result = {
     step:
       Number.isInteger(input.step) && input.step >= -1 && input.step <= 5

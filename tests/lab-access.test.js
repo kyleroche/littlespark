@@ -12,6 +12,8 @@ test("direct lab paths require a real session, including the HTML entry point", 
     "/learn",
     "/learn/",
     "/learn/index.html",
+    "/learn/makey-makey/",
+    "/learn/makey-makey/index.html",
     "/learn/?signin=1",
   ]) {
     let queried = false;

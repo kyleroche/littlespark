@@ -10,13 +10,14 @@ async function request(
   body,
   origin = process.env.APP_ORIGIN,
   method = "POST",
+  lesson = "first-circuit",
 ) {
   if (body && token && !Object.hasOwn(body, "profileId")) {
     body = { ...body, profileId: (await store.session(token))?.id };
   }
   const req = {
     method,
-    url: "/api/family?action=" + action,
+    url: "/api/family?action=" + action + "&lesson=" + lesson,
     headers: {
       origin,
       cookie: `ls_session=${token}`,
@@ -175,6 +176,22 @@ try {
     null,
     "stale devices cannot undo a reset",
   );
+  // Second-lesson saves and resets must never change Blink state or generation.
+  const blinkBefore = await store.progress(kid.id);
+  const makeySaved = await request("save-progress", login.token,
+    {state:{step:5,completed:[-1,0,1,2,3,4,5],found:["clips","fruit"]},generation:0},
+    process.env.APP_ORIGIN,"POST","fruit-piano");
+  assert.equal(makeySaved.status,200);
+  assert.deepEqual(makeySaved.progress.state.found,["clips","fruit"]);
+  const makeyRead = await request("me",login.token,undefined,process.env.APP_ORIGIN,"GET","fruit-piano");
+  assert.equal(makeyRead.progress.state.completed.length,7);
+  assert.deepEqual(await store.progress(kid.id),blinkBefore);
+  const makeyReset=await store.saveProgress(kid.id,{step:-1,completed:[],found:[]},0,true,"fruit-piano");
+  assert.equal(makeyReset.generation,1);
+  assert.equal(await store.saveProgress(kid.id,{completed:[5]},0,false,"fruit-piano"),null);
+  assert.deepEqual(await store.progress(kid.id),blinkBefore);
+  const badLesson = await request("me",login.token,undefined,process.env.APP_ORIGIN,"GET","unknown");
+  assert.equal(badLesson.status,400);
   const expired = await store.childLink(parentA.user.id, kid.id);
   await sql`UPDATE ls_kid_links SET expires_at=now()-interval '1 second' WHERE kid_id=${kid.id}`;
   assert.equal(await store.consumeChild(expired.code), null);

@@ -1,6 +1,13 @@
 // Every data-tour-feature in the UI must be covered here. See AGENTS.md.
 export const TOUR_STEPS = [
   {
+    id: "lesson-picker", feature: "lesson-picker", target: "#lesson-picker",
+    title: "Choose a lesson", description: "Choose Blink an LED for Arduino, or Fruit Piano for Makey Makey, in the field guide.",
+    tip: "Each lesson has its own checklist and progress.",
+    detail: "Fruit Piano starts with unboxing and animated connections, then a playable piano. It has its own tour. Child profiles save both lessons separately; parents see both in Family. Switching lessons keeps your saved steps.",
+    action: "Show the lesson picker", demo: "lesson-picker",
+  },
+  {
     id: "home-store",
     feature: "home-store",
     target: "#how-to-link",
@@ -174,3 +181,13 @@ export function assertTourCoverage(features) {
   if (missing.length)
     throw new Error("App tour needs coverage for: " + missing.join(", "));
 }
+
+export const MAKEY_TOUR_STEPS = [
+  { id: "makey-lessons", feature: "makey-lessons", target: "#makey-lessons", title: "Choose your lesson", description: "Switch between Blink an LED and Fruit Piano here. Each saves its own steps. This tour leaves your progress alone." },
+  { id: "makey-parts", feature: "makey-parts", target: "#makey-kit", title: "Find the parts", description: "Check off the kit parts and things from home. Tap a part in the picture for details. Unboxing is a checklist, with no box to open on screen." },
+  { id: "makey-diagram", feature: "makey-diagram", target: "#makey-diagram", title: "Watch the connections", description: "Next adds one connection at a time. Replay shows it again. Zoom + and − change the view; arrow buttons move it; Reset view brings everything back. Tap a part for a note, then Back to diagram." },
+  { id: "makey-piano", feature: "makey-piano", target: "#makey-piano", title: "Try your fruit keys", description: "In the last step choose Virtual practice, connect virtual EARTH, then tap all three fruit keys. Release EARTH to see why the loop matters. Sound on enables the notes; Mute keeps the visual flashes." },
+  { id: "makey-real", feature: "makey-real", target: "#makey-play-mode", title: "Play a real board", description: "Choose Real board / keyboard and click Focus piano. While holding the metal EARTH clip, touch your fruit. SPACE, LEFT and UP play notes. Your ordinary keyboard works too. No upload or special connection permission is needed; keyboard input cannot prove your real wiring is correct." },
+  { id: "makey-progress", feature: "makey-progress", target: "#makey-progress", title: "Pick up where you left off", description: "Parent practice stays on this device. Child progress syncs to their profile and appears beside Blink progress in Family. Wait for Progress synced before changing devices. Reset lesson resets only Fruit Piano." },
+  { id: "makey-family", feature: "makey-family", target: "#account-button", title: "Family and help", description: "Family opens the parent dashboard or your learner profile. The How-to link opens a new tab. Close this tour to return to your current fruit-piano step." },
+];

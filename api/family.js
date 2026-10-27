@@ -4,6 +4,7 @@ import {
   sessionCookie,
   rateKey,
   normalizeName,
+  normalizeLesson,
 } from "../server/auth-utils.js";
 function send(res, status, data) {
   res.statusCode = status;
@@ -63,6 +64,7 @@ export default async function handler(req, res) {
       token = readCookie(req.headers.cookie),
       session = await store.session(token);
     const input = req.method === "POST" ? await body(req) : {};
+    const lesson = normalizeLesson(url.searchParams.get("lesson") || "first-circuit");
     const ip = String(
       req.headers["x-vercel-forwarded-for"] ||
         req.headers["x-forwarded-for"] ||
@@ -96,7 +98,7 @@ export default async function handler(req, res) {
           name: session.name,
           avatar: session.avatar,
         },
-        progress: await store.progress(session.id),
+        progress: await store.progress(session.id, lesson),
       });
     }
     if (action === "request-parent-link" && req.method === "POST") {
@@ -225,6 +227,7 @@ export default async function handler(req, res) {
           ? input.generation
           : 0,
         input.reset === true,
+        lesson,
       );
       return saved
         ? send(res, 200, { progress: saved })

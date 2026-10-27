@@ -17,7 +17,8 @@ try {
   if (!result.user) location.replace("/signin/");
   else {
     app.hidden = false;
-    await import("./app.js");
+    if (location.pathname.startsWith("/learn/makey-makey")) await import("./makey.js");
+    else await import("./app.js");
     loading.remove();
   }
 } catch {

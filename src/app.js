@@ -856,6 +856,9 @@ function renderTour() {
 function demoTour() {
   if (!isTour() || busy) return;
   switch (TOUR_STEPS[tourIndex].demo) {
+    case "lesson-picker":
+      $("#lesson-picker").scrollIntoView({ behavior: "smooth", block: "center" });
+      break;
     case "home-store":
       document
         .querySelector(".header")

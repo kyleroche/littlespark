@@ -1857,3 +1857,12 @@ p {
   text-underline-offset: 3px;
   color: #506b44;
 }
+
+.home-lessons { padding: 100px max(6vw,24px); background: #e9ecdf; }
+.home-lessons>h2 { font-size: clamp(34px,5vw,64px); letter-spacing:-2px; margin: 18px 0 40px; }
+.home-lesson-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; max-width:1200px; margin:auto; }
+.home-lesson-grid article { padding:36px; border:1px solid #c6d0bb; border-radius:24px; background:#f9f7ed; }
+.home-lesson-grid h3 { font-size:32px; margin:18px 0; }.home-lesson-grid p:not(.eyebrow) { line-height:1.8; color:#64745d; }
+.home-lesson-grid a { display:table; margin-top:20px; }.home-fruit { width:240px; height:120px; margin-bottom:24px; }.home-fruit text { font:16px ui-monospace,monospace; fill:#52674d; }
+.home-lesson-symbol { display:block; font-size:100px; height:120px; color:#be9547; margin-bottom:24px; }
+@media(max-width:760px){.home-lesson-grid{grid-template-columns:1fr}.home-lessons{padding:55px 20px}.home-lesson-grid article{padding:25px}}
