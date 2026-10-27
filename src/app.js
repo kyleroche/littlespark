@@ -214,7 +214,7 @@ const parts = {
     description:
       "The board runs your program. The USB port brings it power and new instructions. Pin D13 can turn our light on and off.",
     specs: [
-      ["BRAIN", "ATmega328P"],
+      ["PROCESSOR", "ATmega328P"],
       ["POWER", "5 V from USB"],
       ["OUR OUTPUT", "Digital pin 13"],
     ],
@@ -242,7 +242,7 @@ const parts = {
   resistor: {
     title: "220 Ω resistor",
     description:
-      "Our resistor limits current so the LED stays happy. Connect it from C11 to C17. Either direction works.",
+      "The resistor limits current to protect the LED. Connect it from C11 to C17. Either direction works.",
     specs: [
       ["RESISTANCE", "220 Ω"],
       ["COLOR BANDS", "Red · red · brown"],
@@ -596,7 +596,7 @@ async function runTest() {
     worker.onerror = () => {
       clearTimeout(timeout);
       invalidate();
-      simStatus("The virtual brain couldn’t start. Please try again.");
+      simStatus("The simulator couldn’t start. Please try again.");
       render();
     };
     worker.postMessage({ type: "run", image, halfPeriod: chosenSpeed });
