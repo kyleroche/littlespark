@@ -32,7 +32,7 @@ export const TOUR_STEPS = [
     target: "#scene",
     title: "Move closer. Make some room.",
     description:
-      "Scroll or pinch to zoom. Choose Move, then drag to slide the picture. On a touch screen, use two fingers to move and pinch.",
+      "Scroll or pinch to zoom. The view glides closer, then stops. Choose Move, then drag to slide the picture. On a touch screen, use two fingers to move and pinch.",
     tip: "Lost your board? Tap the target button.",
     detail:
       "Reset view brings the whole diagram back. Q/E turn, WASD move, +/− zoom, and the up/down arrows tilt.",

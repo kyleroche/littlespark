@@ -64,3 +64,7 @@ The first step identifies one Uno R3, one USB-A to USB-B cable, one 400-point br
 The guided code editor edits both wait instructions with **Blink delay** (250 / 500 / 1000 ms). It is intentionally not a free-text compiler. Changes invalidate the old emulator result. Copy code exports the matching sketch to the clipboard.
 
 `AGENTS.md` requires tutorial updates in the same change as every new, removed, or changed user-facing feature. UI regions declare `data-tour-feature`; tests verify every declared feature is covered by `src/app-tour.js` and every tutorial target exists. Camera help lives in `src/view-controls.js`.
+
+## Rendering stability
+
+Camera easing is time-based and snaps to its exact destination below a subpixel threshold. Idle views do not redraw, and shadow maps are cached until a component moves or scene visibility changes. Edge lines do not write depth; shaded faces and outline shells use separate depth offsets to avoid flicker during zoom. LED simulation invalidates the frame whenever its output changes.

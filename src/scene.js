@@ -1,13 +1,25 @@
 import * as T from "three";
-import { CAMERA_HELP, orbitView, panView, zoomView } from "./view-controls.js";
+import {
+  CAMERA_HELP,
+  orbitView,
+  panView,
+  zoomView,
+  advanceCamera,
+} from "./view-controls.js";
 const INK = 0x263d37;
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const mat = (color, roughness = 0.76, metalness = 0) =>
-  new T.MeshStandardMaterial({ color, roughness, metalness });
+  new T.MeshStandardMaterial({
+    color,
+    roughness,
+    metalness,
+    polygonOffset: true,
+    polygonOffsetFactor: 1,
+    polygonOffsetUnits: 1,
+  });
 const edgeMat = new T.LineBasicMaterial({
   color: INK,
-  transparent: true,
-  opacity: 1,
+  depthWrite: false,
 });
 const outlineMat = new T.ShaderMaterial({
   uniforms: {
@@ -17,6 +29,10 @@ const outlineMat = new T.ShaderMaterial({
   vertexShader: `uniform vec2 resolution; uniform float thickness; void main(){vec4 clip=projectionMatrix*modelViewMatrix*vec4(position,1.0);vec3 n=normalize(normalMatrix*normal);vec2 direction=(projectionMatrix*vec4(n,0.0)).xy;float magnitude=length(direction);if(magnitude>0.001)clip.xy+=direction/magnitude*thickness*2.0/resolution*clip.w;gl_Position=clip;}`,
   fragmentShader: `void main(){gl_FragColor=vec4(0.11,0.18,0.15,1.0);}`,
   side: T.BackSide,
+  depthWrite: false,
+  polygonOffset: true,
+  polygonOffsetFactor: 2,
+  polygonOffsetUnits: 2,
 });
 const dark = mat("#34433e"),
   metal = mat("#b8b9a5", 0.45, 0.45),
@@ -33,6 +49,7 @@ function mesh(geometry, material, parent, pos = [0, 0, 0], edges = true) {
     hull.renderOrder = -1;
     m.add(hull);
     const line = new T.LineSegments(new T.EdgesGeometry(geometry, 30), edgeMat);
+    line.renderOrder = 2;
     m.add(line);
   }
   return m;
@@ -496,6 +513,8 @@ export class Workbench {
     this.parts = {};
     this.animations = [];
     this.pointers = new Map();
+    this.needsRender = true;
+    this.lastFrameTime = performance.now();
     this.renderer = new T.WebGLRenderer({
       canvas: this.canvas,
       antialias: true,
@@ -503,6 +522,8 @@ export class Workbench {
     });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.autoUpdate = false;
+    this.renderer.shadowMap.needsUpdate = true;
     this.renderer.shadowMap.type = T.PCFSoftShadowMap;
     this.renderer.outputColorSpace = T.SRGBColorSpace;
     this.renderer.toneMapping = T.ACESFilmicToneMapping;
@@ -611,6 +632,7 @@ export class Workbench {
     onReady?.();
   }
   resize() {
+    this.needsRender = true;
     let w = this.host.clientWidth,
       h = this.host.clientHeight;
     this.renderer.setSize(w, h, false);
@@ -618,6 +640,8 @@ export class Workbench {
     this.aspect = w / h;
   }
   setStep(step, animate = true) {
+    this.needsRender = true;
+    this.renderer.shadowMap.needsUpdate = true;
     this.inspection = null;
     this.onInspectChange(null);
     let wasKit = this.step === -1;
@@ -665,6 +689,8 @@ export class Workbench {
     this.home();
   }
   resetKit() {
+    this.needsRender = true;
+    this.renderer.shadowMap.needsUpdate = true;
     this.inspection = null;
     this.returnView = null;
     this.onInspectChange(null);
@@ -691,6 +717,8 @@ export class Workbench {
     });
   }
   popout(key, detail = null) {
+    this.needsRender = true;
+    this.renderer.shadowMap.needsUpdate = true;
     const part = this.parts[key];
     if (!part) return false;
     if (this.step !== -1 && !part.visible) return false;
@@ -768,6 +796,7 @@ export class Workbench {
         : "DRAG TO MOVE · SCROLL TO ZOOM";
   }
   home() {
+    this.needsRender = true;
     this.inspection = null;
     this.returnView = null;
     this.onInspectChange(null);
@@ -819,6 +848,7 @@ export class Workbench {
     this.focus(keys[this.step]);
   }
   setLed(on, color = "#df8255") {
+    this.needsRender = true;
     let l = this.parts.led;
     l.userData.lens.color.set(color);
     l.userData.lens.emissive.set(color);
@@ -1011,9 +1041,21 @@ export class Workbench {
   }
   loop() {
     requestAnimationFrame(() => this.loop());
-    let now = performance.now();
-    for (let k of ["x", "y", "z", "scale", "azimuth", "elevation"])
-      this.view[k] += (this.goal[k] - this.view[k]) * (reduced ? 1 : 0.085);
+    const now = performance.now();
+    const elapsedMs = now - this.lastFrameTime;
+    this.lastFrameTime = now;
+    const cameraChanged = advanceCamera(
+      this.view,
+      this.goal,
+      elapsedMs,
+      reduced,
+    );
+    const modelsMoving = Boolean(
+      this.popAnimation || this.animations.length || this.wireAnimation,
+    );
+    if (!cameraChanged && !modelsMoving && !this.needsRender) return;
+    this.needsRender = false;
+    if (modelsMoving) this.renderer.shadowMap.needsUpdate = true;
     let v = this.view;
     let w = (v.scale * this.aspect) / 2;
     this.camera.left = -w;

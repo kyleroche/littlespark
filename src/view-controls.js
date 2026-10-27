@@ -21,3 +21,18 @@ export function panView(view, dx, dy, height) {
 export function zoomView(view, factor) {
   view.scale = Math.max(12, Math.min(320, view.scale * factor));
 }
+
+// Stop exactly at the goal rather than leaving an endless subpixel easing tail.
+// Time-based damping gives the same motion on 30, 60, and 120 Hz displays.
+export function advanceCamera(view, goal, elapsedMs, instant = false) {
+  const alpha = instant ? 1 : 1 - Math.exp(-Math.max(0, elapsedMs) / 75);
+  let changed = false;
+  for (const key of ["x", "y", "z", "scale", "azimuth", "elevation"]) {
+    const previous = view[key];
+    const next = previous + (goal[key] - previous) * alpha;
+    const epsilon = key === "azimuth" || key === "elevation" ? 1e-5 : 0.001;
+    view[key] = Math.abs(goal[key] - next) <= epsilon ? goal[key] : next;
+    changed ||= view[key] !== previous;
+  }
+  return changed;
+}

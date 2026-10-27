@@ -1,7 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { orbitView, panView, zoomView } from "../src/view-controls.js";
+import {
+  orbitView,
+  panView,
+  zoomView,
+  advanceCamera,
+} from "../src/view-controls.js";
 import { TOUR_STEPS, assertTourCoverage } from "../src/app-tour.js";
 const fresh = () => ({
   x: 10,
@@ -66,4 +71,35 @@ test("every user-facing feature declared in the UI has a tutorial and all tour t
     () => assertTourCoverage(new Set([...features, "new-unexplained-feature"])),
     /new-unexplained-feature/,
   );
+});
+
+test("camera settles exactly after zoom at common display refresh rates and stays idle", () => {
+  const goal = {
+    ...fresh(),
+    x: -29,
+    z: 11,
+    y: 6,
+    scale: 26,
+    azimuth: 0.5,
+    elevation: 0.75,
+  };
+  for (const fps of [30, 60, 120]) {
+    const view = fresh();
+    for (let frame = 0; frame < fps * 2; frame++)
+      advanceCamera(view, goal, 1000 / fps);
+    assert.deepEqual(view, goal);
+    assert.equal(advanceCamera(view, goal, 1000 / fps), false);
+  }
+});
+test("camera animation is time-based, monotone, and respects reduced motion", () => {
+  const goal = { ...fresh(), scale: 26 };
+  const slow = fresh(),
+    fast = fresh();
+  for (let frame = 0; frame < 6; frame++) advanceCamera(slow, goal, 1000 / 30);
+  for (let frame = 0; frame < 24; frame++)
+    advanceCamera(fast, goal, 1000 / 120);
+  assert.ok(Math.abs(slow.scale - fast.scale) < 1e-9);
+  assert.ok(slow.scale > goal.scale && slow.scale < 100);
+  assert.equal(advanceCamera(slow, goal, 0, true), true);
+  assert.deepEqual(slow, goal);
 });
