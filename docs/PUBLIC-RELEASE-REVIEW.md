@@ -8,7 +8,7 @@ Reviewed on October 27, 2026. The repository is still private; this document doe
 - Dependency audit reported no known vulnerabilities. Application tests, firmware simulation/protocol tests, and production builds passed.
 - Verified server-side family ownership and child/parent role boundaries, five-minute expiry, atomic one-time redemption, rate limits, session revocation, and progress reset generations against the configured database.
 - Checked that an old tab cannot save to another child after the browser switches accounts. Mutations bind the displayed profile to the authenticated session; mismatches require a reload.
-- Verified production HTTPS, guest account API behavior, and rejection of foreign request origins.
+- Verified production HTTPS, guest account API behavior, and rejection of foreign request origins. A temporary production family also passed parent-link redemption, child creation/link generation, child login, progress save/reload, and revoked-session recovery. This exercised secure production cookies; no real email was sent.
 - Production database and email credentials are excluded from preview environments. GitHub verification jobs have read-only repository permissions and receive no production credentials.
 - Removed the temporary browser test families. Artwork exports and local development credentials are outside the tracked source.
 
