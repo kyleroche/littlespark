@@ -113,3 +113,7 @@ Safari supports the workbench, lessons, accounts, and simulator. Direct USB uplo
 ## Community lessons
 
 See [the proposed contribution format](docs/LESSON-CONTRIBUTIONS.md). The current application still uses a fixed scene for its first circuit; the document describes the schema and preview workflow to implement before accepting drop-in lesson packages. See [the release review](docs/PUBLIC-RELEASE-REVIEW.md) and [SECURITY.md](SECURITY.md) for evidence and remaining public-release checks. The repository remains private.
+
+## Sparky’s guided code help
+
+**Stuck? Ask Sparky** in the notebook opens nonmodal, lesson-specific help with the selected goggles hedgehog artwork. **Give me a hint** highlights both `delay()` lines. **Show a faster blink** / **Show a slower blink** previews the next supported timing; **Try it** applies it through the same verified-firmware invalidation path as the timing control. **Undo Sparky’s change** restores the prior timing and also requires a fresh test. Manual timing changes, profile switches, and entering/leaving the tour clear stale suggestions/undo. Close × or Escape inside the helper collapses it. No automatic uploads, arbitrary code insertion, chat service, or external AI requests are involved. The tour, public How-to and home-page explanation cover this workflow. The original goggles concept was generated with the built-in imagegen tool and is stored in `public/images/sparky/sparky-inventor.png`; the other concept designs are not app assets.

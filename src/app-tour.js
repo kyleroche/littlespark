@@ -118,6 +118,17 @@ export const TOUR_STEPS = [
     demo: "code",
   },
   {
+    id: "sparky",
+    feature: "sparky",
+    target: "#sparky",
+    title: "Ask Sparky for help",
+    description: "Stuck? Ask Sparky sits beside the code. Give me a hint lights up the two wait lines and explains what they do.",
+    tip: "You choose what changes.",
+    detail: "Show a faster blink or Show a slower blink previews both wait changes. Try it applies them; Undo Sparky’s change restores the previous rhythm. Run a fresh test in step 7 after changing code. Close × hides his help. These are prepared hints for this lesson, not a chat or free typing.",
+    action: "Meet Sparky",
+    demo: "sparky",
+  },
+  {
     id: "test",
     feature: "simulation",
     target: "#simulation-status",

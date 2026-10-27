@@ -1,4 +1,6 @@
 import "./style.css";
+import { initSparky } from "./sparky.js";
+let sparky;
 import { initWorkspaceLayout } from "./workspace-layout.js";
 import { initAccounts } from "./accounts.js";
 initWorkspaceLayout();
@@ -326,9 +328,10 @@ function renderCode() {
             /\b(13|250|500|1000|HIGH|LOW|OUTPUT)\b/g,
             '<span class="value">$1</span>',
           );
-      return `<span class="line-no">${i + 1}</span>${text}`;
+      return `<span class="code-line"><span class="line-no">${i + 1}</span>${text}</span>`;
     })
     .join("\n");
+  sparky?.sync();
 }
 function simStatus(text, status = "") {
   $("#sim-status").textContent = text;
@@ -739,6 +742,7 @@ function changeSpeed(speed) {
 }
 function startTour() {
   if (isTour()) return;
+  sparky?.reset();
   tourSnapshot = {
     speed: state.speed,
     color: state.color,
@@ -758,6 +762,7 @@ function startTour() {
 }
 function exitTour(restoreScene = true) {
   if (!isTour()) return;
+  sparky?.reset();
   const finished = tourIndex === TOUR_STEPS.length - 1;
   tourIndex = -1;
   lastTourStep = -1;
@@ -889,6 +894,11 @@ function demoTour() {
       });
       $("#code-delay").focus({ preventScroll: true });
       break;
+    case "sparky":
+      sparky.open();
+      $("#sparky").scrollIntoView({ behavior: "smooth", block: "center" });
+      $("#sparky-hint").focus({ preventScroll: true });
+      break;
     case "test":
       runTest();
       break;
@@ -909,6 +919,7 @@ document.addEventListener("pointerdown", (event) => {
   for (const panel of document.querySelectorAll("dialog[open]"))
     if (!panel.contains(event.target)) panel.close();
 });
+sparky = initSparky({ getSpeed: () => state.speed, changeSpeed });
 go(state.step);
 accounts = initAccounts({
   onProfile(user, progress) {
@@ -921,6 +932,7 @@ accounts = initAccounts({
         completed: [],
         found: [],
       };
+      sparky.reset();
       invalidate();
       go(state.step);
     }

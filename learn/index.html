@@ -299,6 +299,24 @@
                   <span class="code-tag">REPEAT</span>
                 </div>
               </div>
+              <section id="sparky" class="sparky" data-tour-feature="sparky" aria-label="Sparky’s code help">
+                <button id="sparky-toggle" class="sparky-toggle" aria-expanded="false" aria-controls="sparky-panel">
+                  <img src="/images/sparky/sparky-inventor.png" alt="Sparky the hedgehog, wearing orange goggles and holding a circuit board" width="92" height="116" />
+                  <span><strong>Stuck? Ask Sparky.</strong><small>Hints for your code ↗</small></span>
+                </button>
+                <div id="sparky-panel" class="sparky-panel" hidden>
+                  <div class="sparky-heading"><strong>Let’s look at the waits.</strong><button id="sparky-close" aria-label="Close Sparky’s help">×</button></div>
+                  <p id="sparky-message" role="status">I’m Sparky. Want a hint, or shall we change the blink rhythm together?</p>
+                  <div class="sparky-actions">
+                    <button id="sparky-hint">Give me a hint</button>
+                    <button data-sparky-goal="faster">Show a faster blink</button>
+                    <button data-sparky-goal="slower">Show a slower blink</button>
+                  </div>
+                  <pre id="sparky-preview" class="sparky-preview" hidden></pre>
+                  <div class="sparky-actions"><button id="sparky-apply" hidden>Try it</button><button id="sparky-undo" hidden>Undo Sparky’s change</button></div>
+                  <small>Guided help for this lesson. You choose each change.</small>
+                </div>
+              </section>
               <div
                 class="simulation-status"
                 id="simulation-status"

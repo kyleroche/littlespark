@@ -2626,3 +2626,27 @@ body.in-tour .lesson-nav {
   font-size: 12px;
   color: #294c38;
 }
+
+/* Sparky stays in the notebook, leaving the circuit and lesson usable. */
+.sparky { margin: 12px 18px; padding: 12px; border: 1px solid #c8d1bf; border-radius: 16px; background: #eef1e5; }
+.sparky [hidden] { display: none !important; }
+.sparky-toggle { display: flex; align-items: center; gap: 16px; width: 100%; text-align: left; background: transparent; border: 0; color: #29463d; cursor: pointer; }
+.sparky-toggle img { width: 76px; height: 96px; object-fit: contain; transform-origin: bottom center; transition: transform .25s ease; }
+.sparky-toggle:hover img, .sparky-awake .sparky-toggle img { transform: rotate(-5deg); }
+.sparky-toggle strong { display: block; font-size: 17px; }
+.sparky-toggle small { display: block; margin-top: 6px; font-size: 12px; }
+.sparky-panel { padding: 12px 6px 4px; }
+.sparky-heading { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.sparky-heading button { border: 0; background: transparent; font-size: 25px; cursor: pointer; min-width: 44px; min-height: 44px; }
+.sparky-panel p { font-size: 14px; line-height: 1.6; margin: 8px 0 14px; }
+.sparky-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+.sparky-actions button { border: 1px solid #aebba3; border-radius: 9px; background: #fffdf6; padding: 10px 13px; min-height: 44px; color: #29463d; font: inherit; font-size: 13px; cursor: pointer; }
+.sparky-actions #sparky-apply { background: #294f42; color: white; }
+.sparky-preview { padding: 12px; background: #fff9dc; border-radius: 8px; white-space: pre-wrap; font-size: 13px; }
+.sparky-panel > small { color: #5b6955; font-size: 11px; }
+.code-line { border-radius: 3px; }
+.code-line.sparky-line { background: #f5d46c66; outline: 2px solid #d6a83366; }
+.sparky-cheer .sparky-toggle img { animation: sparky-hop .55s ease; }
+@keyframes sparky-hop { 50% { transform: translateY(-10px) rotate(7deg); } }
+@media (prefers-reduced-motion: reduce) { .sparky-toggle img { transition: none; } .sparky-cheer .sparky-toggle img { animation: none; } }
+@media (max-width: 480px) { .sparky { margin: 10px; } .sparky-toggle { gap: 10px; } .sparky-actions button { flex: 1 1 140px; } }
