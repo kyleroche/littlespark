@@ -1868,3 +1868,5 @@ p {
 @media(max-width:760px){.home-lesson-grid{grid-template-columns:1fr}.home-lessons{padding:55px 20px}.home-lesson-grid article{padding:25px}}
 
 @media(min-width:1150px){.home-lesson-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.home-lesson-grid article{padding:26px}}
+
+[data-public-source][hidden]{display:none!important}

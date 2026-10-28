@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
+import { newToken, hashToken } from "../server/auth-utils.js";
 import { neon } from "@neondatabase/serverless";
 import { createStore } from "../server/store.js";
 import handler from "../api/family.js";
@@ -231,6 +232,21 @@ try {
     ).status,
     302,
   );
+  // Deliberately commit a child session after revocation's statement snapshot.
+  // A row deletion alone misses that session; the auth version must reject it.
+  const raceKid=await store.addChild(parentA.user.id,"Revocation fixture","robot");
+  const raceLink=await store.childLink(parentA.user.id,raceKid.id),raceToken=newToken();
+  const consuming=sql`WITH consumed AS(UPDATE ls_kid_links l SET used_at=now() FROM ls_kids k WHERE l.hash=${hashToken(raceLink.code)} AND l.kid_id=k.id AND k.active=true AND l.auth_version=k.auth_version AND l.used_at IS NULL AND l.expires_at>now() RETURNING l.kid_id,l.auth_version), issued AS(INSERT INTO ls_sessions(hash,kid_id,auth_version,expires_at) SELECT ${hashToken(raceToken)},kid_id,auth_version,now()+interval '7 days' FROM consumed RETURNING kid_id) SELECT pg_sleep(0.8) FROM issued`.then(rows=>rows);
+  await new Promise(resolve=>setTimeout(resolve,100));
+  const [issued]=await Promise.all([consuming,store.revokeChild(parentA.user.id,raceKid.id)]);
+  assert.equal(issued.length,1,"the overlapping login actually issued a session");
+  assert.equal(await store.session(raceToken),null,"a concurrently issued session must be revoked");
+  const staleCode="otter-robot-abc234";
+  await sql`INSERT INTO ls_kid_links(kid_id,hash,auth_version,expires_at) VALUES(${raceKid.id},${hashToken(staleCode)},0,now()+interval '5 minutes')`;
+  assert.equal(await store.consumeChild(staleCode),null,"a stale link surviving a race must not sign in");
+  const newLink=await store.childLink(parentA.user.id,raceKid.id);
+  const newLogin=await store.consumeChild(newLink.code);
+  assert.ok(await store.session(newLogin.token),"a fresh post-revocation link must work");
   const limits = await Promise.all(
     Array.from({ length: 5 }, () => store.limit("qa-" + suffix, 3, 60000)),
   );

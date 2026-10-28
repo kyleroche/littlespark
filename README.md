@@ -112,7 +112,7 @@ Safari supports the workbench, lessons, accounts, and simulator. Direct USB uplo
 
 ## Community lessons
 
-See [the proposed contribution format](docs/LESSON-CONTRIBUTIONS.md). The current application still uses a fixed scene for its first circuit; the document describes the schema and preview workflow to implement before accepting drop-in lesson packages. See [the release review](docs/PUBLIC-RELEASE-REVIEW.md) and [SECURITY.md](SECURITY.md) for evidence and remaining public-release checks. The repository remains private.
+See [the proposed contribution format](docs/LESSON-CONTRIBUTIONS.md). The current application still uses a fixed scene for its first circuit; the document describes the schema and preview workflow to implement before accepting drop-in lesson packages. See [the release review](docs/PUBLIC-RELEASE-REVIEW.md) and [SECURITY.md](SECURITY.md) for evidence and remaining public-release checks. The repository remains private pending explicit owner authorization. Original code and lesson text use [MIT](LICENSE); the name, logos, Sparky and artwork are reserved under [BRAND.md](BRAND.md). Dependencies and compiled firmware retain their own licenses; see [firmware licensing](docs/FIRMWARE-LICENSING.md) and [runtime notices](public/THIRD_PARTY_NOTICES.txt).
 
 ## Sparky’s guided code help
 
@@ -145,3 +145,9 @@ Traffic progress uses the `traffic-lights` allowlisted lesson ID, independent lo
 **Game Controller** (`/learn/game-controller/`) uses four foil arrow pads and EARTH, five leads total. Spark Hunt moves one square per distinct arrow press on a bounded 5×5 board. Three sparks complete the lesson; there is no timer. Virtual moves require EARTH, real moves require the activity region to be focused. Position and collected spark IDs save to the child profile. **New round** preserves completed lesson progress; a lesson reset clears the round too. Both new Makey lessons share `makey-activities.js`, data, diagrams and the eight-step activity tour, with prepared Sparky explanations, part notes, replay, zoom/pan/reset and reduced-motion support.
 
 **Push-button Light** (`/learn/button-light/`) shares the Arduino shell and original 3D geometry. LED E11/F11, 220 Ω C11–C17, D13–A17, GND–J11. Four-leg button E22/F22/E24/F24: each column is an always-connected pair, pressing joins the pairs. D2–A22 and J24–I11 add the input and return. Check switch orientation with a grown-up. INPUT_PULLUP means released HIGH, pressed LOW, following the [official Arduino example](https://docs.arduino.cc/built-in-examples/digital/InputPullupSerial/). Two compiled rules implement press=on/off. The verifier injects released/pressed/released on the emulated D2 input; interactive virtual presses then drive that same input. Sparky previews the output rule and Undo invalidates verification. The exact verified image remains the only upload source. The firmware builder now compiles eight positive variants total. Physical kits still need hands-on validation.
+
+## Source link and release notices
+
+Generate dependency notices with `node scripts/build-notices.mjs` after `npm ci` or dependency changes. Keep the corresponding firmware source/license archive with shipped HEX files.
+
+`VITE_PUBLIC_REPOSITORY` defaults to false. Only after the owner authorizes publication and anonymous GitHub access is verified, set it to `true` in the Production build environment and redeploy to show GitHub links in the home navigation and footer. This flag is public build configuration, not a credential. Keep production database/email credentials out of Preview environments.

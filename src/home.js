@@ -1,3 +1,6 @@
+// Enable only after the repository visibility has been changed and verified.
+const publicRepository = import.meta.env.VITE_PUBLIC_REPOSITORY === "true";
+for (const link of document.querySelectorAll("[data-public-source]")) link.hidden = !publicRepository;
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
 const parallaxItems = [...document.querySelectorAll("[data-parallax]")];
 let framePending = false;

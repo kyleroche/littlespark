@@ -21,7 +21,7 @@ export function createStore(url = process.env.DATABASE_URL) {
     async session(token) {
       if (!token || !/^[A-Za-z0-9_-]{43}$/.test(token)) return null;
       const rows =
-        await sql`SELECT s.hash,s.parent_id,s.kid_id,p.email,k.name,k.avatar FROM ls_sessions s LEFT JOIN ls_parents p ON p.id=s.parent_id LEFT JOIN ls_kids k ON k.id=s.kid_id WHERE s.hash=${hashToken(token)} AND s.expires_at>now() AND (s.parent_id IS NOT NULL OR k.active=true)`;
+        await sql`SELECT s.hash,s.parent_id,s.kid_id,p.email,k.name,k.avatar FROM ls_sessions s LEFT JOIN ls_parents p ON p.id=s.parent_id LEFT JOIN ls_kids k ON k.id=s.kid_id WHERE s.hash=${hashToken(token)} AND s.expires_at>now() AND (s.parent_id IS NOT NULL OR (k.active=true AND s.auth_version=k.auth_version))`;
       const row = rows[0];
       return row
         ? {
@@ -71,13 +71,13 @@ export function createStore(url = process.env.DATABASE_URL) {
     },
     async revokeChild(parentId, id) {
       const rows =
-        await sql`WITH owned AS(SELECT id FROM ls_kids WHERE id=${id} AND parent_id=${parentId}), sessions AS(DELETE FROM ls_sessions WHERE kid_id IN(SELECT id FROM owned)), links AS(DELETE FROM ls_kid_links WHERE kid_id IN(SELECT id FROM owned)) SELECT id FROM owned`;
+        await sql`WITH owned AS(UPDATE ls_kids SET auth_version=auth_version+1 WHERE id=${id} AND parent_id=${parentId} RETURNING id), sessions AS(DELETE FROM ls_sessions WHERE kid_id IN(SELECT id FROM owned)), links AS(DELETE FROM ls_kid_links WHERE kid_id IN(SELECT id FROM owned)) SELECT id FROM owned`;
       return Boolean(rows[0]);
     },
     async childLink(parentId, id) {
       const code = kidCode();
       const rows =
-        await sql`INSERT INTO ls_kid_links(kid_id,hash,expires_at) SELECT id,${hashToken(code)},now()+interval '5 minutes' FROM ls_kids WHERE id=${id} AND parent_id=${parentId} AND active=true ON CONFLICT(kid_id) DO UPDATE SET hash=EXCLUDED.hash,expires_at=EXCLUDED.expires_at,used_at=NULL RETURNING expires_at`;
+        await sql`INSERT INTO ls_kid_links(kid_id,hash,auth_version,expires_at) SELECT id,${hashToken(code)},auth_version,now()+interval '5 minutes' FROM ls_kids WHERE id=${id} AND parent_id=${parentId} AND active=true ON CONFLICT(kid_id) DO UPDATE SET hash=EXCLUDED.hash,auth_version=EXCLUDED.auth_version,expires_at=EXCLUDED.expires_at,used_at=NULL RETURNING expires_at`;
       return rows[0]
         ? { code, expiresAt: rows[0].expires_at, expiresIn: LINK_TTL_MS }
         : null;
@@ -85,7 +85,7 @@ export function createStore(url = process.env.DATABASE_URL) {
     async consumeChild(code) {
       const token = newToken();
       const rows =
-        await sql`WITH consumed AS(UPDATE ls_kid_links l SET used_at=now() FROM ls_kids k WHERE l.hash=${hashToken(code)} AND l.kid_id=k.id AND k.active=true AND l.used_at IS NULL AND l.expires_at>now() RETURNING l.kid_id), session AS(INSERT INTO ls_sessions(hash,kid_id,expires_at) SELECT ${hashToken(token)},kid_id,now()+interval '7 days' FROM consumed RETURNING kid_id) SELECT k.id,k.name,k.avatar FROM ls_kids k JOIN session ON session.kid_id=k.id`;
+        await sql`WITH consumed AS(UPDATE ls_kid_links l SET used_at=now() FROM ls_kids k WHERE l.hash=${hashToken(code)} AND l.kid_id=k.id AND k.active=true AND l.auth_version=k.auth_version AND l.used_at IS NULL AND l.expires_at>now() RETURNING l.kid_id,l.auth_version), session AS(INSERT INTO ls_sessions(hash,kid_id,auth_version,expires_at) SELECT ${hashToken(token)},kid_id,auth_version,now()+interval '7 days' FROM consumed RETURNING kid_id) SELECT k.id,k.name,k.avatar FROM ls_kids k JOIN session ON session.kid_id=k.id`;
       return rows[0] ? { token, user: { role: "kid", ...rows[0] } } : null;
     },
     async progress(kidId, lesson = "first-circuit") {

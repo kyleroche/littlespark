@@ -54,3 +54,7 @@ New lessons should explain their parts, demonstrate each connection, and retain 
 The three Arduino lessons now share `src/arduino-lessons.js`, the workbench and the app shell. New built-in lessons still need reviewed geometry, firmware verification and a server-allowlisted progress ID; adding JSON alone does not create them.
 
 The shared catalog in `src/lesson-catalog.js` also supplies the server lesson allowlist and Family navigation. Conductivity Detective and Game Controller share a Makey activity shell; Push-button Light adds an actual emulated input and compiled-rule verification to the Arduino shell. Keep lesson-specific notebook/game fields bounded in server normalization and independent under resets.
+
+## Contribution licensing
+
+Submit original code and lesson text under the repository's [MIT license](../LICENSE). Include compatible license/attribution information for contributed third-party materials; do not submit credentials, family data or active login links. The Little Spark name, logos, Sparky and raster/apparel artwork are reserved separately under [BRAND.md](../BRAND.md). A fork published as a separate app must replace those reserved materials. Preview builds must use disposable fixtures and isolated services, never production family data or credentials.

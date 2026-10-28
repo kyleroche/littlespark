@@ -13,7 +13,7 @@ export const TOUR_STEPS = [
     target: "#how-to-link",
     title: "Home, How-to, and gear",
     description:
-      "Home explains the project. How-to walks through family profiles, the first circuit, and progress. Gear store opens the Little Spark apparel store.",
+      "Home explains the project and lists every lesson. Its footer links third-party licenses; its GitHub link appears when the source repository is public. How-to walks through the steps. Gear store opens the apparel store.",
     tip: "Your workbench stays here.",
     detail:
       "How-to and Gear store open in new tabs from the lab, so switch back here to keep building. Home also links to the guide. Your lesson progress stays separate from the store.",
