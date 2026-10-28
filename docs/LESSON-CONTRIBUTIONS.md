@@ -1,6 +1,6 @@
 # Community lessons: proposed extension format
 
-The current app contains three reviewed, built-in lessons: Arduino Blink (fixed 3D scene/firmware variants) Arduino Traffic Lights (shared Arduino shell/content structure), and Makey Makey Fruit Piano (animated SVG connection diagram and keyboard/Web Audio instrument). Adding a JSON file alone does not yet add a working lesson. The next extension step should separate lesson content, circuit scenes, animation cues, and tests from the app shell.
+The current app contains six reviewed, built-in lessons: Arduino Blink, Traffic Lights and Push-button Light; Makey Makey Fruit Piano, Conductivity Detective and Game Controller. The Arduino lessons share a 3D model/firmware shell. The Makey Makey lessons use animated connection diagrams and keyboard input. Adding a JSON file alone does not yet add a working lesson. The next extension step should separate lesson content, circuit scenes, animation cues, and tests from the app shell.
 
 ## Recommended approach
 
@@ -51,4 +51,6 @@ New lessons should explain their parts, demonstrate each connection, and retain 
 3. Accept reviewed pull requests for new lessons.
 4. Add an in-app authoring tool only after the package format and validation rules are stable.
 
-The two Arduino lessons now share `src/arduino-lessons.js`, the workbench and the app shell. New built-in lessons still need reviewed geometry, firmware verification and a server-allowlisted progress ID; adding JSON alone does not create them.
+The three Arduino lessons now share `src/arduino-lessons.js`, the workbench and the app shell. New built-in lessons still need reviewed geometry, firmware verification and a server-allowlisted progress ID; adding JSON alone does not create them.
+
+The shared catalog in `src/lesson-catalog.js` also supplies the server lesson allowlist and Family navigation. Conductivity Detective and Game Controller share a Makey activity shell; Push-button Light adds an actual emulated input and compiled-rule verification to the Arduino shell. Keep lesson-specific notebook/game fields bounded in server normalization and independent under resets.

@@ -503,7 +503,7 @@ function wire(start, end, color, height) {
   return g;
 }
 export class Workbench {
-  constructor({ onPart, onReady, onInspectChange = () => {}, traffic = false }) {
+  constructor({ onPart, onReady, onInspectChange = () => {}, traffic = false, button = false }) {
     this.traffic = traffic;
     this.canvas = document.querySelector("#workbench");
     this.host = document.querySelector("#scene");
@@ -604,6 +604,16 @@ export class Workbench {
         wire([48.65,3.6,11.62],[71.51,3.6,14.16],"#4e6860",15),
       );
     }
+    if(button){
+      const light=led();light.position.x=0;
+      const group=new T.Group();group.position.x=43.57;group.add(light);Object.assign(group.userData,{part:"led",lens:light.userData.lens,glow:light.userData.glow});
+      const buttonBody=new T.Group();buttonBody.position.x=30.48;group.add(buttonBody);
+      box(7,3,10,dark,buttonBody,0,5.5,0);
+      this.buttonCap=cyl(2.4,2.4,2,mat("#b79158"),buttonBody,0,8,0);
+      for(const x of [-2.54,2.54])for(const z of [-4,4])box(.6,3,.6,metal,buttonBody,x,3.5,z,false);
+      this.parts.led=group;
+      this.parts.wires.add(wire([-16.9,10.6,-23],[71.51,3.6,-14.16],"#9c8055",32),wire([76.59,3.6,14.16],[43.57,3.6,11.62],"#4e6860",15));
+    }
     this.parts.wires.userData.part = "wires";
     for (let [k, p] of Object.entries(this.parts)) {
       this.scene.add(p);
@@ -635,7 +645,7 @@ export class Workbench {
     ]) {
       let el = document.createElement("button");
       el.className = "label";
-      el.textContent = traffic && key === "led" ? "RED · YELLOW · GREEN" : traffic && key === "d13" ? "D13 · D12 · D11" : label;
+      el.textContent = traffic && key === "led" ? "RED · YELLOW · GREEN" : button && key === "led" ? "LED + BUTTON" : traffic && key === "d13" ? "D13 · D12 · D11" : label;
       el.onclick = () => {
         const detail = {
           usb: "usbPort",
@@ -873,6 +883,7 @@ export class Workbench {
     });
     this.focus(keys[this.step]);
   }
+  setButtonPressed(pressed=false){if(this.buttonCap){this.buttonCap.position.y=pressed?7:8;this.needsRender=true;this.renderer.shadowMap.needsUpdate=true;}}
   setTrafficLights(mask = 0) {
     this.needsRender = true;
     for (const light of this.trafficLeds || []) {

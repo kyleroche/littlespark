@@ -1,6 +1,7 @@
-import { verifyBlink, verifyTraffic, createUno } from "./firmware.js";
+import { verifyBlink, verifyTraffic, verifyButton, createUno } from "./firmware.js";
 let active = null;
 self.onmessage = ({ data }) => {
+  if(data.type==="button"){active?.avr.setButton(Boolean(data.pressed));return;}
   if (data.type === "stop") {
     active = null;
     return;
@@ -8,12 +9,13 @@ self.onmessage = ({ data }) => {
   if (data.type !== "run") return;
   try {
     const image = new Uint8Array(data.image);
-    const result = data.traffic ? verifyTraffic(image, data.halfPeriod) : verifyBlink(image, data.halfPeriod);
+    const result = data.button ? verifyButton(image,data.halfPeriod) : data.traffic ? verifyTraffic(image, data.halfPeriod) : verifyBlink(image, data.halfPeriod);
     self.postMessage({ type: "verified", ...result });
     const avr = createUno(image, (high) =>
       !data.traffic && self.postMessage({ type: "pin", high }),
       (mask) => data.traffic && self.postMessage({ type: "traffic-pin", mask }),
     );
+    if(data.button) avr.setButton(false);
     const run = { avr, start: performance.now() };
     active = run;
     function frame() {

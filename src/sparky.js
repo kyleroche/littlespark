@@ -6,7 +6,7 @@ export function suggestRhythm(current, goal) {
   return choices[Math.min(index + 1, choices.length - 1)];
 }
 
-export function initSparky({ getSpeed, changeSpeed, traffic = false }) {
+export function initSparky({ getSpeed, changeSpeed, traffic = false, button = false }) {
   const root = document.querySelector("#sparky");
   const toggle = root.querySelector("#sparky-toggle");
   const panel = root.querySelector("#sparky-panel");
@@ -21,7 +21,7 @@ export function initSparky({ getSpeed, changeSpeed, traffic = false }) {
 
   function highlight(on) {
     document.querySelectorAll("#code .code-line").forEach((line) => {
-      line.classList.toggle("sparky-line", on && line.textContent.includes("delay("));
+      line.classList.toggle("sparky-line", on && (button ? /digital(Read|Write)|INPUT_PULLUP/.test(line.textContent) : line.textContent.includes("delay(")));
     });
   }
   function clearPreview() {
@@ -52,20 +52,21 @@ export function initSparky({ getSpeed, changeSpeed, traffic = false }) {
   });
   root.querySelector("#sparky-hint").onclick = () => {
     clearPreview();
-    message.textContent = traffic ? "Find the three glowing delay() lines. Red and green wait twice as long as yellow. Each LOW turns a light off before the next HIGH turns another on. The order is red, green, yellow." : "Find the two glowing delay() lines. Each number is a wait in milliseconds. 1000 is one second. A smaller number makes the light blink faster.";
+    message.textContent = button ? "INPUT_PULLUP makes D2 HIGH when the button is released. Pressing joins D2 to GND, so digitalRead(2) becomes LOW. The pressed rule chooses the LED’s HIGH or LOW output." : traffic ? "Find the three glowing delay() lines. Red and green wait twice as long as yellow. Each LOW turns a light off before the next HIGH turns another on. The order is red, green, yellow." : "Find the two glowing delay() lines. Each number is a wait in milliseconds. 1000 is one second. A smaller number makes the light blink faster.";
     highlight(true);
   };
+  const buttonMode=button;
   root.querySelectorAll("[data-sparky-goal]").forEach((button) => {
     button.onclick = () => {
       const current = getSpeed();
-      suggestion = suggestRhythm(current, button.dataset.sparkyGoal);
+      suggestion = buttonMode ? (button.dataset.sparkyGoal === "slower" ? 500 : 250) : suggestRhythm(current, button.dataset.sparkyGoal);
       if (suggestion === current) {
         clearPreview();
-        message.textContent = "That’s already the " + (current === 250 ? "fastest" : "slowest") + " rhythm in this lesson. Try the other direction.";
+        message.textContent = buttonMode ? "That rule is already selected. Try the other rule." : "That’s already the " + (current === 250 ? "fastest" : "slowest") + " rhythm in this lesson. Try the other direction.";
         return;
       }
-      message.textContent = traffic ? `Red and green: ${current*2} → ${suggestion*2} ms. Yellow: ${current} → ${suggestion} ms. The sequence stays red, green, yellow. Your code hasn’t changed yet.` : `Let’s change both waits from ${current} to ${suggestion} milliseconds. The light will blink ${suggestion < current ? "faster" : "slower"}. Your code hasn’t changed yet.`;
-      preview.textContent = traffic ? `Red + green: delay(${current*2}); → delay(${suggestion*2});\nYellow: delay(${current}); → delay(${suggestion});` : `Both wait lines:\ndelay(${current}); → delay(${suggestion});`;
+      message.textContent = buttonMode ? `Choose ${suggestion===500?"Press = on":"Press = off"}. The input still reads LOW when pressed; we change which LED output that reading selects. Your code has not changed yet.` : traffic ? `Red and green: ${current*2} → ${suggestion*2} ms. Yellow: ${current} → ${suggestion} ms. The sequence stays red, green, yellow. Your code hasn’t changed yet.` : `Let’s change both waits from ${current} to ${suggestion} milliseconds. The light will blink ${suggestion < current ? "faster" : "slower"}. Your code hasn’t changed yet.`;
+      preview.textContent = buttonMode ? `digitalWrite(13, pressed ? ${suggestion===500?"HIGH : LOW":"LOW : HIGH"});` : traffic ? `Red + green: delay(${current*2}); → delay(${suggestion*2});\nYellow: delay(${current}); → delay(${suggestion});` : `Both wait lines:\ndelay(${current}); → delay(${suggestion});`;
       preview.hidden = false;
       apply.hidden = false;
       highlight(true);
@@ -80,7 +81,7 @@ export function initSparky({ getSpeed, changeSpeed, traffic = false }) {
     previous = before;
     applied = next;
     undo.hidden = false;
-    message.textContent = traffic ? "All three waits changed. Go to step 7 and choose Test my sequence. Undo restores your old waits." : "Both waits changed. Go to step 7 and choose Test my circuit to see the new rhythm. Undo puts your old waits back.";
+    message.textContent = button ? "The rule changed. Run Test my button again, then press and release the virtual button. Undo restores the old rule." : traffic ? "All three waits changed. Go to step 7 and choose Test my sequence. Undo restores your old waits." : "Both waits changed. Go to step 7 and choose Test my circuit to see the new rhythm. Undo puts your old waits back.";
     root.classList.remove("sparky-cheer");
     void root.offsetWidth;
     root.classList.add("sparky-cheer");
@@ -93,7 +94,7 @@ export function initSparky({ getSpeed, changeSpeed, traffic = false }) {
     changeSpeed(restore);
     undo.hidden = true;
     clearPreview();
-    message.textContent = "Your old waits are back. Run a fresh test in step 7 before sending code to a board.";
+    message.textContent = button ? "Your old rule is back. Run Test my button before uploading." : "Your old waits are back. Run a fresh test in step 7 before sending code to a board.";
     highlight(true);
   };
   return {
@@ -104,7 +105,7 @@ export function initSparky({ getSpeed, changeSpeed, traffic = false }) {
         clearPreview();
         previous = applied = null;
         undo.hidden = true;
-        message.textContent = "Your rhythm changed. Want a hint about the two wait lines?";
+        message.textContent = button ? "Your rule changed. Want a hint about the input and output?" : traffic ? "Your sequence pace changed. Want a hint about the three waits?" : "Your rhythm changed. Want a hint about the two wait lines?";
         observed = current;
       }
       highlight(!panel.hidden);
@@ -114,7 +115,7 @@ export function initSparky({ getSpeed, changeSpeed, traffic = false }) {
       previous = applied = null;
       undo.hidden = true;
       observed = getSpeed();
-      message.textContent = traffic ? "I’m Sparky. Want a hint about HIGH, LOW and the three waits?" : "I’m Sparky. Want a hint, or shall we change the blink rhythm together?";
+      message.textContent = button ? "I’m Sparky. Want a hint about the button reading and output rule?" : traffic ? "I’m Sparky. Want a hint about HIGH, LOW and the three waits?" : "I’m Sparky. Want a hint, or shall we change the blink rhythm together?";
       close();
     },
   };

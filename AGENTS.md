@@ -42,3 +42,7 @@ Support Build + Code, Build only, Code only, and Guided layouts. Keep instructio
 - Parent and child authorization must be enforced in the API, never by client-provided roles or IDs. Kid links expire after five minutes, are hashed in storage, and are consumed atomically once.
 - Do not expose production database or email credentials to preview builds or community PRs.
 - Community lesson proposals should be declarative data with validated part IDs, connection points, animation cues, and checks. Do not execute contributor-supplied JavaScript or raw HTML as lesson content.
+
+## Work through an authorized roadmap
+
+When the user approves a multi-step roadmap, continue through the authorized sequence without asking to proceed after each lesson. Pause when the user asks, or report a concrete blocker. Do not treat this as authorization to invent additional work beyond that sequence.

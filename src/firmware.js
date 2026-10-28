@@ -3,6 +3,7 @@ import {
   avrInstruction,
   AVRIOPort,
   portBConfig,
+  portDConfig,
   AVRTimer,
   timer0Config,
   timer1Config,
@@ -56,6 +57,7 @@ export function createUno(image, onPin = () => {}, onPort = () => {}) {
   new AVRTimer(cpu, timer0Config);
   new AVRTimer(cpu, timer1Config);
   new AVRTimer(cpu, timer2Config);
+  const input = new AVRIOPort(cpu, portDConfig);
   const port = new AVRIOPort(cpu, portBConfig);
   let last = false;
   port.addListener((value) => {
@@ -68,6 +70,7 @@ export function createUno(image, onPin = () => {}, onPort = () => {}) {
   });
   return {
     cpu,
+    setButton(pressed){input.setPin(2,!pressed);},
     tick() {
       avrInstruction(cpu);
       cpu.tick();
@@ -122,4 +125,17 @@ export function verifyTraffic(image, unit) {
     }
   }
   return {passed:true,phases:phases.length};
+}
+
+export function verifyButton(image,rule=500){
+ if(![250,500].includes(rule))throw Error('Unsupported button rule.');
+ let high=false;
+ const avr=createUno(image,value=>{high=value;});
+ for(const pressed of [false,true,false]){
+  avr.setButton(pressed);
+  const until=avr.cpu.cycles+320000;
+  while(avr.cpu.cycles<until)avr.tick();
+  if(high!==(rule===500?pressed:!pressed))throw Error('The LED did not follow the button rule.');
+ }
+ return {passed:true,checks:3};
 }

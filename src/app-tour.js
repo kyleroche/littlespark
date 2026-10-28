@@ -2,9 +2,9 @@
 export const TOUR_STEPS = [
   {
     id: "lesson-picker", feature: "lesson-picker", target: "#lesson-picker",
-    title: "Choose a lesson", description: "Choose Blink an LED or Traffic Lights for Arduino, or Fruit Piano for Makey Makey, in the field guide.",
+    title: "Choose a lesson", description: "Choose any Arduino or Makey Makey build in the field guide. Each lesson has its own steps and saved work.",
     tip: "Each lesson has its own checklist and progress.",
-    detail: "Fruit Piano starts with unboxing and animated connections, then a playable piano. It has its own tour. Child profiles save both lessons separately; parents see all three in Family. Switching lessons keeps your saved steps.",
+    detail: "Fruit Piano starts with unboxing and animated connections, then a playable piano. It has its own tour. Child profiles save both lessons separately; parents see every lesson in Family. Switching lessons keeps your saved steps.",
     action: "Show the lesson picker", demo: "lesson-picker",
   },
   {
@@ -183,7 +183,7 @@ export function assertTourCoverage(features) {
 }
 
 export const MAKEY_TOUR_STEPS = [
-  { id: "makey-lessons", feature: "makey-lessons", target: "#makey-lessons", title: "Choose your lesson", description: "Switch between Blink an LED, Traffic Lights and Fruit Piano here. Each saves its own steps. This tour leaves your progress alone." },
+  { id: "makey-lessons", feature: "makey-lessons", target: "#makey-lessons", title: "Choose your lesson", description: "Choose any Arduino or Makey Makey lesson here. Each saves its own steps. This tour leaves your progress alone." },
   { id: "makey-parts", feature: "makey-parts", target: "#makey-kit", title: "Find the parts", description: "Check off the kit parts and things from home. Tap a part in the picture for details. Unboxing is a checklist, with no box to open on screen." },
   { id: "makey-diagram", feature: "makey-diagram", target: "#makey-diagram", title: "Watch the connections", description: "Next adds one connection at a time. Replay shows it again. Zoom + and − change the view; arrow buttons move it; Reset view brings everything back. Tap a part for a note, then Back to diagram." },
   { id: "makey-piano", feature: "makey-piano", target: "#makey-piano", title: "Try your fruit keys", description: "In the last step choose Virtual practice, connect virtual EARTH, then tap all three fruit keys. Release EARTH to see why the loop matters. Sound on enables the notes; Mute keeps the visual flashes." },
@@ -192,7 +192,13 @@ export const MAKEY_TOUR_STEPS = [
   { id: "makey-family", feature: "makey-family", target: "#account-button", title: "Family and help", description: "Family opens the parent dashboard or your learner profile. The How-to link opens a new tab. Close this tour to return to your current fruit-piano step." },
 ];
 
-export function arduinoTour(traffic=false) {
+export function arduinoTour(traffic=false,button=false) {
+  if (button) return TOUR_STEPS.map(step=>({...step,...({
+    code:{title:"Read an input, choose an output",description:"D2 uses INPUT_PULLUP. Released is HIGH; pressed is LOW. Button rule chooses whether a press lights the LED or turns it off.",detail:"Choose Press = on or Press = off. This changes the output rule, not the wiring. Any change needs a fresh Test my button before upload.",action:"Try Press = off"},
+    sparky:{description:"Sparky explains INPUT_PULLUP, digitalRead and the output rule.",detail:"Show press = on/off previews the digitalWrite line. Try it applies the rule, Undo restores it. Test again before uploading."},
+    test:{title:"Test the button",description:"Test my button runs the real Uno program with released, pressed, and released inputs. After a pass, Press virtual button and Release virtual button control the emulator’s D2 input.",detail:"This checks program behavior. A grown-up must still check the LED resistor, button orientation and real wiring."},
+    hardware:{detail:"Check LED E11/F11, resistor C11–C17, switch E22/F22/E24/F24 and all four wires with USB unplugged. Pass the current rule’s test before sending that exact image. The button uses internal pull-up. Physical uploads still need a hands-on check."}
+  })[step.id]}));
   if (!traffic) return TOUR_STEPS;
   const replacements = {
     code: { title:"Edit the sequence pace",description:"The program turns on red, then green, then yellow. Sequence pace changes all three waits. Red and green each last twice as long as yellow.",detail:"This is a guided editor, not free typing. Changing pace clears the old test result. Copy code and Download sketch export this lesson’s matching program.",tip:"Three waits, one repeating sequence.",action:"Try a faster sequence" },
@@ -202,3 +208,13 @@ export function arduinoTour(traffic=false) {
   };
   return TOUR_STEPS.map(step=>({...step,...replacements[step.id]}));
 }
+export function activityTour(game=false){return [
+ {feature:'activity-lessons',target:'#activity-lessons',title:'Choose a lesson',description:'Each lesson keeps its own checklist and progress. The lesson picker links all Arduino and Makey Makey builds.'},
+ {feature:'activity-kit',target:'#activity-kit',title:'Find and inspect the parts',description:'Tick each group in the unboxing list. The small arrow opens a part note. Back to diagram returns to the whole view.'},
+ {feature:'activity-diagram',target:'#activity-diagram',title:'Follow the connection',description:'Each step adds a connection. Replay shows it again. Use +/−, move arrows and Reset view. The diagram is a teaching picture, not a physical wiring test.'},
+ {feature:'activity-hint',target:'#activity-hint',title:'Ask Sparky',description:'Ask Sparky opens a prepared explanation of EARTH, contact and keyboard input. Tap it again to hide the help.'},
+ {feature:'activity-mode',target:'#activity-mode',title:'Virtual or real',description:'Virtual practice needs virtual EARTH. Real board / keyboard needs Focus activity and a USB keyboard connection. It also accepts your ordinary keyboard. It cannot identify a board or check real wiring.'},
+ {feature:'activity-play',target:'#activity-play',title:game?'Collect three sparks':'Predict, test and record',description:game?'From step 6, use the arrows to move one square at a time. Collect three sparks to finish step 7. New round restarts the game while keeping completed lesson progress.': 'From step 5, select a sample and predict yes or no. Test sample runs the virtual example. In real mode, Focus activity then SPACE records a key; Record no key records your observation. All four samples complete step 7. Predictions need not be right.'},
+ {feature:'activity-progress',target:'#activity-progress',title:'Save your work',description:'Child profiles sync steps and the experiment notebook. Parent practice stays on this device. Wait for Progress synced. Reset this lesson preserves every other lesson.'},
+ {feature:'activity-family',target:'#account-button',title:'Family and help',description:'Family shows per-lesson progress. How-to opens another tab. Close tour returns to the same step without completing anything.'},
+];}

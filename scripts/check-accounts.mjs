@@ -199,6 +199,21 @@ try {
   await store.saveProgress(kid.id,{step:-1},0,true,"traffic-lights");
   assert.equal((await store.progress(kid.id,"fruit-piano")).generation,1);
   assert.deepEqual(await store.progress(kid.id),blinkBefore);
+  for(const lesson of ["conductivity","button-light","game-controller"]){
+    const state=lesson==="conductivity"?{step:5,completed:[5],experiments:{foil:{prediction:"no",result:"key",mode:"virtual"}}}:lesson==="game-controller"?{step:5,game:{x:2,y:3,collected:[2]}}:{step:5,speed:250};
+    const saved=await request("save-progress",login.token,{state,generation:0},process.env.APP_ORIGIN,"POST",lesson);assert.equal(saved.status,200);
+    const loaded=await request("me",login.token,undefined,process.env.APP_ORIGIN,"GET",lesson);
+    if(lesson==="conductivity")assert.equal(loaded.progress.state.experiments.foil.prediction,"no");
+    if(lesson==="game-controller")assert.deepEqual(loaded.progress.state.game,{x:2,y:3,collected:[2]});
+    if(lesson==="button-light")assert.equal(loaded.progress.state.speed,250);
+  }
+  const notebook=await store.progress(kid.id,"conductivity");
+  await store.saveProgress(kid.id,{step:5,experiments:{plastic:{prediction:"yes",result:"none",mode:"real"}}},0,false,"conductivity");
+  assert.equal(Object.keys((await store.progress(kid.id,"conductivity")).state.experiments).length,2);
+  await store.saveProgress(kid.id,{step:-1},0,true,"conductivity");
+  assert.equal(await store.saveProgress(kid.id,notebook.state,0,false,"conductivity"),null);
+  assert.deepEqual((await store.progress(kid.id,"game-controller")).state.game,{x:2,y:3,collected:[2]});
+  assert.deepEqual(await store.progress(kid.id),blinkBefore);
   const badLesson = await request("me",login.token,undefined,process.env.APP_ORIGIN,"GET","unknown");
   assert.equal(badLesson.status,400);
   const expired = await store.childLink(parentA.user.id, kid.id);

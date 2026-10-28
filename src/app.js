@@ -9,13 +9,15 @@ import { parseHex } from "./firmware.js";
 import { UnoConnection } from "./uploader.js";
 import { BOARD_DETAILS } from "./component-details.js";
 import { arduinoTour } from "./app-tour.js";
-import { arduinoLesson, trafficSource } from "./arduino-lessons.js";
+import { arduinoLesson, trafficSource, buttonLesson, buttonSource } from "./arduino-lessons.js";
 const $ = (s) => document.querySelector(s);
+const buttonLessonActive = location.pathname.startsWith("/learn/button-light");
+let virtualPressed = false;
 const traffic = location.pathname.startsWith("/learn/traffic-lights");
-const lessonId = traffic ? "traffic-lights" : "first-circuit";
-const parentStorageKey = traffic ? "little-spark-traffic-lights" : "little-sparks-v2";
-const {unboxing, kitItems, steps} = arduinoLesson(traffic);
-const TOUR_STEPS = arduinoTour(traffic);
+const lessonId = buttonLessonActive ? "button-light" : traffic ? "traffic-lights" : "first-circuit";
+const parentStorageKey = buttonLessonActive ? "little-spark-button-light" : traffic ? "little-spark-traffic-lights" : "little-sparks-v2";
+const {unboxing, kitItems, steps} = buttonLessonActive ? buttonLesson() : arduinoLesson(traffic);
+const TOUR_STEPS = arduinoTour(traffic,buttonLessonActive);
 let selectedKit = null;
 let accounts = null,
   profileStorageKey = parentStorageKey;
@@ -43,7 +45,7 @@ try {
         -1,
         Math.min(5, Number.isInteger(saved.step) ? saved.step : -1),
       ),
-      speed: [250, 500, 1000].includes(saved.speed) ? saved.speed : 500,
+      speed: (buttonLessonActive ? [250,500] : [250, 500, 1000]).includes(saved.speed) ? saved.speed : 500,
       color: ["#d25f4d", "#6b9b70", "#d5b549"].includes(saved.color)
         ? saved.color
         : "#d25f4d",
@@ -147,6 +149,11 @@ if (traffic) {
   parts.wires.description="Signals: D13–A10, D12–A19, D11–A28. Return: GND–H4, J4–J13, I13–J22. Keep USB unplugged while wiring.";
   parts.breadboard.description="Columns 4, 13 and 22 hold the LEDs across E/F. Holes A–E within each column connect; F–J are a separate connected group.";
 }
+if (buttonLessonActive) {
+ parts.led.description="LED legs E11/F11. The pushbutton legs are E22/F22/E24/F24, with a connected pair in each numbered column. Pressing joins the two pairs.";
+ parts.wires.description="D13–A17 and GND–J11 drive the LED. D2–A22 and J24–I11 wire the switch to the existing ground group. USB stays unplugged while wiring.";
+ parts.board.description="D2 reads the button using INPUT_PULLUP; D13 controls the LED. An unpressed button reads HIGH, a pressed one LOW.";
+}
 function showInspection(info) {
   clearTimeout(showInspection.closeTimer);
   $("#back-to-step").hidden = !info;
@@ -166,7 +173,7 @@ function showInspection(info) {
   const content =
     (info.detail && BOARD_DETAILS[info.detail]) || parts[info.key];
   $("#inspection-title").textContent = content.title;
-  $("#inspection-description").textContent = traffic && info.detail === "digitalPins" ? "D13 controls red, D12 controls yellow, and D11 controls green. Each numbered socket has its own signal wire and resistor branch." : content.description;
+  $("#inspection-description").textContent = buttonLessonActive && info.detail === "digitalPins" ? "D2 reads the button with INPUT_PULLUP. D13 controls the LED through its resistor." : traffic && info.detail === "digitalPins" ? "D13 controls red, D12 controls yellow, and D11 controls green. Each numbered socket has its own signal wire and resistor branch." : content.description;
 }
 function openPart(key, detail = null) {
   if (!parts[key]) return;
@@ -182,6 +189,7 @@ function openPart(key, detail = null) {
 try {
   workbench = new Workbench({
     traffic,
+    button: buttonLessonActive,
     onPart: openPart,
     onInspectChange: showInspection,
     onReady: () => $("#scene-loading").remove(),
@@ -192,6 +200,7 @@ try {
   console.error(e);
 }
 function codeText() {
+  if (buttonLessonActive) return buttonSource(state.speed);
   if (traffic) return trafficSource(state.speed);
   return `// Blink an LED\nvoid setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(${state.speed});\n  digitalWrite(13, LOW);\n  delay(${state.speed});\n}`;
 }
@@ -208,11 +217,11 @@ function renderCode() {
         text = text
           .replace(/\b(void)\b/g, '<span class="keyword">$1</span>')
           .replace(
-            /\b(setup|loop|digitalWrite|pinMode|delay)\b/g,
+            /\b(setup|loop|digitalRead|digitalWrite|pinMode|delay)\b/g,
             '<span class="fn">$1</span>',
           )
           .replace(
-            /\b(11|12|13|250|500|1000|2000|HIGH|LOW|OUTPUT)\b/g,
+            /\b(2|5|11|12|13|250|500|1000|2000|HIGH|LOW|INPUT_PULLUP|OUTPUT)\b/g,
             '<span class="value">$1</span>',
           );
       return `<span class="code-line"><span class="line-no">${i + 1}</span>${text}</span>`;
@@ -225,6 +234,7 @@ function simStatus(text, status = "") {
   $(".simulation-status").className = "simulation-status " + status;
 }
 function invalidate() {
+  virtualPressed=false;workbench?.setButtonPressed(false);
   simulationEpoch++;
   worker?.terminate();
   worker = null;
@@ -285,11 +295,11 @@ function render() {
   $("#progress-fill").style.width = `${(completed / 7) * 100}%`;
   $("#step-extra").innerHTML =
     state.step === 5
-      ? `<div class="speed-choices" aria-label="Blink speed">${[
+      ? `<div class="speed-choices" aria-label="Blink speed">${(buttonLessonActive ? [[500,"Press = on"],[250,"Press = off"]] : [
           [1000, "Slow"],
           [500, "Steady"],
           [250, "Fast"],
-        ]
+        ])
           .map(
             ([ms, title]) =>
               `<button data-speed="${ms}" class="${state.speed === ms ? "selected" : ""}" aria-pressed="${state.speed === ms}">${title}</button>`,
@@ -309,10 +319,11 @@ function render() {
             "",
           )}</div>${verified ? '<div class="success-note">✓ Your code passed the virtual test!<br>Try it on a real Uno with a grown-up.</div>' : ""}`
       : "";
+  if (buttonLessonActive) $(".speed-choices")?.setAttribute("aria-label", "Button rule");
   if (traffic) $(".speed-choices")?.setAttribute("aria-label", "Sequence pace");
   if (state.step === -1) {
     $("#step-extra").innerHTML =
-      `<div class="kit-checklist"><div class="kit-count"><span>${traffic ? "TRAFFIC-LIGHT CHECKLIST" : "YOUR FIRST-CIRCUIT CHECKLIST"}</span><b>${state.found.length} / 6</b></div>${kitItems.map((item) => `<div class="kit-row ${state.found.includes(item.key) ? "found" : ""} ${selectedKit === item.key ? "selected" : ""}"><button class="kit-look" data-kit="${item.key}" aria-label="Look closely at ${item.name}"><span class="kit-glyph ${item.key}-glyph">${item.glyph}</span><span><strong>${item.name}</strong><small>${item.qty}</small></span><i>⌕</i></button><button class="kit-check" data-found="${item.key}" aria-label="${state.found.includes(item.key) ? "Unmark" : "Found"} ${item.name}" aria-pressed="${state.found.includes(item.key)}">${state.found.includes(item.key) ? "✓" : "+"}</button></div>`).join("")}</div>${selectedKit ? `<div class="kit-detail"><strong>${kitItems.find((i) => i.key === selectedKit).name}</strong><p>${kitItems.find((i) => i.key === selectedKit).hint}</p><button id="back-to-kit">↶ See all six parts</button></div>` : '<p class="kit-hint">Check off each part. You can also identify them on screen.</p>'}<a class="kit-source" href="https://store-usa.arduino.cc/products/arduino-starter-kit-multi-language" target="_blank" rel="noopener noreferrer">Based on the official Uno R3 Starter Kit ↗</a>`;
+      `<div class="kit-checklist"><div class="kit-count"><span>${buttonLessonActive ? "BUTTON-LIGHT CHECKLIST" : traffic ? "TRAFFIC-LIGHT CHECKLIST" : "YOUR FIRST-CIRCUIT CHECKLIST"}</span><b>${state.found.length} / 6</b></div>${kitItems.map((item) => `<div class="kit-row ${state.found.includes(item.key) ? "found" : ""} ${selectedKit === item.key ? "selected" : ""}"><button class="kit-look" data-kit="${item.key}" aria-label="Look closely at ${item.name}"><span class="kit-glyph ${item.key}-glyph">${item.glyph}</span><span><strong>${item.name}</strong><small>${item.qty}</small></span><i>⌕</i></button><button class="kit-check" data-found="${item.key}" aria-label="${state.found.includes(item.key) ? "Unmark" : "Found"} ${item.name}" aria-pressed="${state.found.includes(item.key)}">${state.found.includes(item.key) ? "✓" : "+"}</button></div>`).join("")}</div>${selectedKit ? `<div class="kit-detail"><strong>${kitItems.find((i) => i.key === selectedKit).name}</strong><p>${kitItems.find((i) => i.key === selectedKit).hint}</p><button id="back-to-kit">↶ See all six parts</button></div>` : '<p class="kit-hint">Check off each part. You can also identify them on screen.</p>'}<a class="kit-source" href="https://store-usa.arduino.cc/products/arduino-starter-kit-multi-language" target="_blank" rel="noopener noreferrer">Based on the official Uno R3 Starter Kit ↗</a>`;
     document.querySelectorAll("[data-kit]").forEach(
       (b) =>
         (b.onclick = () => {
@@ -345,7 +356,12 @@ function render() {
   document.querySelectorAll("[data-speed]").forEach((button) => {
     button.onclick = () => changeSpeed(Number(button.dataset.speed));
   });
-  if (traffic) $(".color-choices")?.remove();
+  if (traffic || buttonLessonActive) $(".color-choices")?.remove();
+  if (buttonLessonActive && state.step===5) {
+    const control=document.createElement("button");control.id="virtual-button";control.className="button secondary";control.disabled=!running;control.setAttribute("aria-pressed",String(virtualPressed));control.textContent=virtualPressed?"Release virtual button":"Press virtual button";
+    control.onclick=()=>{virtualPressed=!virtualPressed;workbench?.setButtonPressed(virtualPressed);worker?.postMessage({type:"button",pressed:virtualPressed});control.setAttribute("aria-pressed",String(virtualPressed));control.textContent=virtualPressed?"Release virtual button":"Press virtual button";};
+    $("#step-extra").append(control);
+  }
   document.querySelectorAll("[data-color]").forEach(
     (b) =>
       (b.onclick = () => {
@@ -393,6 +409,7 @@ $("#next-step").onclick = () => {
     if (!state.completed.includes(state.step)) state.completed.push(state.step);
     go(state.step + 1);
   } else if (running) {
+    virtualPressed=false;workbench?.setButtonPressed(false);
     worker?.terminate();
     worker = null;
     running = false;
@@ -436,7 +453,7 @@ async function runTest() {
       if (!r.ok) throw Error("Firmware library is unavailable.");
       return r.json();
     });
-    const record = (traffic ? manifest.traffic : manifest.variants)[String(chosenSpeed)];
+    const record = (buttonLessonActive ? manifest.button : traffic ? manifest.traffic : manifest.variants)[String(chosenSpeed)];
     if (!record) throw Error("This speed is not available.");
     let response = await fetch(record.path);
     if (!response.ok) throw Error("Could not load the Arduino program.");
@@ -471,12 +488,12 @@ async function runTest() {
         busy = false;
         if (!isTour() && !state.completed.includes(5)) state.completed.push(5);
         simStatus(
-          traffic ? `Test passed · ${data.phases} phases checked · red → green → yellow` : `Test passed · ${data.edges} LED changes checked · ${Math.round(data.measuredMs)} ms on / off`,
+          buttonLessonActive ? `Test passed · ${data.checks} button states checked` : traffic ? `Test passed · ${data.phases} phases checked · red → green → yellow` : `Test passed · ${data.edges} LED changes checked · ${Math.round(data.measuredMs)} ms on / off`,
           "passed",
         );
         updateUpload();
         render();
-        toast(traffic ? "Test passed. Your traffic lights are running." : "Test passed. Your LED is blinking.");
+        toast(buttonLessonActive ? "Test passed. Try the virtual button." : traffic ? "Test passed. Your traffic lights are running." : "Test passed. Your LED is blinking.");
       } else if (data.type === "traffic-pin") workbench?.setTrafficLights(data.mask);
       else if (data.type === "pin") workbench?.setLed(data.high, state.color);
       else if (data.type === "error") {
@@ -492,7 +509,7 @@ async function runTest() {
       simStatus("The simulator couldn’t start. Please try again.");
       render();
     };
-    worker.postMessage({ type: "run", image, halfPeriod: chosenSpeed, traffic });
+    worker.postMessage({ type: "run", image, halfPeriod: chosenSpeed, traffic, button:buttonLessonActive });
   } catch (e) {
     if (epoch !== simulationEpoch) return;
     invalidate();
@@ -560,7 +577,7 @@ $("#download-sketch").onclick = () => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = traffic ? "little_spark_traffic_lights.ino" : "little_spark_blink.ino";
+  a.download = buttonLessonActive ? "little_spark_button_light.ino" : traffic ? "little_spark_traffic_lights.ino" : "little_spark_blink.ino";
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
@@ -623,10 +640,10 @@ navigator.serial?.addEventListener("disconnect", async () => {
   updateUpload();
 });
 function changeSpeed(speed) {
-  if (![250, 500, 1000].includes(speed)) return;
+  if (!(buttonLessonActive ? [250,500] : [250, 500, 1000]).includes(speed)) return;
   state.speed = speed;
   invalidate();
-  simStatus("New rhythm! Test this version before sending it to a board.");
+  simStatus(buttonLessonActive ? "New rule. Test this version before sending it to a board." : "New rhythm! Test this version before sending it to a board.");
   if (!isTour()) save();
   render();
 }
@@ -812,13 +829,13 @@ document.addEventListener("pointerdown", (event) => {
   for (const panel of document.querySelectorAll("dialog[open]"))
     if (!panel.contains(event.target)) panel.close();
 });
-sparky = initSparky({ getSpeed: () => state.speed, changeSpeed, traffic });
+sparky = initSparky({ getSpeed: () => state.speed, changeSpeed, traffic, button:buttonLessonActive });
 go(state.step);
 accounts = initAccounts({
   lesson: lessonId,
   onProfile(user, progress) {
     if (user?.role === "kid") {
-      profileStorageKey = `little-spark-profile-${user.id}${traffic ? "-traffic-lights" : ""}`;
+      profileStorageKey = `little-spark-profile-${user.id}${buttonLessonActive ? "-button-light" : traffic ? "-traffic-lights" : ""}`;
       state = progress || {
         step: -1,
         speed: 500,

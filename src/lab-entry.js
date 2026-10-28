@@ -1,4 +1,5 @@
 import "./style.css";
+import { renderLessonNav } from "./lesson-catalog.js";
 const app = document.querySelector("#app");
 const loading = document.querySelector("#lab-loading");
 addEventListener("pagehide", () => {
@@ -17,7 +18,9 @@ try {
   if (!result.user) location.replace("/signin/");
   else {
     app.hidden = false;
-    if (location.pathname.startsWith("/learn/makey-makey")) await import("./makey.js");
+    renderLessonNav();
+    if (/^\/learn\/(conductivity|game-controller)/.test(location.pathname)) await import("./makey-activities.js");
+    else if (location.pathname.startsWith("/learn/makey-makey")) await import("./makey.js");
     else await import("./app.js");
     loading.remove();
   }

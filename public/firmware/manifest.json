@@ -29,5 +29,15 @@
       "path": "/firmware/traffic-1000.hex",
       "sha256": "d8df5f75e7c5b23a4318f3f6bc2f7da016eb4ad931949919b6d4771f1ba0a0de"
     }
+  },
+  "button": {
+    "250": {
+      "path": "/firmware/button-250.hex",
+      "sha256": "ae2f2ffbbef5322a0bcf9d283e980a99fb59e58e85f228e13967567bb3793194"
+    },
+    "500": {
+      "path": "/firmware/button-500.hex",
+      "sha256": "83d030d694c6e526e01ef7a791502c47f31e8274112123fcac63bad4d9b84500"
+    }
   }
 }

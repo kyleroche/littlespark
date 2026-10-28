@@ -103,7 +103,7 @@ export function createStore(url = process.env.DATABASE_URL) {
         return rows[0];
       }
       const rows =
-        await sql`INSERT INTO ls_progress(kid_id,lesson_id,state,generation) VALUES(${kidId},${lesson},${JSON.stringify(state)}::jsonb,${generation}) ON CONFLICT(kid_id,lesson_id) DO UPDATE SET state=EXCLUDED.state || jsonb_build_object('completed',(SELECT COALESCE(jsonb_agg(DISTINCT value),'[]'::jsonb) FROM jsonb_array_elements(COALESCE(ls_progress.state->'completed','[]'::jsonb)||(EXCLUDED.state->'completed'))),'found',(SELECT COALESCE(jsonb_agg(DISTINCT value),'[]'::jsonb) FROM jsonb_array_elements(COALESCE(ls_progress.state->'found','[]'::jsonb)||(EXCLUDED.state->'found')))),updated_at=now() WHERE ls_progress.generation=${generation} RETURNING state,generation,updated_at`;
+        await sql`INSERT INTO ls_progress(kid_id,lesson_id,state,generation) VALUES(${kidId},${lesson},${JSON.stringify(state)}::jsonb,${generation}) ON CONFLICT(kid_id,lesson_id) DO UPDATE SET state=EXCLUDED.state || jsonb_build_object('experiments',COALESCE(ls_progress.state->'experiments','{}'::jsonb)||COALESCE(EXCLUDED.state->'experiments','{}'::jsonb),'completed',(SELECT COALESCE(jsonb_agg(DISTINCT value),'[]'::jsonb) FROM jsonb_array_elements(COALESCE(ls_progress.state->'completed','[]'::jsonb)||(EXCLUDED.state->'completed'))),'found',(SELECT COALESCE(jsonb_agg(DISTINCT value),'[]'::jsonb) FROM jsonb_array_elements(COALESCE(ls_progress.state->'found','[]'::jsonb)||(EXCLUDED.state->'found')))),updated_at=now() WHERE ls_progress.generation=${generation} RETURNING state,generation,updated_at`;
       return rows[0] || null;
     },
     async cleanup() {
