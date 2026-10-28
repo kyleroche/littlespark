@@ -1,4 +1,8 @@
+import "./placement-guide.css";
+import {mountPlacementGuide} from "./placement-guide.js";
 import "./style.css";
+import "./resistor-guide.css";
+import { mountResistorGuide } from "./resistor-guide.js";
 import { initSparky } from "./sparky.js";
 let sparky;
 import { initWorkspaceLayout } from "./workspace-layout.js";
@@ -7,14 +11,19 @@ initWorkspaceLayout();
 import { Workbench } from "./scene.js";
 import { parseHex } from "./firmware.js";
 import { UnoConnection } from "./uploader.js";
-import { BOARD_DETAILS } from "./component-details.js";
+import { R4Connection, isR4Wifi } from "./r4-uploader.js";
+import { BOARD_DETAILS, R4_BOARD_DETAILS } from "./component-details.js";
 import { arduinoTour } from "./app-tour.js";
-import { arduinoLesson, trafficSource, buttonLesson, buttonSource } from "./arduino-lessons.js";
+import { arduinoLesson, trafficSource, buttonLesson, buttonSource, blinkSource } from "./arduino-lessons.js";
 const $ = (s) => document.querySelector(s);
+const resistorGuide = mountResistorGuide($("#resistor-help"));
+let lastResistorContext = null;
 const buttonLessonActive = location.pathname.startsWith("/learn/button-light");
 let virtualPressed = false;
+let boardKind = localStorage.getItem('little-spark-board-model') === 'r4' ? 'r4' : 'r3';
 const traffic = location.pathname.startsWith("/learn/traffic-lights");
 const lessonId = buttonLessonActive ? "button-light" : traffic ? "traffic-lights" : "first-circuit";
+const placementGuide=mountPlacementGuide($('#placement-help'),{lesson:lessonId,onZoom:(item,target)=>{if($("#learning-layout").dataset.layout==="code")$('[data-layout="split"]').click();workbench?.focusPlacement(item,target);},onBack:()=>workbench?.retreat()});
 const parentStorageKey = buttonLessonActive ? "little-spark-button-light" : traffic ? "little-spark-traffic-lights" : "little-sparks-v2";
 const {unboxing, kitItems, steps} = buttonLessonActive ? buttonLesson() : arduinoLesson(traffic);
 const TOUR_STEPS = arduinoTour(traffic,buttonLessonActive);
@@ -127,7 +136,7 @@ const parts = {
       "The resistor limits current to protect the LED. Connect it from C11 to C17. Either direction works.",
     specs: [
       ["RESISTANCE", "220 Ω"],
-      ["COLOR BANDS", "Red · red · brown"],
+      ["COLOR BANDS", "See the 4- or 5-band guide"],
       ["CONNECTED TO", "C11 and C17"],
     ],
   },
@@ -165,13 +174,14 @@ function showInspection(info) {
     showInspection.closeTimer = setTimeout(() => {
       panel.hidden = true;
     }, 140);
+  $("#inspection-resistor-help").hidden = info?.key !== "resistor";
   if (!info) {
     selectedKit = null;
     if (state.step === -1 && !isTour()) render();
     return;
   }
   const content =
-    (info.detail && BOARD_DETAILS[info.detail]) || parts[info.key];
+    (info.placement && {title:info.placement.title,description:`${info.placement.from.replace('board:','Uno ')}${info.placement.to?' → '+info.placement.to.replace('board:','Uno '):''}. ${info.placement.note}`}) || (info.detail && (boardKind === 'r4' ? R4_BOARD_DETAILS : BOARD_DETAILS)[info.detail]) || parts[info.key];
   $("#inspection-title").textContent = content.title;
   $("#inspection-description").textContent = buttonLessonActive && info.detail === "digitalPins" ? "D2 reads the button with INPUT_PULLUP. D13 controls the LED through its resistor." : traffic && info.detail === "digitalPins" ? "D13 controls red, D12 controls yellow, and D11 controls green. Each numbered socket has its own signal wire and resistor branch." : content.description;
 }
@@ -202,7 +212,7 @@ try {
 function codeText() {
   if (buttonLessonActive) return buttonSource(state.speed);
   if (traffic) return trafficSource(state.speed);
-  return `// Blink an LED\nvoid setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(${state.speed});\n  digitalWrite(13, LOW);\n  delay(${state.speed});\n}`;
+  return blinkSource(state.speed);
 }
 function renderCode() {
   $("#code-delay").value = String(state.speed);
@@ -249,6 +259,9 @@ function render() {
     renderTour();
     return;
   }
+  const guideContext = `${state.step}:${selectedKit}`;
+  resistorGuide.show(state.step === -1 || state.step === 3, guideContext !== lastResistorContext ? state.step === 3 || selectedKit === "resistor" : undefined);
+  lastResistorContext = guideContext;
   const step = state.step === -1 ? unboxing : steps[state.step];
   $("#step-list").innerHTML = [unboxing, ...steps]
     .map((s, navIndex) => {
@@ -263,6 +276,7 @@ function render() {
     `STEP ${String(state.step + 2).padStart(2, "0")} / 07`;
   $("#step-art").innerHTML =
     `${String(state.step + 2).padStart(2, "0")}<span>✦</span>`;
+  placementGuide.show(state.step);
   $("#step-title").textContent = step.title;
   $("#step-description").textContent = step.description;
   $("#tip-title").textContent = step.tip;
@@ -273,7 +287,7 @@ function render() {
     state.step === -1 && selectedKit
       ? kitItems.find((item) => item.key === selectedKit).name.toUpperCase() +
         " · FIND THIS IN YOUR KIT"
-      : step.caption;
+      : boardKind === "r4" && step.caption === "ARDUINO UNO R3" ? "ARDUINO UNO R4 WiFi" : step.caption;
   $("#previous-step").disabled = state.step === -1;
   $("#next-step").innerHTML =
     state.step === 5
@@ -323,7 +337,7 @@ function render() {
   if (traffic) $(".speed-choices")?.setAttribute("aria-label", "Sequence pace");
   if (state.step === -1) {
     $("#step-extra").innerHTML =
-      `<div class="kit-checklist"><div class="kit-count"><span>${buttonLessonActive ? "BUTTON-LIGHT CHECKLIST" : traffic ? "TRAFFIC-LIGHT CHECKLIST" : "YOUR FIRST-CIRCUIT CHECKLIST"}</span><b>${state.found.length} / 6</b></div>${kitItems.map((item) => `<div class="kit-row ${state.found.includes(item.key) ? "found" : ""} ${selectedKit === item.key ? "selected" : ""}"><button class="kit-look" data-kit="${item.key}" aria-label="Look closely at ${item.name}"><span class="kit-glyph ${item.key}-glyph">${item.glyph}</span><span><strong>${item.name}</strong><small>${item.qty}</small></span><i>⌕</i></button><button class="kit-check" data-found="${item.key}" aria-label="${state.found.includes(item.key) ? "Unmark" : "Found"} ${item.name}" aria-pressed="${state.found.includes(item.key)}">${state.found.includes(item.key) ? "✓" : "+"}</button></div>`).join("")}</div>${selectedKit ? `<div class="kit-detail"><strong>${kitItems.find((i) => i.key === selectedKit).name}</strong><p>${kitItems.find((i) => i.key === selectedKit).hint}</p><button id="back-to-kit">↶ See all six parts</button></div>` : '<p class="kit-hint">Check off each part. You can also identify them on screen.</p>'}<a class="kit-source" href="https://store-usa.arduino.cc/products/arduino-starter-kit-multi-language" target="_blank" rel="noopener noreferrer">Based on the official Uno R3 Starter Kit ↗</a>`;
+      `<div class="kit-checklist"><div class="kit-count"><span>${buttonLessonActive ? "BUTTON-LIGHT CHECKLIST" : traffic ? "TRAFFIC-LIGHT CHECKLIST" : "YOUR FIRST-CIRCUIT CHECKLIST"}</span><b>${state.found.length} / 6</b></div>${kitItems.map((item) => `<div class="kit-row ${state.found.includes(item.key) ? "found" : ""} ${selectedKit === item.key ? "selected" : ""}"><button class="kit-look" data-kit="${item.key}" aria-label="Look closely at ${item.name}"><span class="kit-glyph ${item.key}-glyph">${item.glyph}</span><span><strong>${item.name}</strong><small>${item.qty}</small></span><i>⌕</i></button><button class="kit-check" data-found="${item.key}" aria-label="${state.found.includes(item.key) ? "Unmark" : "Found"} ${item.name}" aria-pressed="${state.found.includes(item.key)}">${state.found.includes(item.key) ? "✓" : "+"}</button></div>`).join("")}</div>${selectedKit ? `<div class="kit-detail"><strong>${kitItems.find((i) => i.key === selectedKit).name}</strong><p>${kitItems.find((i) => i.key === selectedKit).hint}</p><button id="back-to-kit">↶ See all six parts</button></div>` : '<p class="kit-hint">Check off each part. You can also identify them on screen.</p>'}<a class="kit-source" href="${boardKind === 'r4' ? 'https://store-usa.arduino.cc/products/starter-kit-r4' : 'https://store-usa.arduino.cc/products/arduino-starter-kit-multi-language'}" target="_blank" rel="noopener noreferrer">Official Starter Kit parts · R3 or R4 WiFi ↗</a>`;
     document.querySelectorAll("[data-kit]").forEach(
       (b) =>
         (b.onclick = () => {
@@ -445,7 +459,7 @@ async function runTest() {
   busy = true;
   render();
   simStatus(
-    traffic ? "Running actual AVR instructions and checking all three outputs…" : "Running actual AVR instructions and checking the LED timing…",
+    boardKind === 'r4' ? 'Checking compiled ARM sketch instructions with simulated pins and timing…' : traffic ? 'Running actual AVR instructions and checking all three outputs…' : 'Running actual AVR instructions and checking the LED timing…',
     "running",
   );
   try {
@@ -453,22 +467,24 @@ async function runTest() {
       if (!r.ok) throw Error("Firmware library is unavailable.");
       return r.json();
     });
-    const record = (buttonLessonActive ? manifest.button : traffic ? manifest.traffic : manifest.variants)[String(chosenSpeed)];
+    const library = boardKind === 'r4' ? manifest.r4 : manifest;
+    const record = (buttonLessonActive ? library.button : traffic ? library.traffic : library.variants)[String(chosenSpeed)];
     if (!record) throw Error("This speed is not available.");
     let response = await fetch(record.path);
     if (!response.ok) throw Error("Could not load the Arduino program.");
-    let text = await response.text();
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    let text = new TextDecoder().decode(bytes);
     let digest = Array.from(
       new Uint8Array(
-        await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text)),
+        await crypto.subtle.digest("SHA-256", bytes),
       ),
       (b) => b.toString(16).padStart(2, "0"),
     ).join("");
     if (digest !== record.sha256)
       throw Error("Firmware integrity check failed.");
     if (epoch !== simulationEpoch) return;
-    let image = parseHex(text);
-    worker = new Worker(new URL("./emulator.worker.js", import.meta.url), {
+    let image = boardKind === 'r4' ? bytes : parseHex(text);
+    worker = boardKind === 'r4' ? new Worker(new URL('./r4-emulator.worker.js', import.meta.url), {type:'module'}) : new Worker(new URL("./emulator.worker.js", import.meta.url), {
       type: "module",
     });
     let currentWorker = worker;
@@ -483,7 +499,7 @@ async function runTest() {
       if (worker !== currentWorker) return;
       if (data.type === "verified") {
         clearTimeout(timeout);
-        verified = { image, halfPeriod: chosenSpeed, digest };
+        verified = { image, halfPeriod: chosenSpeed, digest, board:boardKind };
         running = true;
         busy = false;
         if (!isTour() && !state.completed.includes(5)) state.completed.push(5);
@@ -509,7 +525,7 @@ async function runTest() {
       simStatus("The simulator couldn’t start. Please try again.");
       render();
     };
-    worker.postMessage({ type: "run", image, halfPeriod: chosenSpeed, traffic, button:buttonLessonActive });
+    worker.postMessage({ type: "run", image, symbols:record.symbols, halfPeriod: chosenSpeed, traffic, button:buttonLessonActive });
   } catch (e) {
     if (epoch !== simulationEpoch) return;
     invalidate();
@@ -531,6 +547,7 @@ document
   .forEach((b) => (b.onclick = () => openPart(b.dataset.part)));
 $("#back-to-step").onclick = () => workbench?.retreat();
 $("#inspection-close").onclick = () => workbench?.retreat();
+$("#inspection-resistor-help").onclick = () => resistorGuide.reveal();
 $("#code-delay").onchange = (e) => changeSpeed(Number(e.target.value));
 document
   .querySelectorAll(".dialog-close")
@@ -553,9 +570,11 @@ $("#parent-notes").onclick = () => $("#notes-dialog").show();
 $(".close-notes").onclick = () => $("#notes-dialog").close();
 function updateUpload() {
   let supported = "serial" in navigator;
+  $("#board-model").disabled=hardwareBusy;
+  $("#code-delay").disabled=hardwareBusy;
   $("#connect-usb").disabled = !supported || hardwareBusy;
   $("#upload-usb").disabled =
-    !connection || !verified || !$("#adult-check").checked || hardwareBusy;
+    !connection || !verified || verified.board !== boardKind || !$("#adult-check").checked || hardwareBusy;
   if (!supported)
     $("#hardware-status").textContent =
       "This browser can run the lessons and simulator, but does not provide Web Serial for direct USB upload. Download the sketch below and upload it using the Arduino IDE, or use a browser with Web Serial.";
@@ -565,7 +584,7 @@ function updateUpload() {
   else if (!hardwareBusy)
     $("#hardware-status").textContent = connection
       ? "Uno connected. Check the grown-up box to send the tested program."
-      : "Virtual test passed. Ready to connect your Uno R3.";
+      : "Virtual test passed. Ready to connect your selected Uno.";
 }
 $("#board-button").onclick = () => {
   updateUpload();
@@ -588,7 +607,9 @@ $("#connect-usb").onclick = async () => {
   }
   try {
     let port = await navigator.serial.requestPort();
-    let candidate = new UnoConnection(port);
+    const detectedKind = isR4Wifi(port.getInfo()) ? 'r4' : 'r3';
+    if(detectedKind !== boardKind) selectBoard(detectedKind);
+    let candidate = detectedKind === 'r4' ? new R4Connection(port) : new UnoConnection(port);
     try {
       await candidate.open();
     } catch (e) {
@@ -597,7 +618,7 @@ $("#connect-usb").onclick = async () => {
     }
     connection = candidate;
     $("#board-button").innerHTML =
-      '<span>⌁</span> Uno connected <span class="status-dot" style="background:#70a878"></span>';
+      `<span>⌁</span> Uno ${boardKind === 'r4' ? 'R4 WiFi' : 'R3'} selected <span class="status-dot" style="background:#70a878"></span>`;
     $("#connect-usb").textContent = "Reconnect Uno";
     updateUpload();
   } catch (e) {
@@ -608,7 +629,7 @@ $("#connect-usb").onclick = async () => {
   }
 };
 $("#upload-usb").onclick = async () => {
-  if (!verified || !connection || !$("#adult-check").checked || hardwareBusy)
+  if (!verified || verified.board !== boardKind || !connection || !$("#adult-check").checked || hardwareBusy)
     return;
   hardwareBusy = true;
   let firmware = verified.image.slice();
@@ -621,24 +642,46 @@ $("#upload-usb").onclick = async () => {
           `Sending and checking your program… ${p}%`),
     );
     $("#hardware-status").textContent =
-      traffic ? "✓ Program uploaded and read back successfully. Check your real sequence with a grown-up." : "✓ Program uploaded and read back successfully. Look at your real LED!";
+      boardKind === 'r4' ? '✓ R4 program uploaded and flash checksums verified. Check the real circuit with a grown-up.' : traffic ? '✓ Program uploaded and read back successfully. Check your real sequence with a grown-up.' : '✓ Program uploaded and read back successfully. Look at your real LED!';
     toast("From your screen to your desk. Your program is on the Uno!");
   } catch (e) {
     $("#hardware-status").textContent = e.message;
   } finally {
     hardwareBusy = false;
+    $("#board-model").disabled=false;
+    $("#code-delay").disabled=false;
     $("#connect-usb").disabled = false;
     $("#upload-usb").disabled =
       !connection || !verified || !$("#adult-check").checked;
   }
 };
-navigator.serial?.addEventListener("disconnect", async () => {
+navigator.serial?.addEventListener("disconnect", async (event) => {
+  if (hardwareBusy || (connection && event.target !== connection.port)) return;
   await connection?.close();
   connection = null;
   $("#board-button").innerHTML =
     '<span>⌁</span> Connect a board <span class="status-dot"></span>';
   updateUpload();
 });
+function selectBoard(kind) {
+  $('#adult-check').checked=false;
+  boardKind=kind;localStorage.setItem('little-spark-board-model',kind);
+  $('#board-model').value=kind;
+  invalidate();workbench?.setBoardModel(kind);
+  $('#scene-title').textContent=kind==='r4'?'ARDUINO UNO R4 WiFi':'ARDUINO UNO R3';
+  parts.board.title=kind==='r4'?'Arduino Uno R4 WiFi':'Arduino Uno R3';
+  parts.board.specs[0]=['PROCESSOR',kind==='r4'?'Renesas RA4M1':'ATmega328P'];
+  parts.usb.specs[1]=['UNO END',kind==='r4'?'USB-C':'USB-B'];
+  for(const item of kitItems){
+    if(item.key==='board')item.hint=kind==='r4'?'Look for UNO R4 WiFi, the small USB-C socket, square chip and grid of 96 built-in LEDs.':'Look for UNO R3, a large square USB-B socket and long black chip.';
+    if(item.key==='usb')item.hint=kind==='r4'?'Find the USB-C data cable that fits your Uno R4 WiFi. Keep it unplugged while building.':'Find the USB data cable with a square USB-B end for the Uno R3. Keep it unplugged while building.';
+  }
+  parts.board.description=kind==='r4'?'Uno R4 WiFi: a square Renesas chip, USB-C port, wireless module and built-in LED matrix. Our breadboard wires use the same numbered sockets.':'Uno R3: the long ATmega328P chip runs your program. Connect its square USB-B socket with a data cable.';
+  parts.usb.description=kind==='r4'?'Use a USB-C data cable for the Uno R4 WiFi. Some cables only provide power.':'Use a USB data cable with a square USB-B end for the Uno R3.';
+  simStatus('Board changed. Test this board’s program before uploading.');render();updateUpload();
+}
+$('#board-model').onchange=async e=>{if(hardwareBusy)return;if(connection){await connection.close();connection=null;}selectBoard(e.target.value);};
+selectBoard(boardKind);
 function changeSpeed(speed) {
   if (!(buttonLessonActive ? [250,500] : [250, 500, 1000]).includes(speed)) return;
   state.speed = speed;
@@ -696,6 +739,7 @@ function exitTour(restoreScene = true) {
     );
   } catch {}
   $("#replay").textContent = "↻ Watch that again";
+  placementGuide.show(-1);
   if (restoreScene) {
     workbench?.setStep(state.step, false);
     render();
@@ -710,6 +754,7 @@ function advanceTour(direction) {
     exitTour();
     return;
   }
+  $("#board-dialog").close();
   invalidate();
   tourIndex = Math.max(
     0,
@@ -720,6 +765,9 @@ function advanceTour(direction) {
 }
 function renderTour() {
   const step = TOUR_STEPS[tourIndex];
+  placementGuide.show(state.step,step.feature === "pin-placement");
+  $("#placement-help").hidden=step.feature!=="pin-placement";
+  resistorGuide.show(step.feature === "resistor-guide", step.feature === "resistor-guide" ? true : undefined);
   document.querySelector(".intro h1").innerHTML = "App tour<span>.</span>";
   document.querySelector(".intro>div>p").textContent =
     "Try the controls and learn how progress is saved.";
@@ -763,6 +811,9 @@ function renderTour() {
 function demoTour() {
   if (!isTour() || busy) return;
   switch (TOUR_STEPS[tourIndex].demo) {
+    case "placement":
+      $("#placement-help").scrollIntoView({behavior:"smooth",block:"center"});
+      break;
     case "lesson-picker":
       $("#lesson-picker").scrollIntoView({ behavior: "smooth", block: "center" });
       break;
@@ -795,6 +846,10 @@ function demoTour() {
       break;
     case "inspect":
       openPart("board", "microcontroller");
+      break;
+    case "resistor":
+      openPart("resistor");
+      resistorGuide.reveal();
       break;
     case "code":
       changeSpeed(250);

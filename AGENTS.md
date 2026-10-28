@@ -54,3 +54,11 @@ When the user approves a multi-step roadmap, continue through the authorized seq
 - Child/family export and deletion require server-enforced parent ownership, the displayed profile ID, a fresh parent email session and explicit confirmation. Exports must never include credentials or link hashes.
 - Family accounts/progress stay until the parent deletes them. Do not add inactivity-based deletion without owner authorization. Purge expired security credentials daily and review ongoing necessity of child-data retention. Use disposable fixtures for retention/deletion tests.
 - Keep the daily job bearer-secret protected. Do not log recipients, nicknames, exported records, tokens or deletion details. Preserve deletion receipts before database restores and reapply them before serving restored data.
+
+## Show exact placement in every hardware lesson
+
+- Every new or changed wiring/assembly step MUST include an enlarged placement view with exact board socket names and breadboard letter/number labels, or the equivalent named connector/contact for other platforms. A perspective overview and prose alone are insufficient.
+- Show one connection or component at a time, identify both endpoints, LED long/short legs and polarity, resistor value, and switch orientation/connected pairs where relevant. Explain the breadboard middle gap and shared five-hole groups before wiring.
+- Provide a user-triggered animated 3D close-up of the relevant holes and board socket, visible endpoint markers, and an obvious Back to step view/Escape return. Respect reduced motion and keep the current lesson progress unchanged. Never insert a wire visually as a placement instruction when only illustrating internal breadboard connectivity.
+- Keep placement data, procedural geometry, lesson text, public How-to and in-app tour consistent. Review each endpoint against the scene's pin/hole coordinates and test on a narrow screen. Board selection must preserve correct pin names and use the matching physical board model.
+- Final testing instructions must distinguish the board's built-in indicator from the separate breadboard LED. A blinking built-in L light with a dark breadboard LED calls for an unplugged placement/polarity/resistor check, not a claim that the complete circuit works.

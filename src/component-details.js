@@ -35,3 +35,11 @@ export const BOARD_DETAILS = {
       "Pressing this button starts the program over from the beginning.",
   },
 };
+export const R4_BOARD_DETAILS = {
+ ...BOARD_DETAILS,
+ usbPort:{title:'USB-C port',description:'The small oval socket powers your Uno R4 WiFi and receives your program. Use a USB data cable.'},
+ microcontroller:{title:'Renesas RA4M1',description:'This square chip runs your program. It uses different instructions from the Uno R3.'},
+ wifiModule:{title:'Wi-Fi and Bluetooth module',description:'The metal-covered ESP32-S3 handles wireless features and the USB connection. These lessons use USB.'},
+ ledMatrix:{title:'12 × 8 LED matrix',description:'These 96 little lights are built into the R4 WiFi. Our first lessons use the separate breadboard LEDs.'},
+ qwiic:{title:'Qwiic connector',description:'This small connector is for compatible sensors. Leave it empty for this lesson.'},
+};

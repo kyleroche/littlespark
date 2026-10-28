@@ -41,8 +41,8 @@ export const blinkKit = [
   {
     key: "resistor",
     name: "220 Ω resistor",
-    qty: "1 · red, red, brown",
-    hint: "Look for red–red–brown–gold bands on a four-band resistor. A five-band 220 Ω resistor is red–red–black–black–brown. Ask a grown-up to check.",
+    qty: "1 · 220 Ω · check the bands",
+    hint: "Body colors and sizes vary. Open Find the 220 Ω resistor below and choose 4 bands or 5 bands to match yours. Ask a grown-up if the bands are unclear.",
     glyph: "▰",
   },
   {
@@ -137,8 +137,8 @@ export function trafficSource(unit) {
 }
 export function arduinoLesson(traffic=false) {
   if (!traffic) return {unboxing:blinkUnboxing,kitItems:blinkKit,steps:blinkSteps};
-  const kitItems=blinkKit.map(item => item.key==='led' ? {...item,name:'Red, yellow and green LEDs',qty:'3 · one of each color',hint:'Find three two-legged LEDs: red, yellow and green. Each long leg is positive. Use their positions to tell them apart in the diagram.'} : item.key==='resistor' ? {...item,qty:'3 · 220 Ω each',hint:'Each LED needs its own 220 Ω resistor. Ask a grown-up to check all three resistor values.'} : item.key==='wires' ? {...item,qty:'6 · solid core',hint:'Three leads go from D13, D12 and D11 to the resistors. Three more join the short LED legs to a common GND path.'} : item);
-  return {unboxing:{...blinkUnboxing,title:'Find the traffic-light parts.',description:'From your Uno R3 Starter Kit, find the board, USB cable, breadboard, three LEDs, three 220 Ω resistors and six jumper wires. Tick each group when you find it.'},kitItems,steps:[
+  const kitItems=blinkKit.map(item => item.key==='led' ? {...item,name:'Red, yellow and green LEDs',qty:'3 · one of each color',hint:'Find three two-legged LEDs: red, yellow and green. Each long leg is positive. Use their positions to tell them apart in the diagram.'} : item.key==='resistor' ? {...item,qty:'3 · 220 Ω each',hint:'Each LED needs its own 220 Ω resistor. Use Find the 220 Ω resistor below to check the bands on all three.'} : item.key==='wires' ? {...item,qty:'6 · solid core',hint:'Three leads go from D13, D12 and D11 to the resistors. Three more join the short LED legs to a common GND path.'} : item);
+  return {unboxing:{...blinkUnboxing,title:'Find the traffic-light parts.',description:'From your Arduino Starter Kit, find the board, USB cable, breadboard, three LEDs, three 220 Ω resistors and six jumper wires. Tick each group when you find it.'},kitItems,steps:[
     {...blinkSteps[0],title:'Three outputs, one sequence',description:'D13 will control red, D12 yellow, and D11 green. Each output will turn on just one light. Drag to explore the Uno.',detail:'We are making a model traffic light, not a controller for a real road.'},
     {...blinkSteps[1],detail:'Each column number has two separate groups: A–E and F–J. The middle gap separates the LED’s two legs.'},
     {...blinkSteps[2],short:'Place three LEDs',title:'Red, yellow, green',description:'Red: long leg E4, short leg F4. Yellow: E13 and F13. Green: E22 and F22. Watch the three LEDs land across the middle gap.',detail:'The long legs are on the A–E side. The short legs are on the F–J side. Check each one before adding wires.',caption:'RED 4 · YELLOW 13 · GREEN 22',next:'Give each LED a resistor'},
@@ -159,3 +159,8 @@ export function buttonLesson(){return {unboxing:{...blinkUnboxing,title:'Find th
  {...blinkSteps[4],title:'Wire the output and input',description:'D13 → A17 and GND → J11 complete the LED branch. D2 → A22 connects the button input. J24 → I11 joins the opposite button pair to the existing ground group.',detail:'Keep USB unplugged while wiring. The LED still needs its 220 Ω resistor. INPUT_PULLUP is inside the Uno, so the switch needs no extra external pull-up resistor.',caption:'D2 INPUT · D13 OUTPUT · COMMON GND'},
  {...blinkSteps[5],title:'Press, release, and test',short:'Try the input',description:'Predict the LED response. Test my button checks released, pressed, and released again. After it passes, use Press virtual button and Release virtual button.',tip:'Pressed reads LOW.',detail:'Choose Press = on or Press = off to reverse the rule. Sparky explains the reading and previews the code change. Retest after changing the rule.',caption:'READ INPUT → CHOOSE OUTPUT',next:'Test my button'},
 ]};}
+
+export function blinkSource(speed=500) {
+ if(![250,500,1000].includes(speed))throw Error('Unsupported lesson speed.');
+ return `// Blink an LED\nvoid setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(${speed});\n  digitalWrite(13, LOW);\n  delay(${speed});\n}\n`;
+}

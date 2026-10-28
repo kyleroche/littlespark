@@ -1,3 +1,4 @@
+import { buildR4Firmware } from './build-r4-firmware.mjs';
 import {
   mkdtempSync,
   mkdirSync,
@@ -10,7 +11,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { trafficSource, buttonSource } from "../src/arduino-lessons.js";
+import { trafficSource, buttonSource, blinkSource } from "../src/arduino-lessons.js";
 const root = resolve(import.meta.dirname, "..");
 const temp = mkdtempSync(join(tmpdir(), "little-sparks-"));
 mkdirSync(join(root, "public/firmware"), { recursive: true });
@@ -26,7 +27,7 @@ try {
   for (const speed of [250, 500, 1000]) {
     const sketch = join(temp, `blink${speed}`);
     mkdirSync(sketch);
-    const source = `// Our first little light\nvoid setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(${speed});\n  digitalWrite(13, LOW);\n  delay(${speed});\n}\n`;
+    const source = blinkSource(speed);
     writeFileSync(join(sketch, `blink${speed}.ino`), source);
     const output = join(sketch, "build");
     execFileSync(
@@ -59,6 +60,7 @@ try {
     const dest=join(root,"public/firmware",`button-${speed}.hex`);copyFileSync(join(output,`${name}.ino.hex`),dest);writeFileSync(join(root,"public/firmware",`button-${speed}.ino`),source);
     manifest.button[speed]={path:`/firmware/button-${speed}.hex`,sha256:createHash("sha256").update(readFileSync(dest)).digest("hex")};
   }
+  manifest.r4 = buildR4Firmware(root,temp);
   writeFileSync(
     join(root, "public/firmware/manifest.json"),
     JSON.stringify(manifest, null, 2) + "\n",

@@ -112,6 +112,14 @@ export const TOUR_STEPS = [
     demo: "inspect",
   },
   {
+    id: "resistor", feature: "resistor-guide", target: "#resistor-help",
+    title: "Find the right resistor",
+    description: "The colored bands tell you the value. The body can look different from our picture. Find the 220 Ω resistor is in unboxing and the resistor step.",
+    tip: "Match the bands, not the body.",
+    detail: "Choose 4 bands or 5 bands to see a larger example with color names and numbers. Both examples are 220 Ω. The separated last stripe tells you how close the real value should be. Close the guide with its title. Ask a grown-up if you cannot read the bands.",
+    action: "Inspect the resistor", demo: "resistor",
+  },
+  {
     id: "code",
     feature: "code",
     target: "#code-notebook",
@@ -149,15 +157,29 @@ export const TOUR_STEPS = [
     demo: "test",
   },
   {
+    id:"pin-placement",feature:"pin-placement",target:"#placement-help",title:"Find the exact hole",
+    description:"Place it here shows an enlarged, straight-on view. Match the row letter and column number. Orange rings mark the holes for this part.",
+    tip:"Long LED leg in E; short leg in F.",
+    detail:"Choose one connection at a time. Zoom breadboard holes in 3D moves the camera to those endpoints. Wire steps also offer Zoom board pin. Back to step view or Escape returns to the diagram. Keep USB unplugged while placing parts; wire colors can differ. The final step lets you check every connection again.",
+    action:"Show the placement view",demo:"placement",
+  },
+  {
+    id: "board-model", feature: "board-model", target: "#board-model",
+    title: "Match your board", description: "Open Connect a board, then choose Uno R3 or Uno R4 WiFi. The workbench changes to match. R3 has a square USB socket; R4 WiFi uses USB-C.",
+    tip: "Changing boards clears the old test.",
+    detail: "Connecting an R4 WiFi selects its model automatically. Run a new test after changing boards. R3 runs in the AVR emulator. R4 checks compiled ARM sketch instructions with simulated digital pins and waits. Neither checks real wiring. Close × returns to your build.",
+    action: "See board choices", demo: "hardware",
+  },
+  {
     id: "hardware",
     feature: "hardware",
     target: "#board-button",
     title: "From the screen to your desk.",
     description:
-      "With a grown-up, Connect a board can send a tested program to a classic Uno R3 using its USB cable.",
+      "With a grown-up, Connect a board can send a tested program to a Uno R3 or R4 WiFi using its USB cable.",
     tip: "Build unplugged. Check together.",
     detail:
-      "The connection guide is a floating panel. Close its × or click the workbench to return. Pass the virtual test, have a grown-up check the real wiring, then connect and send in desktop Chrome or Edge. The test cannot see your physical wires. Safari users can download the sketch and upload it through the Arduino IDE.",
+      "The connection guide is a floating panel. R3 uploads use flash readback. R4 WiFi uploads ask the running sketch to checksum its flash; wait for verification before unplugging. Close its × or click the workbench to return. Pass the virtual test, have a grown-up check the real wiring, then connect and send in desktop Chrome or Edge. The test cannot see your physical wires. Safari users can download the sketch and upload it through the Arduino IDE.",
     action: "See the connection guide",
     demo: "hardware",
   },
@@ -204,7 +226,7 @@ export function arduinoTour(traffic=false,button=false) {
     code: { title:"Edit the sequence pace",description:"The program turns on red, then green, then yellow. Sequence pace changes all three waits. Red and green each last twice as long as yellow.",detail:"This is a guided editor, not free typing. Changing pace clears the old test result. Copy code and Download sketch export this lesson’s matching program.",tip:"Three waits, one repeating sequence.",action:"Try a faster sequence" },
     sparky: { description:"Ask Sparky highlights the three wait lines and explains HIGH, LOW, and red → green → yellow.",detail:"Show a faster sequence or Show a slower sequence previews the three waits. Try it applies them; Undo restores the old pace. Test my sequence in step 7 checks the new program. Close × hides his help." },
     test: { title:"Test all three outputs",description:"In step 7, Test my sequence runs the compiled Uno program. It checks the order, timing and that two lights are never on together.",detail:"The diagram follows the program’s actual D13, D12 and D11 outputs. A changed pace needs a new test. Pause stops all three lights. This does not check physical wiring." },
-    hardware: { detail:"With USB unplugged, have a grown-up check all three LED directions, three 220 Ω resistors and six jumper wires. Pass Test my sequence, then connect and send that exact tested program to a classic Uno R3 in Chrome or Edge. Safari can download the sketch for Arduino IDE. Close × returns to the workbench." },
+    hardware: { detail:"With USB unplugged, have a grown-up check all three LED directions, three 220 Ω resistors and six jumper wires. Pass Test my sequence, then connect and send that exact tested program to a Uno R3 or R4 WiFi in Chrome or Edge. Safari can download the sketch for Arduino IDE. Close × returns to the workbench." },
   };
   return TOUR_STEPS.map(step=>({...step,...replacements[step.id]}));
 }

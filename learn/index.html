@@ -167,7 +167,7 @@
                     ×</button
                   ><span class="eyebrow">⌖ A CLOSER LOOK</span>
                   <h3 id="inspection-title"></h3>
-                  <p id="inspection-description"></p>
+                  <p id="inspection-description"></p><button id="inspection-resistor-help" type="button" hidden>Read the color bands ↗</button>
                 </div>
                 <div id="scene-loading">Setting out your workbench…</div>
                 <div class="scene-caption">
@@ -261,7 +261,9 @@
                   </div>
                 </div>
                 <div id="step-extra"></div>
+                <section id="resistor-help" data-tour-feature="resistor-guide" aria-label="Resistor color guide" hidden></section>
               </div>
+              <section id="placement-help" class="placement-guide" data-tour-feature="pin-placement" aria-label="Pin placement close-up" hidden></section>
               <div class="instruction-actions">
                 <button id="replay" class="replay">↻ Watch that again</button
                 ><button id="next-step" class="button primary">
@@ -358,8 +360,8 @@
         <div class="eyebrow">USB UPLOAD</div>
         <h2>Upload to your Uno</h2>
         <p>
-          With a grown-up, connect a
-          <strong>classic Arduino Uno R3 (ATmega328P)</strong> using its USB
+          With a grown-up, connect an
+          <strong>Arduino Uno R3 or Uno R4 WiFi</strong> using its USB
           cable.
         </p>
         <div class="hardware-checks">
@@ -387,8 +389,11 @@
         </div>
         <label class="adult-check"
           ><input type="checkbox" id="adult-check" /> A grown-up checked our Uno
-          R3 and wiring.</label
+          and wiring.</label
         >
+        <label data-tour-feature="board-model" for="board-model">Your board</label>
+        <select id="board-model" aria-label="Your Arduino board"><option value="r3">Uno R3 · USB-B</option><option value="r4">Uno R4 WiFi · USB-C</option></select>
+        <p class="fine-print">Choose your kit board. Connecting an R4 WiFi selects its model automatically. Changing boards needs a fresh test.</p>
         <div id="hardware-status" role="status"></div>
         <button id="download-sketch" class="button secondary">
           Download sketch for Arduino IDE
@@ -406,7 +411,7 @@
         </div>
         <p class="small-print">
           The virtual test checks program behavior. It cannot inspect the wires
-          on your real board. This lesson doesn’t support Uno R4, Nano, or
+          on your real board. This lesson doesn’t support Uno R4 Minima, Nano, or
           ESP32.
         </p>
       </dialog>
@@ -415,7 +420,7 @@
         <div class="eyebrow">FOR PARENTS</div>
         <h2>Before you start</h2>
         <p>
-          This first lesson uses a classic Uno R3, a breadboard, a standard LED,
+          This first lesson uses an Uno R3 or R4 WiFi, a breadboard, a standard LED,
           a 220 Ω resistor, and two jumper wires.
         </p>
         <p>

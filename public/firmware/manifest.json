@@ -39,5 +39,305 @@
       "path": "/firmware/button-500.hex",
       "sha256": "83d030d694c6e526e01ef7a791502c47f31e8274112123fcac63bad4d9b84500"
     }
+  },
+  "r4": {
+    "board": "arduino:renesas_uno:unor4wifi",
+    "core": "arduino:renesas_uno@1.6.0",
+    "architecture": "arm-cortex-m4",
+    "loadAddress": 16384,
+    "variants": {
+      "250": {
+        "path": "/firmware/r4/blink-250.bin",
+        "sha256": "1d7212049ca7fff6347bee44c01ac926ad1f5902cf5ae5841efcc8441ea884df",
+        "sourceSha256": "a5211b416e21656c2a721b9e6b9f8e6496dcf7ee7782e8b5f11d634beabbfc09",
+        "symbols": {
+          "delay": {
+            "address": 40476,
+            "size": 28
+          },
+          "digitalWrite": {
+            "address": 40192,
+            "size": 24
+          },
+          "littleSparkImageLength": {
+            "address": 64112,
+            "size": 4
+          },
+          "littleSparkVerifyFlash": {
+            "address": 16648,
+            "size": 212
+          },
+          "loop": {
+            "address": 16860,
+            "size": 38
+          },
+          "pinMode": {
+            "address": 40144,
+            "size": 48
+          },
+          "setup": {
+            "address": 16640,
+            "size": 8
+          }
+        }
+      },
+      "500": {
+        "path": "/firmware/r4/blink-500.bin",
+        "sha256": "2f450a475c6582b622994560994c639bb13f53e9b52f12c99e8edc294bb7dee6",
+        "sourceSha256": "4c123576f729c675509f7e8dcd76c734fa2b0581e7803bb4d1b9d4459421652d",
+        "symbols": {
+          "delay": {
+            "address": 40476,
+            "size": 28
+          },
+          "digitalWrite": {
+            "address": 40192,
+            "size": 24
+          },
+          "littleSparkImageLength": {
+            "address": 64112,
+            "size": 4
+          },
+          "littleSparkVerifyFlash": {
+            "address": 16648,
+            "size": 212
+          },
+          "loop": {
+            "address": 16860,
+            "size": 42
+          },
+          "pinMode": {
+            "address": 40144,
+            "size": 48
+          },
+          "setup": {
+            "address": 16640,
+            "size": 8
+          }
+        }
+      },
+      "1000": {
+        "path": "/firmware/r4/blink-1000.bin",
+        "sha256": "d23e6fd642b815b90ebd2950380268423042b36be9bb7127c8fbde4ebe61e7c4",
+        "sourceSha256": "a262679f52013abfdc63ea054d67263a60b75b5e716285913ea523d2893dce0c",
+        "symbols": {
+          "delay": {
+            "address": 40476,
+            "size": 28
+          },
+          "digitalWrite": {
+            "address": 40192,
+            "size": 24
+          },
+          "littleSparkImageLength": {
+            "address": 64112,
+            "size": 4
+          },
+          "littleSparkVerifyFlash": {
+            "address": 16648,
+            "size": 212
+          },
+          "loop": {
+            "address": 16860,
+            "size": 42
+          },
+          "pinMode": {
+            "address": 40144,
+            "size": 48
+          },
+          "setup": {
+            "address": 16640,
+            "size": 8
+          }
+        }
+      }
+    },
+    "traffic": {
+      "250": {
+        "path": "/firmware/r4/traffic-250.bin",
+        "sha256": "52c31809130ee766f87afc95bddda2f8cfb80eb611c11db6e9a29bc9b0b79df4",
+        "sourceSha256": "7849d0a78b40815bb6b7e2d09705db69a1d18826157e5ed1201b8d51a017f75c",
+        "symbols": {
+          "delay": {
+            "address": 40540,
+            "size": 28
+          },
+          "digitalWrite": {
+            "address": 40256,
+            "size": 24
+          },
+          "littleSparkImageLength": {
+            "address": 64176,
+            "size": 4
+          },
+          "littleSparkVerifyFlash": {
+            "address": 16672,
+            "size": 212
+          },
+          "loop": {
+            "address": 16884,
+            "size": 80
+          },
+          "pinMode": {
+            "address": 40208,
+            "size": 48
+          },
+          "setup": {
+            "address": 16640,
+            "size": 30
+          }
+        }
+      },
+      "500": {
+        "path": "/firmware/r4/traffic-500.bin",
+        "sha256": "02e04f0e5c6dbb952552bf3864b0ec050f3eb027eee8eb649f312c36ded844ff",
+        "sourceSha256": "8242af95118e1e2e090474b1264f0f3636aa36c6539551a6f37433408d6bc8ad",
+        "symbols": {
+          "delay": {
+            "address": 40540,
+            "size": 28
+          },
+          "digitalWrite": {
+            "address": 40256,
+            "size": 24
+          },
+          "littleSparkImageLength": {
+            "address": 64176,
+            "size": 4
+          },
+          "littleSparkVerifyFlash": {
+            "address": 16672,
+            "size": 212
+          },
+          "loop": {
+            "address": 16884,
+            "size": 82
+          },
+          "pinMode": {
+            "address": 40208,
+            "size": 48
+          },
+          "setup": {
+            "address": 16640,
+            "size": 30
+          }
+        }
+      },
+      "1000": {
+        "path": "/firmware/r4/traffic-1000.bin",
+        "sha256": "1b6a9150a33eb5c14c4807e8652d78f2eed2d9778a2f3629468d2e3d87b869de",
+        "sourceSha256": "2dfefd6d9f8fdb365804bfb7c59e45864549223d9087b3ce66239c5ff71f82c5",
+        "symbols": {
+          "delay": {
+            "address": 40540,
+            "size": 28
+          },
+          "digitalWrite": {
+            "address": 40256,
+            "size": 24
+          },
+          "littleSparkImageLength": {
+            "address": 64176,
+            "size": 4
+          },
+          "littleSparkVerifyFlash": {
+            "address": 16672,
+            "size": 212
+          },
+          "loop": {
+            "address": 16884,
+            "size": 82
+          },
+          "pinMode": {
+            "address": 40208,
+            "size": 48
+          },
+          "setup": {
+            "address": 16640,
+            "size": 30
+          }
+        }
+      }
+    },
+    "button": {
+      "250": {
+        "path": "/firmware/r4/button-250.bin",
+        "sha256": "47db615be3f04b7c64dd3dd82183f78b6d919254ce067b626cd8ee7af4a3d2d9",
+        "sourceSha256": "35365a6062b36ae4c22456ea7dc305c870a33547442a6732053c022e8bbadf77",
+        "symbols": {
+          "delay": {
+            "address": 40556,
+            "size": 28
+          },
+          "digitalRead": {
+            "address": 40256,
+            "size": 40
+          },
+          "digitalWrite": {
+            "address": 40232,
+            "size": 24
+          },
+          "littleSparkImageLength": {
+            "address": 64192,
+            "size": 4
+          },
+          "littleSparkVerifyFlash": {
+            "address": 16664,
+            "size": 212
+          },
+          "loop": {
+            "address": 16876,
+            "size": 34
+          },
+          "pinMode": {
+            "address": 40184,
+            "size": 48
+          },
+          "setup": {
+            "address": 16640,
+            "size": 22
+          }
+        }
+      },
+      "500": {
+        "path": "/firmware/r4/button-500.bin",
+        "sha256": "c749695459da130e2104b06aaad2a6949a4ed73d5927d919a57278825ec29da8",
+        "sourceSha256": "fdd0a4a683dd4ac5c77328ffed7bc47fed22035ebf33709272eb5eddefb502de",
+        "symbols": {
+          "delay": {
+            "address": 40556,
+            "size": 28
+          },
+          "digitalRead": {
+            "address": 40256,
+            "size": 40
+          },
+          "digitalWrite": {
+            "address": 40232,
+            "size": 24
+          },
+          "littleSparkImageLength": {
+            "address": 64192,
+            "size": 4
+          },
+          "littleSparkVerifyFlash": {
+            "address": 16664,
+            "size": 212
+          },
+          "loop": {
+            "address": 16876,
+            "size": 34
+          },
+          "pinMode": {
+            "address": 40184,
+            "size": 48
+          },
+          "setup": {
+            "address": 16640,
+            "size": 22
+          }
+        }
+      }
+    }
   }
 }

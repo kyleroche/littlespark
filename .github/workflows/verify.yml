@@ -20,7 +20,7 @@ jobs:
         run: node scripts/build-notices.mjs
       - uses: arduino/setup-arduino-cli@v2
       - name: Install pinned Uno core
-        run: arduino-cli core update-index && arduino-cli core install arduino:avr@1.8.8
+        run: arduino-cli core update-index && arduino-cli core install arduino:avr@1.8.8 arduino:renesas_uno@1.6.0
       - name: Compile all Arduino lesson variants
         run: node scripts/build-firmware.mjs
       - name: Test actual firmware and upload protocol

@@ -2661,3 +2661,5 @@ body.in-tour .lesson-nav {
 .family-privacy{border-block:1px solid var(--line);padding:16px 0;margin:16px 0}.family-privacy summary{cursor:pointer;font-weight:700}.family-privacy details{margin-top:18px}.family-privacy form{display:grid;gap:12px}.family-privacy input{width:100%;box-sizing:border-box}.family-privacy a{color:inherit}
 
 .parent-permission{display:grid;gap:12px;border:1px solid var(--line);padding:16px;margin-block:16px}.parent-permission input[type="checkbox"]{width:auto;margin-right:8px}
+#board-model { display:block; width:100%; margin:.5rem 0; padding:.8rem 1rem; border:1px solid var(--line, #d3d8c8); border-radius:8px; background:#f4f3e9; color:#29483f; font:inherit; }
+label[for="board-model"] {display:block; margin-top:1rem; font-weight:600;}

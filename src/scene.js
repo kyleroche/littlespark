@@ -1,4 +1,5 @@
 import * as T from "three";
+import {holePosition} from "./placement-guide.js";
 import { TRAFFIC_CONNECTIONS } from "./arduino-lessons.js";
 import {
   CAMERA_HELP,
@@ -89,7 +90,7 @@ function textPlane(parent, w, h, draw, x = 0, y = 0, z = 0) {
   parent.add(p);
   return p;
 }
-function board() {
+function board(r4 = false) {
   let g = new T.Group();
   let shape = new T.Shape();
   shape.moveTo(-34, -26.5);
@@ -118,7 +119,7 @@ function board() {
     steps: 1,
   });
   geo.rotateX(-Math.PI / 2);
-  mesh(geo, mat("#438b7b"), g, [0, 2, 0]);
+  mesh(geo, mat(r4 ? "#287c88" : "#438b7b"), g, [0, 2, 0]);
   textPlane(
     g,
     65,
@@ -154,7 +155,7 @@ function board() {
       ctx.font = "bold 2.8px sans-serif";
       ctx.fillText("ARDUINO", 36, 27);
       ctx.font = "1.7px monospace";
-      ctx.fillText("UNO R3", 37, 30.4);
+      ctx.fillText(r4 ? "UNO R4 WiFi" : "UNO R3", r4 ? 31 : 37, r4 ? 21 : 30.4);
       ctx.font = "1.25px monospace";
       ctx.fillText("DIGITAL  ~ PWM", 44, 7);
       ctx.fillText("POWER", 22, 40);
@@ -240,11 +241,17 @@ function board() {
   let usb = new T.Group();
   g.add(usb);
   usb.userData.detail = "usbPort";
+  if(r4){
+    box(7,3.3,9,metal,usb,-33,5.6,-8);
+    box(.3,1.8,7, dark,usb,-36.6,5.6,-8);
+    box(.4,.4,5,cream,usb,-36.8,5.6,-8);
+  }else{
   box(13, 10, 12, metal, usb, -29, 8, -8);
   box(0.4, 7, 9, mat("#5e6d60"), usb, -35.6, 7.8, -8);
   box(0.45, 5.3, 6.8, cream, usb, -35.9, 7.7, -8);
   box(10, 0.4, 10, mat("#cbccb7"), usb, -29, 13.2, -8);
   for (let z of [-12, -4]) box(5, 0.2, 0.4, dark, usb, -29, 13.5, z);
+  }
   const jackBody = box(11, 9, 9, dark, g, -29, 7.5, 13);
   jackBody.userData.detail = "powerJack";
   let jack = cyl(3.7, 3.7, 6, dark, g, -34.5, 8, 13);
@@ -253,6 +260,29 @@ function board() {
   let jackHole = cyl(2.4, 2.4, 0.1, mat("#182c25"), g, -37.6, 8, 13);
   jackHole.rotation.z = Math.PI / 2;
   jackHole.userData.detail = "powerJack";
+  if(r4){
+    const chip=new T.Group();g.add(chip);chip.userData.detail="microcontroller";
+    box(12,1.8,12,dark,chip,17,5,-9);
+    for(let i=0;i<16;i++)for(const side of [-1,1]){
+      box(.4,.5,1.4,metal,chip,11.4+i*.75,4.5,-9+side*6.7,false);
+      box(1.4,.5,.4,metal,chip,17+side*6.7,4.5,-14.6+i*.75,false);
+    }
+    textPlane(chip,10,9,c=>{c.fillStyle="#a5b2a3";c.font="1.5px monospace";c.fillText("RENESAS",.3,3);c.fillText("RA4M1",1.2,5.5);},17,6,-9);
+    const radio=new T.Group();radio.userData.detail="wifiModule";g.add(radio);
+    box(16,2.5,15,metal,radio,-21,5.5,6);
+    box(5,1.4,15,dark,radio,-31,4.7,6);
+    textPlane(radio,14,12,c=>{c.fillStyle="#677d73";c.font="1.6px monospace";c.fillText("ESPRESSIF",.5,4);c.font="1.2px monospace";c.fillText("ESP32-S3",1,7);},-21,6.8,6);
+    const matrix=new T.Group();matrix.userData.detail="ledMatrix";g.add(matrix);
+    box(29,.35,17,mat("#275f67"),matrix,12,4.1,10);
+    for(let row=0;row<8;row++)for(let col=0;col<12;col++){
+      box(1.1,.45,.7,cream,matrix,-1+col*2.3,4.55,2.8+row*2.05,false);
+      box(.4,.46,.7,mat("#c86e58"),matrix,-.8+col*2.3,4.56,2.8+row*2.05,false);
+    }
+    const reset=new T.Group();reset.userData.detail="resetButton";g.add(reset);
+    box(7,1,6,metal,reset,-29,4.6,-21);cyl(2,2,1.2,cream,reset,-29,5.6,-21);
+    for(let i=0;i<14;i++)box(2.1,.6,1, i%3?dark:cream,g,-18+(i%5)*3,4.2,-16+Math.floor(i/5)*4,false);
+    box(4,3,5,cream,g,32,5,15).userData.detail="qwiic";
+  }else{
   let dip = box(32, 4.5, 8, dark, g, 9, 6.5, 11);
   dip.userData.detail = "microcontroller";
   const chipLabel = textPlane(
@@ -325,6 +355,7 @@ function board() {
     for (let s of [-1, 1])
       box(0.5, 0.72, 1.1, metal, g, x + s * 1.2, 4.28, z, false);
   }
+  }
   let on = box(1.6, 0.5, 1, mat("#bfd577"), g, 25, 4.1, 6);
   on.material.emissive = new T.Color("#a4b855");
   on.material.emissiveIntensity = 0.4;
@@ -396,14 +427,14 @@ function breadboard() {
   g.userData.part = "breadboard";
   return g;
 }
-function usbCable() {
+function usbCable(r4 = false) {
   let g = new T.Group();
   mesh(new T.TorusGeometry(7, 0.62, 8, 48), dark, g, [0, 1, 0]).rotation.x =
     Math.PI / 2;
   box(5, 2.3, 2.7, dark, g, -9, 1.5, 0);
   box(4, 1.6, 2.4, metal, g, -13, 1.5, 0);
-  box(3, 3, 3, dark, g, 9, 1.5, 0);
-  box(2.6, 2.6, 3, metal, g, 11.5, 1.5, 0);
+  box(3, r4 ? 1.5 : 3, r4 ? 5 : 3, dark, g, 9, 1.5, 0);
+  box(2.6, r4 ? 1 : 2.6, r4 ? 4.5 : 3, metal, g, 11.5, 1.5, 0);
   g.userData.part = "usb";
   return g;
 }
@@ -675,7 +706,19 @@ export class Workbench {
     outlineMat.uniforms.resolution.value.set(w, h);
     this.aspect = w / h;
   }
+  setBoardModel(kind) {
+    if(this.boardKind===kind)return;
+    this.retreat();
+    for(const [key,replacement] of [['board',board(kind==='r4')],['usb',usbCable(kind==='r4')]]){
+      const previous=this.parts[key];replacement.position.copy(previous.position);replacement.scale.copy(previous.scale);replacement.visible=previous.visible;
+      replacement.userData.home=previous.userData.home.clone();
+      this.scene.remove(previous);this.scene.add(replacement);this.parts[key]=replacement;
+      previous.traverse(object=>{object.geometry?.dispose();if(object.material){for(const material of [].concat(object.material)){if(material.map){material.map.dispose();material.dispose();}}}});
+    }
+    this.boardKind=kind;this.needsRender=true;this.renderer.shadowMap.needsUpdate=true;
+  }
   setStep(step, animate = true) {
+    this.clearPlacementMarkers();
     this.needsRender = true;
     this.renderer.shadowMap.needsUpdate = true;
     this.inspection = null;
@@ -753,6 +796,7 @@ export class Workbench {
     });
   }
   popout(key, detail = null) {
+    this.clearPlacementMarkers();
     this.needsRender = true;
     this.renderer.shadowMap.needsUpdate = true;
     const part = this.parts[key];
@@ -805,7 +849,29 @@ export class Workbench {
     this.onInspectChange(this.inspection);
     return true;
   }
+  focusPlacement(item,target='holes') {
+    if(!this.inspection)this.returnView={...this.goal};
+    this.clearPlacementMarkers();this.animations=[];this.popAnimation=null;
+    const labels=target==='board'?[item.from]:[item.from,item.to].filter(label=>label&&/^[A-J]\d+$/.test(label));
+    if(!labels.length)labels.push(item.from);
+    const points=labels.map(label=>{
+      if(/^[A-J]\d+$/.test(label)){const p=holePosition(label);return new T.Vector3(p.x,p.y,p.z);}
+      const pin=label.replace('board:','');
+      const x=pin==='GND'?-47.38:-44.84+(13-Number(pin.slice(1)))*2.54;
+      return new T.Vector3(x,10.7,-23);
+    });
+    this.placementMarkers=new T.Group();this.scene.add(this.placementMarkers);
+    for(const point of points){const marker=new T.Mesh(new T.RingGeometry(1.1,1.6,32),new T.MeshBasicMaterial({color:'#d96c35',side:T.DoubleSide,depthTest:false}));marker.rotation.x=-Math.PI/2;marker.position.copy(point);marker.renderOrder=100;this.placementMarkers.add(marker);}
+    const bounds=new T.Box3().setFromPoints(points),center=bounds.getCenter(new T.Vector3()),size=bounds.getSize(new T.Vector3());
+    this.inspection={key:labels[0].startsWith('board:')?'board':'breadboard',placement:item,point:center.clone()};
+    Object.assign(this.goal,{x:center.x,y:3,z:center.z,scale:Math.max(26,size.x/this.aspect+18,size.z+18),elevation:1.35,azimuth:0});
+    this.goal.x-=this.goal.scale*this.aspect*.12;this.needsRender=true;
+    this.onInspectChange(this.inspection);
+    this.host.scrollIntoView({behavior:reduced?'instant':'smooth',block:'center'});
+  }
+  clearPlacementMarkers(){if(this.placementMarkers){this.scene.remove(this.placementMarkers);this.placementMarkers.traverse(o=>{o.geometry?.dispose();o.material?.dispose();});this.placementMarkers=null;}}
   retreat() {
+    this.clearPlacementMarkers();
     if (!this.inspection) {
       this.home();
       return;
