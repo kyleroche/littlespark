@@ -6,6 +6,7 @@ export default defineConfig(({ mode }) => ({
       input: {
         home: "index.html",
         howto: "how-to/index.html",
+        privacy: "privacy/index.html",
         learn: "learn/index.html",
         makey: "learn/makey-makey/index.html",
         traffic: "learn/traffic-lights/index.html",

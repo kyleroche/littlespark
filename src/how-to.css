@@ -553,3 +553,5 @@
     letter-spacing: -2px;
   }
 }
+
+.guide-section{max-width:960px;margin:0 auto;padding:50px 24px;line-height:1.8;border-top:1px solid var(--line)}.guide-section h2{font:500 36px var(--display);letter-spacing:-1px}.guide-section p,.guide-section li{margin-bottom:16px}.guide-section a{color:inherit}

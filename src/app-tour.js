@@ -39,7 +39,7 @@ export const TOUR_STEPS = [
     target: "#account-button",
     title: "Parent dashboard",
     description:
-      "After signing in as a parent, create child profiles, see lesson progress, and generate a temporary login link or QR code for each child.",
+      "After signing in as a parent, create child profiles, see lesson progress, and generate a temporary login link or QR code for each child. Confirm parent permission first. Your family’s data offers a JSON download and permanent child/family deletion after a fresh parent email sign-in; read Privacy before deleting.",
     tip: "Use the link on the child’s device.",
     detail:
       "Each child has their own progress. Links work once and expire after five minutes; that does not limit lesson time. Use the child’s device. Parents can edit profiles or sign out a child’s devices.",
@@ -189,7 +189,7 @@ export const MAKEY_TOUR_STEPS = [
   { id: "makey-piano", feature: "makey-piano", target: "#makey-piano", title: "Try your fruit keys", description: "In the last step choose Virtual practice, connect virtual EARTH, then tap all three fruit keys. Release EARTH to see why the loop matters. Sound on enables the notes; Mute keeps the visual flashes." },
   { id: "makey-real", feature: "makey-real", target: "#makey-play-mode", title: "Play a real board", description: "Choose Real board / keyboard and click Focus piano. While holding the metal EARTH clip, touch your fruit. SPACE, LEFT and UP play notes. Your ordinary keyboard works too. No upload or special connection permission is needed; keyboard input cannot prove your real wiring is correct." },
   { id: "makey-progress", feature: "makey-progress", target: "#makey-progress", title: "Pick up where you left off", description: "Parent practice stays on this device. Child progress syncs to their profile and appears beside the Arduino lessons in Family. Wait for Progress synced before changing devices. Reset lesson resets only Fruit Piano." },
-  { id: "makey-family", feature: "makey-family", target: "#account-button", title: "Family and help", description: "Family opens the parent dashboard or your learner profile. The How-to link opens a new tab. Close this tour to return to your current fruit-piano step." },
+  { id: "makey-family", feature: "makey-family", target: "#account-button", title: "Family and help", description: "Family opens the parent dashboard or your learner profile. Parents confirm permission and can download or permanently delete data in Your family’s data after a fresh email sign-in. Privacy explains retention. The How-to link opens a new tab. Close this tour to return to your current fruit-piano step." },
 ];
 
 export function arduinoTour(traffic=false,button=false) {
@@ -216,5 +216,5 @@ export function activityTour(game=false){return [
  {feature:'activity-mode',target:'#activity-mode',title:'Virtual or real',description:'Virtual practice needs virtual EARTH. Real board / keyboard needs Focus activity and a USB keyboard connection. It also accepts your ordinary keyboard. It cannot identify a board or check real wiring.'},
  {feature:'activity-play',target:'#activity-play',title:game?'Collect three sparks':'Predict, test and record',description:game?'From step 6, use the arrows to move one square at a time. Collect three sparks to finish step 7. New round restarts the game while keeping completed lesson progress.': 'From step 5, select a sample and predict yes or no. Test sample runs the virtual example. In real mode, Focus activity then SPACE records a key; Record no key records your observation. All four samples complete step 7. Predictions need not be right.'},
  {feature:'activity-progress',target:'#activity-progress',title:'Save your work',description:'Child profiles sync steps and the experiment notebook. Parent practice stays on this device. Wait for Progress synced. Reset this lesson preserves every other lesson.'},
- {feature:'activity-family',target:'#account-button',title:'Family and help',description:'Family shows per-lesson progress. How-to opens another tab. Close tour returns to the same step without completing anything.'},
+ {feature:'activity-family',target:'#account-button',title:'Family and help',description:'Family shows per-lesson progress. Parents confirm permission and can download or permanently delete data in Your family’s data after a fresh email sign-in. Privacy explains retention. How-to opens another tab. Close tour returns to the same step without completing anything.'},
 ];}

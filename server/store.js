@@ -1,4 +1,5 @@
 import { neon } from "@neondatabase/serverless";
+import { privacyExport, PRIVACY_VERSION } from "./privacy.js";
 import { randomUUID } from "node:crypto";
 import {
   hashToken,
@@ -21,8 +22,9 @@ export function createStore(url = process.env.DATABASE_URL) {
     async session(token) {
       if (!token || !/^[A-Za-z0-9_-]{43}$/.test(token)) return null;
       const rows =
-        await sql`SELECT s.hash,s.parent_id,s.kid_id,p.email,k.name,k.avatar FROM ls_sessions s LEFT JOIN ls_parents p ON p.id=s.parent_id LEFT JOIN ls_kids k ON k.id=s.kid_id WHERE s.hash=${hashToken(token)} AND s.expires_at>now() AND (s.parent_id IS NOT NULL OR (k.active=true AND s.auth_version=k.auth_version))`;
+        await sql`SELECT s.hash,s.parent_id,s.kid_id,s.created_at,p.email,p.privacy_version,p.parent_permission_at,k.name,k.avatar FROM ls_sessions s LEFT JOIN ls_parents p ON p.id=s.parent_id LEFT JOIN ls_kids k ON k.id=s.kid_id WHERE s.hash=${hashToken(token)} AND s.expires_at>now() AND (s.parent_id IS NOT NULL OR (k.active=true AND s.auth_version=k.auth_version))`;
       const row = rows[0];
+
       return row
         ? {
             ...row,
@@ -106,7 +108,32 @@ export function createStore(url = process.env.DATABASE_URL) {
         await sql`INSERT INTO ls_progress(kid_id,lesson_id,state,generation) VALUES(${kidId},${lesson},${JSON.stringify(state)}::jsonb,${generation}) ON CONFLICT(kid_id,lesson_id) DO UPDATE SET state=EXCLUDED.state || jsonb_build_object('experiments',COALESCE(ls_progress.state->'experiments','{}'::jsonb)||COALESCE(EXCLUDED.state->'experiments','{}'::jsonb),'completed',(SELECT COALESCE(jsonb_agg(DISTINCT value),'[]'::jsonb) FROM jsonb_array_elements(COALESCE(ls_progress.state->'completed','[]'::jsonb)||(EXCLUDED.state->'completed'))),'found',(SELECT COALESCE(jsonb_agg(DISTINCT value),'[]'::jsonb) FROM jsonb_array_elements(COALESCE(ls_progress.state->'found','[]'::jsonb)||(EXCLUDED.state->'found')))),updated_at=now() WHERE ls_progress.generation=${generation} RETURNING state,generation,updated_at`;
       return rows[0] || null;
     },
+    async exportFamily(parentId) {
+      const rows = await sql`SELECT id,email,created_at,privacy_version,parent_permission_at,permission_email_sent_at FROM ls_parents WHERE id=${parentId}`;
+      if (!rows[0]) return null;
+      const kids = await sql`SELECT id,name,avatar,active,created_at FROM ls_kids WHERE parent_id=${parentId} ORDER BY created_at`;
+      const progress = await sql`SELECT p.kid_id,p.lesson_id,p.state,p.generation,p.updated_at FROM ls_progress p JOIN ls_kids k ON k.id=p.kid_id WHERE k.parent_id=${parentId}`;
+      return privacyExport(rows[0],kids,progress);
+    },
+    async deleteChild(parentId, id, name) {
+      const rows = await sql`WITH removed AS(DELETE FROM ls_kids WHERE id=${id} AND parent_id=${parentId} AND name=${name} RETURNING id), receipt AS(INSERT INTO ls_deletions(subject_id,kind) SELECT id,'kid' FROM removed RETURNING subject_id) SELECT subject_id AS id FROM receipt`;
+      return Boolean(rows[0]);
+    },
+    async deleteFamily(parentId, email) {
+      const rows = await sql`WITH removed AS(DELETE FROM ls_parents WHERE id=${parentId} AND email=${email} RETURNING id,email), links AS(DELETE FROM ls_parent_links WHERE email IN(SELECT email FROM removed)), receipt AS(INSERT INTO ls_deletions(subject_id,kind) SELECT id,'parent' FROM removed) SELECT email FROM removed`;
+      return Boolean(rows[0]);
+    },
+    async parentPermission(parentId) {
+      await sql`UPDATE ls_parents SET privacy_version=${PRIVACY_VERSION},parent_permission_at=now(),permission_email_sent_at=NULL WHERE id=${parentId}`;
+    },
+    async permissionConfirmations() {
+      return sql`SELECT id,email,parent_permission_at FROM ls_parents WHERE parent_permission_at<now()-interval '30 minutes' AND permission_email_sent_at IS NULL ORDER BY parent_permission_at LIMIT 50`;
+    },
+    async markPermissionConfirmation(id,permissionAt) {
+      await sql`UPDATE ls_parents SET permission_email_sent_at=now() WHERE id=${id} AND parent_permission_at=${permissionAt} AND permission_email_sent_at IS NULL`;
+    },
     async cleanup() {
+      await sql`DELETE FROM ls_deletions WHERE deleted_at<now()-interval '35 days'`;
       await sql`DELETE FROM ls_sessions WHERE expires_at<now()`;
       await sql`DELETE FROM ls_limits WHERE expires_at<now()-interval '1 day'`;
       await sql`DELETE FROM ls_parent_links WHERE expires_at<now()-interval '1 day'`;

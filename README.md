@@ -151,3 +151,9 @@ Traffic progress uses the `traffic-lights` allowlisted lesson ID, independent lo
 Generate dependency notices with `node scripts/build-notices.mjs` after `npm ci` or dependency changes. Keep the corresponding firmware source/license archive with shipped HEX files.
 
 `VITE_PUBLIC_REPOSITORY` defaults to false. Only after the owner authorizes publication and anonymous GitHub access is verified, set it to `true` in the Production build environment and redeploy to show GitHub links in the home navigation and footer. This flag is public build configuration, not a credential. Keep production database/email credentials out of Preview environments.
+
+## Family privacy
+
+`/privacy/` describes the operator, data purposes, providers, storage, rights and owner-selected retention: family profiles/progress remain until the parent deletes them, without inactivity deletion. Parents confirm permission before creating profiles/links; the daily job sends a delayed confirmation. Family → Your family’s data downloads JSON or permanently deletes a child/family after a fresh parent email sign-in and typed confirmation. Child accounts cannot use these controls.
+
+Run migrations before deploying. Set a random server-only Production `CRON_SECRET` for the daily authenticated `/api/retention` cleanup/confirmation job. Never put it in VITE variables or Preview builds. See [privacy operations](docs/PRIVACY-OPERATIONS.md) for deletion receipts, restore procedures, provider/consent review and remaining operator/legal decisions. This implementation is not a compliance certification. Fonts now ship locally with OFL notices in `public/fonts/`.

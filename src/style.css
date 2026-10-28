@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+@import url("/fonts/fonts.css");
 :root {
   --paper: #f7f5ee;
   --cream: #efede3;
@@ -2657,3 +2657,7 @@ body.in-tour .lesson-nav {
   .lesson-picker{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
   .lesson-picker a{flex:1 1 100px;font-size:11px;padding:9px}
 }
+
+.family-privacy{border-block:1px solid var(--line);padding:16px 0;margin:16px 0}.family-privacy summary{cursor:pointer;font-weight:700}.family-privacy details{margin-top:18px}.family-privacy form{display:grid;gap:12px}.family-privacy input{width:100%;box-sizing:border-box}.family-privacy a{color:inherit}
+
+.parent-permission{display:grid;gap:12px;border:1px solid var(--line);padding:16px;margin-block:16px}.parent-permission input[type="checkbox"]{width:auto;margin-right:8px}

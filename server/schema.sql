@@ -12,3 +12,9 @@ CREATE TABLE IF NOT EXISTS ls_limits (key text PRIMARY KEY, count integer NOT NU
 ALTER TABLE ls_kids ADD COLUMN IF NOT EXISTS auth_version integer NOT NULL DEFAULT 0;
 ALTER TABLE ls_sessions ADD COLUMN IF NOT EXISTS auth_version integer NOT NULL DEFAULT 0;
 ALTER TABLE ls_kid_links ADD COLUMN IF NOT EXISTS auth_version integer NOT NULL DEFAULT 0;
+
+ALTER TABLE ls_parents ADD COLUMN IF NOT EXISTS privacy_version text;
+ALTER TABLE ls_parents ADD COLUMN IF NOT EXISTS parent_permission_at timestamptz;
+ALTER TABLE ls_parents ADD COLUMN IF NOT EXISTS permission_email_sent_at timestamptz;
+-- Minimal deletion receipts support safe restores and expire after 35 days.
+CREATE TABLE IF NOT EXISTS ls_deletions (subject_id uuid PRIMARY KEY, kind text NOT NULL CHECK(kind IN('parent','kid')), deleted_at timestamptz NOT NULL DEFAULT now());

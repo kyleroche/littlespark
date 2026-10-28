@@ -98,5 +98,11 @@
       "source": "/parent-login/:token",
       "destination": "/signin/index.html"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/retention",
+      "schedule": "0 8 * * *"
+    }
   ]
 }

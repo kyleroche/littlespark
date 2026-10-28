@@ -46,3 +46,11 @@ Support Build + Code, Build only, Code only, and Guided layouts. Keep instructio
 ## Work through an authorized roadmap
 
 When the user approves a multi-step roadmap, continue through the authorized sequence without asking to proceed after each lesson. Pause when the user asks, or report a concrete blocker. Do not treat this as authorization to invent additional work beyond that sequence.
+
+## Privacy and family data
+
+- Family data is only for providing/securing the requested service. Never sell it, use it for advertising, or train/fine-tune AI on it. Sparky uses prepared local hints.
+- Changes to data collection, providers, retention or parent controls must update `/privacy/`, the How-to and relevant home/tour explanations in the same change. Keep the public notice accurate; do not claim legal certification.
+- Child/family export and deletion require server-enforced parent ownership, the displayed profile ID, a fresh parent email session and explicit confirmation. Exports must never include credentials or link hashes.
+- Family accounts/progress stay until the parent deletes them. Do not add inactivity-based deletion without owner authorization. Purge expired security credentials daily and review ongoing necessity of child-data retention. Use disposable fixtures for retention/deletion tests.
+- Keep the daily job bearer-secret protected. Do not log recipients, nicknames, exported records, tokens or deletion details. Preserve deletion receipts before database restores and reapply them before serving restored data.

@@ -50,6 +50,7 @@ if (match) {
     }
   };
 } else {
+  if(new URLSearchParams(location.search).has("deleted")) $("#access-status").textContent="Your family account and saved progress were deleted.";
   api("me")
     .then((result) => {
       if (result.user)

@@ -1,3 +1,4 @@
+import { attachPrivacyControls } from "./family-privacy.js";
 import { LESSONS } from "./lesson-catalog.js";
 const escape = (s) =>
   String(s ?? "")
@@ -151,7 +152,7 @@ export function initAccounts({ onProfile, onNotice = () => {}, lesson = "first-c
       return;
     }
     if (user.role === "kid") {
-      content.innerHTML = `<div class="eyebrow">LEARNER PROFILE</div><h2>${avatars[user.avatar] || "🤖"} ${escape(user.name)}</h2><p>Your progress is saved to your profile and can follow you to another device.</p><button id="family-signout" class="button secondary">Sign out</button>`;
+      content.innerHTML = `<div class="eyebrow">LEARNER PROFILE</div><h2>${avatars[user.avatar] || "🤖"} ${escape(user.name)}</h2><p>Your progress is saved to your profile and can follow you to another device. Ask your grown-up to download or delete it in Family. <a href="/privacy/" target="_blank" rel="noopener noreferrer">Your privacy ↗</a></p><button id="family-signout" class="button secondary">Sign out</button>`;
       document.querySelector("#family-signout").onclick = logout;
       return;
     }
@@ -186,6 +187,7 @@ export function initAccounts({ onProfile, onNotice = () => {}, lesson = "first-c
       .join(
         "",
       )}</select></label><button class="button primary" type="submit">Create child profile</button></form></details><button id="family-signout" class="family-signout">Sign out</button>`;
+    attachPrivacyControls({panel,api,message,refresh,user,kids:grouped,escape});
     document.querySelector("#family-signout").onclick = logout;
     document.querySelector("#add-child").onsubmit = async (e) => {
       e.preventDefault();

@@ -26,3 +26,7 @@ The lab requires a server-validated parent or child session. Vercel Node routing
 A clean automated scan reduces risk; it is not a guarantee that the application has no vulnerabilities.
 
 See [the current release review](docs/PUBLIC-RELEASE-REVIEW.md) for audit evidence, author-email exposure and outstanding privacy/data-lifecycle work. Source publication is separate from service privacy readiness.
+
+## Family data controls
+
+Parent export/deletion requires a matching displayed identity and parent email session created within 15 minutes; child deletion also matches the owned nickname, and family deletion matches email plus DELETE. Foreign origins and child/sibling access are rejected. Cascades remove access and lesson records. The daily job requires CRON_SECRET and only purges expired technical records/sends delayed parent permission confirmations; it does not expire families. See [privacy operations](docs/PRIVACY-OPERATIONS.md) for restore safeguards and remaining legal/provider work.

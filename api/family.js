@@ -1,3 +1,4 @@
+import { recentParent, PRIVACY_VERSION } from "../server/privacy.js";
 import { createStore } from "../server/store.js";
 import {
   readCookie,
@@ -88,7 +89,7 @@ export default async function handler(req, res) {
       if (!session) return send(res, 200, { user: null });
       if (session.role === "parent")
         return send(res, 200, {
-          user: { role: "parent", id: session.id, email: session.email },
+          user: { role: "parent", id: session.id, email: session.email, privacyVersion:session.privacy_version },
           kids: await store.children(session.id),
         });
       return send(res, 200, {
@@ -207,6 +208,10 @@ export default async function handler(req, res) {
         "kid-link",
         "update-child",
         "revoke-child",
+        "parent-permission",
+        "export-family",
+        "delete-child",
+        "delete-family",
       ].includes(action) &&
       input.profileId !== session.id
     )
@@ -239,6 +244,26 @@ export default async function handler(req, res) {
     }
     if (session.role !== "parent")
       return send(res, 403, { error: "This action needs a parent account." });
+    if (action === "parent-permission" && req.method === "POST") {
+      if (!recentParent(session)) return send(res,403,{error:"Sign out and use a new parent email link to confirm permission."});
+      if (input.parentPermission !== true || input.privacyVersion !== PRIVACY_VERSION) return send(res,400,{error:"Confirm you are the parent or legal guardian and have read the privacy notice."});
+      await store.parentPermission(session.id);
+      return send(res,200,{ok:true});
+    }
+    if (["add-child","kid-link"].includes(action) && session.privacy_version !== PRIVACY_VERSION) return send(res,403,{error:"Read the privacy notice and confirm parent permission in Family first."});
+    if (["export-family","delete-child","delete-family"].includes(action) && req.method === "POST") {
+      if (!recentParent(session)) return send(res,403,{code:"RECENT_SIGNIN_REQUIRED",error:"For family data controls, sign out and use a new parent email link. Then try again within 15 minutes."});
+      if (action === "export-family") return send(res,200,{data:await store.exportFamily(session.id)});
+      if (action === "delete-child") {
+        if (!uuid(input.id) || typeof input.confirmName !== "string") return send(res,400,{error:"Enter the child's exact nickname to confirm."});
+        if (!await store.deleteChild(session.id,input.id,input.confirmName)) return send(res,404,{error:"Profile not found or nickname did not match."});
+        return send(res,200,{ok:true});
+      }
+      if (input.confirmEmail !== session.email || input.confirmDelete !== "DELETE") return send(res,400,{error:"Enter your email and DELETE to confirm."});
+      if (!await store.deleteFamily(session.id,input.confirmEmail)) return send(res,404,{error:"Family not found."});
+      res.setHeader("Set-Cookie",sessionCookie("",{secure,maxAge:0}));
+      return send(res,200,{ok:true});
+    }
     if (action === "add-child" && req.method === "POST")
       return send(res, 201, {
         kid: await store.addChild(

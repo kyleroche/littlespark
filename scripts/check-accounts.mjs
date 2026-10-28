@@ -61,6 +61,9 @@ try {
   );
   const tokenB = await store.parentLink(emailB);
   parentB = await store.consumeParent(tokenB);
+  assert.equal((await request("parent-permission",parentA.token,{parentPermission:false,privacyVersion:"2026-10-27"})).status,400);
+  await store.parentPermission(parentA.user.id);
+  await store.parentPermission(parentB.user.id);
   const kid = await store.addChild(parentA.user.id, "QA learner", "robot");
   assert.equal(
     await store.childLink(parentB.user.id, kid.id),
@@ -251,6 +254,36 @@ try {
     Array.from({ length: 5 }, () => store.limit("qa-" + suffix, 3, 60000)),
   );
   assert.equal(limits.filter(Boolean).length, 3);
+  // Privacy controls operate only on disposable families created above.
+  assert.equal((await request("export-family",login.token,{})).status,401);
+  const kidExport=await request("export-family",siblingLogin.token,{});assert.equal(kidExport.status,403);
+  const permission=await request("parent-permission",parentA.token,{parentPermission:true,privacyVersion:"2026-10-27"});assert.equal(permission.status,200);
+  const exported=await request("export-family",parentA.token,{});assert.equal(exported.status,200);
+  assert.equal(exported.data.parent.email,emailA);
+  assert.ok(exported.data.children.every(k=>k.id!==parentB.user.id));
+  assert.ok(!JSON.stringify(exported.data).includes("auth_version"));
+  assert.ok(!JSON.stringify(exported.data).includes(login.token));
+  await sql`UPDATE ls_sessions SET created_at=now()-interval '16 minutes' WHERE parent_id=${parentA.user.id}`;
+  assert.equal((await request("export-family",parentA.token,{})).status,403);
+  await sql`UPDATE ls_sessions SET created_at=now() WHERE parent_id=${parentA.user.id}`;
+  const privacyKid=await store.addChild(parentA.user.id,"Delete fixture","robot");
+  await store.saveProgress(privacyKid.id,{step:3});
+  const privacyLink=await store.childLink(parentA.user.id,privacyKid.id),privacyLogin=await store.consumeChild(privacyLink.code);
+  assert.equal((await request("delete-child",parentB.token,{id:privacyKid.id,confirmName:"Delete fixture"})).status,404);
+  assert.equal((await request("delete-child",parentA.token,{id:privacyKid.id,confirmName:"Wrong"})).status,404);
+  assert.equal((await request("delete-child",parentA.token,{id:privacyKid.id,confirmName:"Delete fixture"})).status,200);
+  assert.equal(await store.session(privacyLogin.token),null);
+  assert.equal((await sql`SELECT count(*)::int AS n FROM ls_progress WHERE kid_id=${privacyKid.id}`)[0].n,0);
+  assert.equal((await sql`SELECT count(*)::int AS n FROM ls_deletions WHERE subject_id=${privacyKid.id}`)[0].n,1);
+  await sql`DELETE FROM ls_deletions WHERE subject_id=${privacyKid.id}`;
+  const familyKid=await store.addChild(parentB.user.id,"Family deletion fixture","fox");
+  const familyLink=await store.childLink(parentB.user.id,familyKid.id),familyLogin=await store.consumeChild(familyLink.code);
+  assert.equal((await request("delete-family",parentA.token,{confirmEmail:emailB,confirmDelete:"DELETE"})).status,400);
+  assert.equal((await request("delete-family",parentB.token,{confirmEmail:emailB,confirmDelete:"wrong"})).status,400);
+  assert.equal((await request("delete-family",parentB.token,{confirmEmail:emailB,confirmDelete:"DELETE"})).status,200);
+  assert.equal(await store.session(parentB.token),null);assert.equal(await store.session(familyLogin.token),null);
+  assert.equal((await sql`SELECT count(*)::int AS n FROM ls_parent_links WHERE email=${emailB}`)[0].n,0);
+  await sql`DELETE FROM ls_deletions WHERE subject_id=${parentB.user.id}`;
   console.log(
     "Database checks passed: atomic single use, expiry, parent isolation, profile revocation, progress merge/reset, and rate limits.",
   );
