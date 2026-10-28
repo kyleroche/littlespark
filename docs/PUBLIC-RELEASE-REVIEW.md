@@ -1,10 +1,10 @@
 # Public release review
 
-Reviewed October 27, 2026, against baseline `d5a7032` and the release-preparation changes accompanying this document. The repository remains private. This review does not authorize a visibility change.
+Reviewed October 27, 2026, against baseline `d5a7032` and the release-preparation changes accompanying this document. The owner subsequently authorized a fresh public repository containing sanitized history, with the original repository preserved as a private archive.
 
 ## Result
 
-No committed credentials were found in the fetched history. The original code and lesson text are now MIT licensed; the brand and artwork are reserved under [BRAND.md](../BRAND.md). Publication still requires the owner's authorization and resolution of the retained pull-request history described below. This is a scoped audit, not a guarantee that the application has no vulnerabilities.
+No committed credentials were found in the fetched history. The original code and lesson text are now MIT licensed; the brand and artwork are reserved under [BRAND.md](../BRAND.md). The owner authorized publication from a fresh repository so the original pull-request references remain private. This is a scoped audit, not a guarantee that the application has no vulnerabilities.
 
 ## Evidence
 
@@ -18,9 +18,9 @@ No committed credentials were found in the fetched history. The original code an
 
 ## Publication details
 
-At the owner's request, both branch histories were rewritten to replace the work email with the GitHub no-reply address. File trees were verified unchanged, and future local commits use the no-reply address. GitHub still retains the original merged pull request #1 head/merge references, which contain the previous metadata. Those references cannot be overwritten through a normal branch push. Keep the repository private until the owner chooses GitHub-assisted removal or a fresh repository containing only sanitized history. An ignored local backup preserves recovery; do not publish that backup.
+At the owner's request, both branch histories were rewritten to replace the work email with the GitHub no-reply address. File trees were verified unchanged, and future local commits use the no-reply address. GitHub retained the original merged pull-request references despite the branch rewrite. The owner authorized preserving that repository as `littlespark-private-archive` (private and archived), and publishing only sanitized history in a new `kyleroche/littlespark` repository. Old pull-request references and local recovery backups are excluded from the public repository. Do not publish the archive or push backup/mirror refs.
 
-The home navigation and footer have a prepared GitHub link controlled by the public build flag `VITE_PUBLIC_REPOSITORY=true`. Leave it false while the repository is private. After explicit publication authorization, change visibility, verify anonymous repository access, enable the flag for Production and redeploy. The public footer already links to dependency licenses.
+The home navigation and footer link to the public source when the Production build flag `VITE_PUBLIC_REPOSITORY=true` is enabled. Verify anonymous repository access and the Vercel Git connection to the new repository ID before enabling it. The public footer also links to dependency licenses.
 
 ## Existing service gaps, separate from source publication
 

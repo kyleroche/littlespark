@@ -112,7 +112,7 @@ Safari supports the workbench, lessons, accounts, and simulator. Direct USB uplo
 
 ## Community lessons
 
-See [the proposed contribution format](docs/LESSON-CONTRIBUTIONS.md). The current application still uses a fixed scene for its first circuit; the document describes the schema and preview workflow to implement before accepting drop-in lesson packages. See [the release review](docs/PUBLIC-RELEASE-REVIEW.md) and [SECURITY.md](SECURITY.md) for evidence and remaining public-release checks. The repository remains private pending explicit owner authorization. Original code and lesson text use [MIT](LICENSE); the name, logos, Sparky and artwork are reserved under [BRAND.md](BRAND.md). Dependencies and compiled firmware retain their own licenses; see [firmware licensing](docs/FIRMWARE-LICENSING.md) and [runtime notices](public/THIRD_PARTY_NOTICES.txt).
+See [the proposed contribution format](docs/LESSON-CONTRIBUTIONS.md). The current application still uses a fixed scene for its first circuit; the document describes the schema and preview workflow to implement before accepting drop-in lesson packages. See [the release review](docs/PUBLIC-RELEASE-REVIEW.md) and [SECURITY.md](SECURITY.md) for evidence and remaining public-release checks. The owner authorized publication of the sanitized source on October 27, 2026. The original repository and its old pull-request metadata remain in a separate private archive. Original code and lesson text use [MIT](LICENSE); the name, logos, Sparky and artwork are reserved under [BRAND.md](BRAND.md). Dependencies and compiled firmware retain their own licenses; see [firmware licensing](docs/FIRMWARE-LICENSING.md) and [runtime notices](public/THIRD_PARTY_NOTICES.txt).
 
 ## Sparky’s guided code help
 

@@ -21,7 +21,7 @@ Every addition, removal, or change to a user-facing feature MUST update the in-a
 
 ## Development and release
 
-- Source: https://github.com/kyleroche/littlespark (private).
+- Source: https://github.com/kyleroche/littlespark (public).
 - Brand: **Little Spark** (singular). Canonical domain: `littlespark.tech`.
 - Hosting: Vercel project `little-sparks`; preserve the existing project and fallback production alias.
 - Existing `little-sparks-*` local-storage keys intentionally preserve returning learners’ progress.
@@ -37,7 +37,7 @@ Support Build + Code, Build only, Code only, and Guided layouts. Keep instructio
 
 ## Accounts and public contributions
 
-- Keep the repository private until the owner explicitly authorizes a visibility change.
+- Public source publication was authorized by the owner on October 27, 2026. Keep `littlespark-private-archive` private and archived. Never push local backup/mirror refs, old pull-request refs, credentials or learner data to the public repository.
 - Never commit `.env` files, credentials, user data, or child login links.
 - Parent and child authorization must be enforced in the API, never by client-provided roles or IDs. Kid links expire after five minutes, are hashed in storage, and are consumed atomically once.
 - Do not expose production database or email credentials to preview builds or community PRs.

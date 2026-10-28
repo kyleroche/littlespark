@@ -1,6 +1,6 @@
 # Security
 
-This repository is private pending an explicit release decision by its owner. Do not publish credentials, learner data, or active login links in issues or pull requests. Report vulnerabilities privately to the repository owner; enable GitHub private vulnerability reporting when the repository is made public.
+This repository contains the sanitized public source. The original repository remains separately private and archived. Do not publish credentials, learner data, or active login links in issues or pull requests. Report vulnerabilities privately through GitHub’s private vulnerability reporting, rather than in a public issue.
 
 ## Trust boundaries
 
@@ -25,7 +25,7 @@ The lab requires a server-validated parent or child session. Vercel Node routing
 
 A clean automated scan reduces risk; it is not a guarantee that the application has no vulnerabilities.
 
-See [the current release review](docs/PUBLIC-RELEASE-REVIEW.md) for audit evidence, author-email exposure and outstanding privacy/data-lifecycle work. Source publication is separate from service privacy readiness.
+See [the current release review](docs/PUBLIC-RELEASE-REVIEW.md) for audit evidence, the private archive decision and outstanding privacy/data-lifecycle work. Source publication is separate from service privacy readiness.
 
 ## Family data controls
 
