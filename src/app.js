@@ -402,6 +402,7 @@ function render() {
 function go(step) {
   if (isTour()) exitTour(false);
   if (step !== state.step) {
+    $(".instruction-card").scrollTo({top:0,behavior:"instant"});
     invalidate();
     simStatus(
       step === 5
@@ -765,6 +766,7 @@ function advanceTour(direction) {
 }
 function renderTour() {
   const step = TOUR_STEPS[tourIndex];
+  if(lastTourStep !== tourIndex)$(".instruction-card").scrollTo({top:0,behavior:"instant"});
   placementGuide.show(state.step,step.feature === "pin-placement");
   $("#placement-help").hidden=step.feature!=="pin-placement";
   resistorGuide.show(step.feature === "resistor-guide", step.feature === "resistor-guide" ? true : undefined);

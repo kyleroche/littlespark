@@ -98,7 +98,7 @@ Keep unrelated mail records. Verify after DNS changes with `vercel domains verif
 
 ## Workspace and accounts
 
-Choose **Build + Code**, **Build only**, **Code only**, or **Guided** above the workbench. Build + Code displays both panes side by side on wider screens and stacks them on narrow screens. The lesson controls stay available below the panes. Layout preference is browser-local.
+Choose **Build + Code**, **Build only**, **Code only**, or **Guided** above the workbench. Build + Code displays both panes side by side on wider screens and stacks them on narrow screens. The lesson controls stay available below the panes. Guided uses a wider instruction panel on screens above 1100px. Its content scrolls independently with scroll chaining contained; the workbench height stays fixed while reading. Keyboard users can focus the instruction region and scroll it. New steps and layout changes reset its scroll position. At 1100px and below, Guided stacks the panels with normal page scrolling. Layout preference is browser-local.
 
 Parents sign in with a single-use email link. The parent dashboard can create and rename child profiles, view step completion, generate a five-minute child login link/QR code, and revoke child sessions. Kids do not provide email addresses or passwords. Links use friendly words plus a random suffix, are stored as hashes, and are consumed atomically. Signed-in child progress is stored in Neon Postgres; parent practice stays on the device. Progress resets invalidate stale writes from other devices. Account changes in another tab block stale saves and show a persistent message with Reload. Locally recovered progress is sent back to the server after sign-in.
 

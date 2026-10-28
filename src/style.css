@@ -2663,3 +2663,60 @@ body.in-tour .lesson-nav {
 .parent-permission{display:grid;gap:12px;border:1px solid var(--line);padding:16px;margin-block:16px}.parent-permission input[type="checkbox"]{width:auto;margin-right:8px}
 #board-model { display:block; width:100%; margin:.5rem 0; padding:.8rem 1rem; border:1px solid var(--line, #d3d8c8); border-radius:8px; background:#f4f3e9; color:#29483f; font:inherit; }
 label[for="board-model"] {display:block; margin-top:1rem; font-weight:600;}
+
+/* Guided reading: the instructions scroll independently of the workbench. */
+@media (min-width: 1101px) {
+  .learning-layout[data-layout="guided"] .workspace {
+    grid-template-columns: minmax(0, 1fr) clamp(360px, 38%, 600px);
+    height: var(--guided-pane-height, clamp(300px, calc(100dvh - 380px), 900px));
+    align-items: stretch;
+  }
+  .learning-layout[data-layout="guided"] .stage-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+  .learning-layout[data-layout="guided"] .stage-card #scene {
+    flex: 1 1 0;
+    height: auto;
+    min-height: 180px;
+  }
+  .learning-layout[data-layout="guided"] .stage-card > :not(#scene) {
+    flex-shrink: 0;
+  }
+  .learning-layout[data-layout="guided"] .instruction-card,
+  body.in-tour .learning-layout[data-layout="guided"] .instruction-card {
+    position: relative;
+    top: auto;
+    display: block;
+    height: 100%;
+    min-height: 0;
+    min-width: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-gutter: stable;
+    padding: 24px;
+    scroll-padding-block: 24px;
+  }
+  .learning-layout[data-layout="guided"] .instruction-card .step-art {
+    font-size: 38px;
+    margin: 18px 0 12px;
+  }
+  .learning-layout[data-layout="guided"] .instruction-card h2 {
+    font-size: 27px;
+    margin-top: 14px;
+  }
+  .learning-layout[data-layout="guided"] .instruction-card .instruction-content > p {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .learning-layout[data-layout="guided"] .instruction-card .instruction-actions {
+    margin-top: 22px;
+  }
+}
+@media (min-width: 761px) and (max-width: 1100px) {
+  .learning-layout[data-layout="guided"] .workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

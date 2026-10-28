@@ -55,7 +55,7 @@ export const TOUR_STEPS = [
       "Build + Code puts the 3D workbench beside the editor on a wide screen. Build only and Code only give either pane more room.",
     tip: "Keep the instructions nearby.",
     detail:
-      "The lesson and Next button stay below the workspace. Guided restores the lesson panel beside the workbench. Your choice is saved in this browser. The tour shows both panes and restores your layout when you leave.",
+      "The lesson and Next button stay below the workspace. Guided gives the instructions a wider panel beside the workbench. On a large screen, scroll inside that panel to read while the workbench stays in place. The panel starts at the top for each new step. Smaller screens stack the panels and scroll the page. Your choice is saved in this browser. The tour shows both panes and restores your layout when you leave.",
     action: "Try Build + Code",
     demo: "layout",
   },
