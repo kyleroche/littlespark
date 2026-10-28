@@ -65,7 +65,7 @@ Drag to rotate and tilt. Choose **Move**, Shift-drag, right-drag, or middle-drag
 
 ## Assets and dependencies
 
-Models and interface are original and authored in this repository. Three.js and AVR8js are MIT-licensed dependencies; their licenses are retained by npm. Arduino's compiled core is LGPL-2.1; the source sketches and toolchain/core version are included, and corresponding core source is available at https://github.com/arduino/ArduinoCore-avr/tree/1.8.8. Interface fonts are loaded from Google Fonts.
+Models and interface are original and authored in this repository. Three.js and AVR8js are MIT-licensed dependencies; their licenses are retained by npm. Arduino's compiled core is LGPL-2.1; the source sketches and toolchain/core version are included, and corresponding core source is available at https://github.com/arduino/ArduinoCore-avr/tree/1.8.8. Interface fonts are self-hosted under SIL Open Font License 1.1; the app makes no Google Fonts requests.
 
 The visual exploration was inspired by Dilum Sanjaya's Learn Arduino (https://learn-arduino-red.vercel.app/). No reference-site code or models are included.
 
